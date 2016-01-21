@@ -6,7 +6,7 @@ public abstract class Message {
 	
 	private OpCode opCode;
 	
-	public Message(byte[] bytes) {
+	public Message(byte[] bytes) throws InvalidMessageException {
 		decode(bytes);
 	}
 	
@@ -14,7 +14,7 @@ public abstract class Message {
 		this.opCode = opCode;
 	}
 	
-	protected void decode(byte[] bytes) {
+	protected void decode(byte[] bytes) throws InvalidMessageException {
 		this.opCode = OpCode.convert(bytes[1]);
 	}
 	
