@@ -1,2 +1,13 @@
-/bin/
+# Hidden Files
 .*
+
+# Autosaves
+*~
+\#*\#
+
+# Binary files
+*.jar
+*.class
+
+# Output
+bin

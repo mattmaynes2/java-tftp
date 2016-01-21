@@ -14,15 +14,7 @@ public abstract class Message {
 		this.opCode = opCode;
 	}
 	
-	protected void decode(byte[] bytes) throws InvalidMessageException{
-		if (bytes[0] != 0) {
-			throw new InvalidMessageException("The first byte of the opCode is not 0.");
-		}
-		
-		if (!OpCode.isValid(bytes[1])) {
-			throw new InvalidMessageException("The second byte of the opCode does not represent a valid message.");
-		}
-		
+	protected void decode(byte[] bytes) throws InvalidMessageException {
 		this.opCode = OpCode.convert(bytes[1]);
 	}
 	
