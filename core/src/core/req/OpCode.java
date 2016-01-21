@@ -1,3 +1,4 @@
+package core.req;
 
 public enum OpCode {
     READ    ((byte) 0x01),
