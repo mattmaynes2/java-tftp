@@ -42,7 +42,7 @@ public class AckMessage extends Message {
 	
 	@Override
 	public byte[] toBytes() {
-	ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			out.write(super.toBytes());
 			out.write(ByteUtils.intToByteArray(blockNum));
