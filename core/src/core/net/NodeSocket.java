@@ -7,6 +7,7 @@ import core.req.InvalidMessageException;
 
 import java.util.Arrays;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.DatagramSocket;
@@ -26,7 +27,7 @@ public class NodeSocket {
     }
 
     public void send (Message message) throws IOException {
-        this.sed(message, this.address);
+        this.send(message, this.address);
     }
 
     public void send (Message message, SocketAddress address) throws IOException {

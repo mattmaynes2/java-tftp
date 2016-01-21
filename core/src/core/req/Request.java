@@ -20,7 +20,7 @@ public abstract class Request extends Message {
         super(code);
     }
 
-    public Request (byte[] data) {
+    public Request (byte[] data) throws InvalidMessageException {
         super(data);
     }
 
@@ -40,18 +40,18 @@ public abstract class Request extends Message {
         return this.filename;
     }
 
-    protected void decode (byte[] data) {
+    protected void decode (byte[] data) throws InvalidMessageException {
         int fileIndex, modeIndex;
 
         super.decode(data);
 
-        fileIndex = ByteUtils.indexOf(data, 2, 0x00);
+        fileIndex = ByteUtils.indexOf(data, 2, (byte) 0x00);
         this.filename = new String(Arrays.copyOfRange(data, 2, fileIndex));
 
-        modeIndex = ByteUtils.indexOf(data, fileIndex + 1, 0x00);
-        this.mode = RequestMode.convert(
+        modeIndex = ByteUtils.indexOf(data, fileIndex + 1, (byte) 0x00);
+        this.mode = RequestMode.convert(new String(
             Arrays.copyOfRange(data, fileIndex, modeIndex)
-            );
+            ));
 
     }
 

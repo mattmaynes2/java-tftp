@@ -15,7 +15,7 @@ public enum RequestMode {
         return this.mode;
     }
 
-    public static RequestMode covert (String mode){
+    public static RequestMode convert (String mode){
         switch(mode.toLowerCase()){
             case "netascii":
                 return RequestMode.ASCII;
@@ -23,5 +23,9 @@ public enum RequestMode {
                 return RequestMode.BINARY;
         }
     }
+
+	public byte[] getBytes() {
+		return this.mode.getBytes();
+	}
 
 }
