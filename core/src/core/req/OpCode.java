@@ -17,5 +17,15 @@ public enum OpCode {
         return this.code;
     }
 
-
+    public static OpCode convert(byte code) {
+    	return OpCode.values()[code - 1];
+    }
+    
+    public static boolean isValid(byte code) {
+    	if (code < 1 || code > 5) {
+    		return false;
+    	}
+    	
+    	return true;
+    }
 }
