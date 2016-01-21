@@ -9,7 +9,7 @@ public class CommandFactory {
 	static final String WRITE_COMMAND_INPUT = "write";
 	static final String SHUTDOWN_COMMAND_INPUT = "shutdown";
 	
-	static Command createCommand(String input) throws CommandInputError{
+	static Command createCommand(String input) throws CommandInputException{
 		StringTokenizer tokenizer = new StringTokenizer(input);
 		Command returnCommand;
 		
@@ -26,12 +26,12 @@ public class CommandFactory {
 					returnCommand = createShutdownCommand();
 					break;
 				default:
-					throw new CommandInputError("Unknown command in input:\n " + input);
+					throw new CommandInputException("Unknown command in input:\n " + input);
 			}
 		}catch(NoSuchElementException ex){
-			throw new CommandInputError("Input does not contain a valid command:\n " + input);
+			throw new CommandInputException("Input does not contain a valid command:\n " + input);
 		}
-		return null;	
+		return returnCommand;	
 	}
 	
 	private static Command createReadCommand(String fileName){
