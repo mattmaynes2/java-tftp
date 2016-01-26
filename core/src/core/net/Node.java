@@ -16,14 +16,6 @@ public abstract class Node implements CommandHandler {
 
     private CLI cli;
 
-    public Node () throws SocketException {
-        this.socket = new NodeSocket();
-    }
-
-    public Node (int port) throws SocketException {
-        this.socket = new NodeSocket(port);
-    }
-
     public void start () {
         this.cli = new CLI(this.interpreter, System.in, System.out);
         this.cli.addCommandHandler(this);
