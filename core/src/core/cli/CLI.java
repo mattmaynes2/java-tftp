@@ -8,64 +8,64 @@ import java.util.Scanner;
 
 public class CLI implements Runnable {
 
-	private InputStream in;
-	private OutputStream out;
-	private boolean running;
-	private ArrayList<CommandHandler> handlers;
-	private final String PROMPT = "\n> ";
-	
-	public CLI(InputStream in, OutputStream out){
-		this.in =  in;
-		this.out = out;
-		this.running = false;
-		this.handlers = new ArrayList<CommandHandler>();
-	}
-	
-	public void run(){
-		setRunning(true);
-		Scanner sc = new Scanner(in);
-		
-		while (isRunning()){
-			write(PROMPT);
-			String line = sc.nextLine();
-			try {
-				Command command = CommandFactory.createCommand(line);
-				notifyHandlers(command);
-			} catch (CommandInputException e) {
-				write(e.getMessage() + "\n");
-			}
-		}
-		
-		sc.close();
-	}
-	
-	public void stop(){
-		setRunning(false);
-	}
-	
-	public void addCommandHandler(CommandHandler handler){
-		handlers.add(handler);
-	}
-	
-	public void notifyHandlers(Command command){
-		for (CommandHandler handler : handlers){
-			command.execute(handler);
-		}
-	}
-	
-	private void write(String output){
-		try {
-			out.write(output.getBytes());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private synchronized void setRunning(boolean value){
-		this.running = value;
-	}
-	
-	private synchronized boolean isRunning(){
-		return running;
-	}
+    private InputStream in;
+    private OutputStream out;
+    private boolean running;
+    private ArrayList<CommandHandler> handlers;
+    private final String PROMPT = "\n> ";
+
+    public CLI(InputStream in, OutputStream out){
+        this.in =  in;
+        this.out = out;
+        this.running = false;
+        this.handlers = new ArrayList<CommandHandler>();
+    }
+
+    public void run(){
+        setRunning(true);
+        Scanner sc = new Scanner(in);
+
+        while (isRunning()){
+            write(PROMPT);
+            String line = sc.nextLine();
+            try {
+                Command command = CommandFactory.createCommand(line);
+                notifyHandlers(command);
+            } catch (CommandInputException e) {
+                write(e.getMessage() + "\n");
+            }
+        }
+
+        sc.close();
+    }
+
+    public void stop(){
+        setRunning(false);
+    }
+
+    public void addCommandHandler(CommandHandler handler){
+        handlers.add(handler);
+    }
+
+    public void notifyHandlers(Command command){
+        for (CommandHandler handler : handlers){
+            command.execute(handler);
+        }
+    }
+
+    private void write(String output){
+        try {
+            out.write(output.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private synchronized void setRunning(boolean value){
+        this.running = value;
+    }
+
+    private synchronized boolean isRunning(){
+        return running;
+    }
 }

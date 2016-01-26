@@ -46,4 +46,7 @@ public class NodeSocket {
             );
     }
 
+    public void close () {
+        this.socket.close();
+    }
 }
