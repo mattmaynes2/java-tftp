@@ -15,15 +15,15 @@ public class CLI implements Runnable {
     private final String PROMPT = "\n> ";
     private CommandInterpreter interpreter;
 
-    public CLI(InputStream in, OutputStream out){
+    public CLI(CommandInterpreter interpreter, InputStream in, OutputStream out){
         this.in =  in;
         this.out = out;
         this.running = false;
         this.handlers = new ArrayList<CommandHandler>();
-        this.interpreter = new CommandInterpreter();
+        this.interpreter = interpreter;
     }
 
-    public void run(){
+    public void run (){
         setRunning(true);
         Scanner sc = new Scanner(in);
 
@@ -31,7 +31,7 @@ public class CLI implements Runnable {
             write(PROMPT);
             String line = sc.nextLine();
             try {
-                Command command = CommandFactory.createCommand(line);
+                Command command = this.interpreter.parseCommand(line);
                 notifyHandlers(command);
             } catch (CommandInputException e) {
                 write(e.getMessage() + "\n");
@@ -51,7 +51,7 @@ public class CLI implements Runnable {
 
     public void notifyHandlers(Command command){
         for (CommandHandler handler : handlers){
-            command.execute(handler);
+            handler.handleCommand(command);
         }
     }
 

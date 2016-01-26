@@ -1,22 +1,21 @@
 package core.cli;
 
-import core.cli.CommandToken;
 import core.cli.Command;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class CommandInterpreter {
 
-    private HashMap<CommandToken, Class<Command>> commands;
+    private ArrayList<String> commands ;
 
     public CommandInterpreter () {
-        this.commands = new HashMap<CommandToken, Class<Command>>();
+        this.commands = new ArrayList<String>();
     }
 
-    public void addCommand(Command command, Class<Command> constructor){
-        this.commands.put(command.getToken(), constructor);
+    public void addCommand(String token){
+        this.commands.add(token);
     }
 
     public Command parseCommand(String input) throws CommandInputException {
@@ -28,17 +27,12 @@ public class CommandInterpreter {
     private Command interpretCommand(String commandToken, StringTokenizer tokenizer)
         throws CommandInputException {
 
-        try {
-            for(CommandToken token : this.commands.keySet()){
-                if(token.getToken().equals(commandToken)){
-                    return token.getArgumentCount() == 0 ?
-                        this.commands.get(token).getConstructor().newInstance() :
-                        this.commands.get(token).getConstructor(String.class).newInstance(tokenizer.nextToken());
-                }
+        for(String token : this.commands){
+            if(token.equals(commandToken)){
+                return tokenizer.hasMoreTokens() ?
+                    new Command(commandToken, tokenizer.nextToken()) :
+                    new Command(commandToken);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
         }
 
         throw new CommandInputException("Unknown command: " + commandToken + ". Type 'help' for instructions");
