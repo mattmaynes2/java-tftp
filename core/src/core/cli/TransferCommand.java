@@ -2,13 +2,13 @@ package core.cli;
 
 public abstract class TransferCommand extends Command {
 
-    private String fileName;
+    private String filename;
 
-    public TransferCommand(String fileName){
-        this.fileName = fileName;
+    public TransferCommand(String filename){
+        this.filename = filename;
     }
 
-    public String getFileName(){
-        return fileName;
+    public String getFilename(){
+        return filename;
     }
 }

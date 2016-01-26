@@ -13,12 +13,14 @@ public class CLI implements Runnable {
     private boolean running;
     private ArrayList<CommandHandler> handlers;
     private final String PROMPT = "\n> ";
+    private CommandInterpreter interpreter;
 
     public CLI(InputStream in, OutputStream out){
         this.in =  in;
         this.out = out;
         this.running = false;
         this.handlers = new ArrayList<CommandHandler>();
+        this.interpreter = new CommandInterpreter();
     }
 
     public void run(){
