@@ -3,8 +3,8 @@ package core.run;
 import core.run.Controller;
 
 import core.net.NodeSocket;
-import core.net.ReadTransferRunner;
-import core.net.WriteTransferRunner;
+import core.net.ReadTransfer;
+import core.net.WriteTransfer;
 import core.net.RequestHandler;
 
 import core.req.Request;
@@ -37,12 +37,12 @@ public abstract class RequestController extends Controller implements RequestHan
     }
 
     public void read (String filename){
-        WriteTransferRunner runner;
+        WriteTransfer runner;
         FileInputStream in;
 
         try {
             in = new FileInputStream(filename);
-            runner = new WriteTransferRunner(this.socket, in);
+            runner = new WriteTransfer(this.socket, in);
 
             (new Thread(runner)).start();
         } catch (Exception e){
@@ -52,12 +52,12 @@ public abstract class RequestController extends Controller implements RequestHan
     }
 
     public void write (String filename){
-        ReadTransferRunner runner;
+        ReadTransfer runner;
         FileOutputStream out;
 
         try {
             out = new FileOutputStream(filename);
-            runner = new ReadTransferRunner(this.socket, out);
+            runner = new ReadTransfer(this.socket, out);
 
             // Send the initial Ack
             this.socket.send(new AckMessage((short)0));
