@@ -13,7 +13,7 @@ public class DataMessage extends AckMessage {
         super(bytes);
     }
 
-    public DataMessage (int block, byte[] data) {
+    public DataMessage (short block, byte[] data) {
         super(OpCode.DATA,block);
         this.data=data;
     }

@@ -1,20 +1,18 @@
 package core.req;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-
-import core.util.ByteUtils;
-
+import java.nio.ByteBuffer;
 
 public class AckMessage extends Message {
 
-    private int block;
+    private short block;
 
     public AckMessage(byte[] bytes) throws InvalidMessageException {
         super(bytes);
+        this.decode(bytes);
     }
 
-    public AckMessage(int block){
+    public AckMessage(short block){
         super(OpCode.ACK);
         this.block=block;
     }
@@ -22,16 +20,16 @@ public class AckMessage extends Message {
     /**
      * Constructor used by classes that extend AckMessage
      */
-    protected AckMessage(OpCode opcode,int block) {
+    protected AckMessage(OpCode opcode,short block) {
         super(opcode);
         this.block=block;
     }
 
-    public int getBlock() {
+    public short getBlock() {
         return this.block;
     }
 
-    public void setBlock(int block) {
+    public void setBlock(short block) {
         this.block = block;
     }
 
@@ -46,15 +44,23 @@ public class AckMessage extends Message {
             throw new InvalidMessageException("Ack Message must be 4 bytes");
         }
         super.decode(bytes);
-        this.block= ByteUtils.bytesToInt(Arrays.copyOfRange(bytes, 2, 4));
+        
+        ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 4);
+        
+        this.block= wrapper.getShort();
     }
 
     @Override
     public byte[] toBytes() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteBuffer b = ByteBuffer.allocate(2);
+	    b.putShort(this.block);
+	
+	    byte[] result = b.array();
+	      
         try {
             out.write(super.toBytes());
-            out.write(ByteUtils.intToByteArray(block));
+            out.write(result);
         } catch (IOException e) {
             e.printStackTrace();
         }
