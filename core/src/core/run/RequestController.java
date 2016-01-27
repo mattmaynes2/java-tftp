@@ -55,7 +55,7 @@ public abstract class RequestController extends Controller implements RequestHan
             runner = new ReadTransferRunner(this.socket, out);
 
             // Send the initial Ack
-            this.socket.send(new AckMessage(0));
+            this.socket.send(new AckMessage((short)0));
 
             (new Thread(runner)).start();
         } catch (Exception e){
