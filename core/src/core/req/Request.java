@@ -18,6 +18,7 @@ public abstract class Request extends Message {
 
     public Request (OpCode code, String filename) {
         super(code);
+        this.mode = RequestMode.BINARY;
         this.filename = filename;
     }
 

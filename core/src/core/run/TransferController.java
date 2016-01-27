@@ -16,6 +16,8 @@ public abstract class TransferController extends Controller {
 
     public TransferController (NodeSocket socket){
         super(socket);
+		this.interpreter.addCommand("read");
+		this.interpreter.addCommand("write");
     }
 
     @Override

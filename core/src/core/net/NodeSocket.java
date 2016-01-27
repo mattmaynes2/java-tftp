@@ -26,6 +26,14 @@ public class NodeSocket {
         this.socket = new DatagramSocket(port);
     }
 
+    public SocketAddress getAddress(){
+    	return address;
+    }
+    
+    public void setAddress(SocketAddress address){
+    	this.address = address;
+    }
+    
     public void send (Message message) throws IOException {
         this.send(message, this.address);
     }

@@ -13,19 +13,31 @@ import java.net.SocketException;
 
 public abstract class Controller implements CommandHandler {
 
-    NodeSocket socket;
-    CommandInterpreter interpreter;
+    protected NodeSocket socket;
+    protected CommandInterpreter interpreter;
 
     private CLI cli;
 
-    public Controller (NodeSocket socket){
-        this.socket = socket;
-    }
+    public Controller(NodeSocket socket){
+    	this.socket = socket;
+    	this.interpreter = new CommandInterpreter();
 
+		this.interpreter.addCommand("shutdown");
+		this.interpreter.addCommand("help");
+    }
+    
+    public NodeSocket getSocket(){
+    	return socket;
+    }
+    
+    public void setSocket(NodeSocket socket){
+    	this.socket = socket;
+    }
+    
     public void start () {
         this.cli = new CLI(this.interpreter, System.in, System.out);
         this.cli.addCommandHandler(this);
-        (new Thread(this.cli)).start();
+        this.cli.start();
     }
 
     public void stop () {
@@ -43,6 +55,8 @@ public abstract class Controller implements CommandHandler {
             case HELP:
                 this.usage();
                 break;
+            default:
+            	break;
         }
     }
 
