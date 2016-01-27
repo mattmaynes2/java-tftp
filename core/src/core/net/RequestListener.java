@@ -20,6 +20,7 @@ public class RequestListener extends Worker {
 
     public RequestListener (int port) throws SocketException {
         super();
+        handlers = new ArrayList<RequestHandler>();
         this.socket = new NodeSocket(port);
     }
 
@@ -31,7 +32,7 @@ public class RequestListener extends Worker {
         Request req = (Request) this.socket.receive();
 
         for (RequestHandler handler : this.handlers){
-            handler.handleRequest(req);
+            handler.handleRequest(req, socket.getAddress());
         }
     }
 
