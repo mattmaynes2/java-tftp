@@ -22,8 +22,8 @@ public class WriteTransfer {
         this.currentBlock = 1;
     }
 
-    public void getAcknowledge () throws IOException, InvalidMessageException {
-        AckMessage ack = (AckMessage) this.socket.receive();
+    public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
+    	return (AckMessage) this.socket.receive();
     }
 
     public boolean sendData (InputStream in) throws IOException {
