@@ -1,5 +1,6 @@
 package core.net;
 
+import core.net.Transfer;
 import core.net.ReadTransfer;
 import core.net.NodeSocket;
 
@@ -31,10 +32,13 @@ public class ReadTransferRunner implements Runnable {
             transfer = new ReadTransfer(this.socket);
 
             msg = transfer.getData();
-            while (msg.getData().length > 0){
+
+            while (msg.getData().length == Transfer.BLOCK_SIZE){
                 transfer.forwardData(msg, this.out);
                 msg = transfer.getData();
             }
+
+            transfer.forwardData(msg, this.out);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);

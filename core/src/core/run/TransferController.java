@@ -1,7 +1,6 @@
 package core.run;
 
 import core.run.Controller;
-import core.run.ControllerCommand;
 
 import core.net.NodeSocket;
 import core.net.ReadTransferRunner;
@@ -16,21 +15,25 @@ import java.net.SocketAddress;
 
 public abstract class TransferController extends Controller {
 
+
+    public static final String READ_COMMAND     = "read";
+    public static final String WRITE_COMMAND    = "write";
+
     public TransferController (SocketAddress address){
         super(address);
-        this.interpreter.addCommand("read");
-        this.interpreter.addCommand("write");
+        this.interpreter.addCommand(READ_COMMAND);
+        this.interpreter.addCommand(WRITE_COMMAND);
     }
 
     @Override
     public void handleCommand (Command command){
         super.handleCommand(command);
 
-        switch (ControllerCommand.createCommand(command.getToken())){
-            case READ:
+        switch (command.getToken()){
+            case READ_COMMAND:
                 this.read(command.getArgument());
                 break;
-            case WRITE:
+            case WRITE_COMMAND:
                 this.write(command.getArgument());
                 break;
         }

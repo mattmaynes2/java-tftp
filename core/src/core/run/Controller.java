@@ -1,7 +1,5 @@
 package core.run;
 
-import core.run.ControllerCommand;
-
 import core.net.NodeSocket;
 
 import core.cli.CLI;
@@ -14,6 +12,9 @@ import java.net.SocketAddress;
 
 public abstract class Controller implements CommandHandler {
 
+    public static final String SHUTDOWN_COMMAND     = "shutdown";
+    public static final String HELP_COMMAND         = "help";
+
     protected SocketAddress address;
     protected CommandInterpreter interpreter;
 
@@ -22,8 +23,8 @@ public abstract class Controller implements CommandHandler {
     protected Controller () {
         this.interpreter = new CommandInterpreter();
 
-        this.interpreter.addCommand("shutdown");
-        this.interpreter.addCommand("help");
+        this.interpreter.addCommand(SHUTDOWN_COMMAND);
+        this.interpreter.addCommand(HELP_COMMAND);
 
     }
 
@@ -49,11 +50,11 @@ public abstract class Controller implements CommandHandler {
     public abstract void usage();
 
     public void handleCommand (Command command){
-        switch (ControllerCommand.createCommand(command.getToken())){
-            case SHUTDOWN:
+        switch (command.getToken()){
+            case SHUTDOWN_COMMAND:
                 this.stop();
                 break;
-            case HELP:
+            case HELP_COMMAND:
                 this.usage();
                 break;
             default:

@@ -1,5 +1,6 @@
 package core.net;
 
+import core.net.Transfer;
 import core.net.NodeSocket;
 
 import core.req.DataMessage;
@@ -11,11 +12,10 @@ import java.io.InputStream;
 
 import java.util.Arrays;
 
-public class WriteTransfer {
+public class WriteTransfer extends Transfer {
 
     private NodeSocket socket;
     private short currentBlock;
-    private static final int DATA_SIZE = 512;
 
     public WriteTransfer (NodeSocket socket){
         this.socket = socket;
@@ -23,7 +23,7 @@ public class WriteTransfer {
     }
 
     public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
-    	return (AckMessage) this.socket.receive();
+        return (AckMessage) this.socket.receive();
     }
 
     public boolean sendData (InputStream in) throws IOException {
@@ -34,10 +34,9 @@ public class WriteTransfer {
 
     private DataMessage createMessage(InputStream in) throws IOException {
         int read;
-        byte[] data = new byte[DATA_SIZE];
+        byte[] data = new byte[Transfer.BLOCK_SIZE];
 
-        read = in.read(data, DATA_SIZE * (this.currentBlock - 1), DATA_SIZE);
-
+        read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
         return new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
     }
 

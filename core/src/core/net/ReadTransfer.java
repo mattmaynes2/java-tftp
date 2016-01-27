@@ -1,5 +1,6 @@
 package core.net;
 
+import core.net.Transfer;
 import core.net.NodeSocket;
 
 import core.req.DataMessage;
@@ -9,7 +10,7 @@ import core.req.InvalidMessageException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ReadTransfer {
+public class ReadTransfer extends Transfer {
 
     private NodeSocket socket;
 
