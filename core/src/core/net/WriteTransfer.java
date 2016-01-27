@@ -36,7 +36,7 @@ public class WriteTransfer {
         int read;
         byte[] data = new byte[DATA_SIZE];
 
-        read = in.read(data, DATA_SIZE * this.currentBlock, DATA_SIZE);
+        read = in.read(data, DATA_SIZE * (this.currentBlock - 1), DATA_SIZE);
 
         return new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
     }

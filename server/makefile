@@ -44,7 +44,7 @@ DOC = doc
 #
 # Flags
 #
-FLAGS = -classpath $(LIB)/*.jar:$(BIN):. -sourcepath $(SRC)
+FLAGS = -classpath $(LIB)/core.jar:$(BIN):. -sourcepath $(SRC)
 
 #
 # The default directive is used when only make is called. It

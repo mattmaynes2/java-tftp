@@ -14,10 +14,15 @@ import core.req.AckMessage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import java.net.SocketException;
+
 public abstract class RequestController extends Controller implements RequestHandler {
 
-    public RequestController (NodeSocket socket){
-        super(socket);
+    private NodeSocket socket;
+
+    public RequestController (int port) throws SocketException {
+        super();
+        this.socket = new NodeSocket(port);
     }
 
     public void handleRequest (Request req){

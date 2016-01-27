@@ -10,30 +10,32 @@ import core.cli.CommandInterpreter;
 import core.cli.Command;
 
 import java.net.SocketException;
+import java.net.SocketAddress;
 
 public abstract class Controller implements CommandHandler {
 
-    protected NodeSocket socket;
+    protected SocketAddress address;
     protected CommandInterpreter interpreter;
 
     private CLI cli;
 
-    public Controller(NodeSocket socket){
-    	this.socket = socket;
-    	this.interpreter = new CommandInterpreter();
+    protected Controller () {
+        this.interpreter = new CommandInterpreter();
 
-		this.interpreter.addCommand("shutdown");
-		this.interpreter.addCommand("help");
+        this.interpreter.addCommand("shutdown");
+        this.interpreter.addCommand("help");
+
     }
-    
-    public NodeSocket getSocket(){
-    	return socket;
+
+    public Controller (SocketAddress address){
+        this();
+        this.address = address;
     }
-    
-    public void setSocket(NodeSocket socket){
-    	this.socket = socket;
+
+    public SocketAddress getAddress (){
+        return this.address;
     }
-    
+
     public void start () {
         this.cli = new CLI(this.interpreter, System.in, System.out);
         this.cli.addCommandHandler(this);
@@ -41,7 +43,6 @@ public abstract class Controller implements CommandHandler {
     }
 
     public void stop () {
-        this.socket.close();
         this.cli.stop();
     }
 
@@ -56,7 +57,7 @@ public abstract class Controller implements CommandHandler {
                 this.usage();
                 break;
             default:
-            	break;
+                break;
         }
     }
 

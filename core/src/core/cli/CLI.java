@@ -13,7 +13,7 @@ public class CLI extends Worker {
     private InputStream in;
     private OutputStream out;
     private ArrayList<CommandHandler> handlers;
-    private final String PROMPT = "\n> ";
+    private final String PROMPT = "> ";
     private CommandInterpreter interpreter;
     private Scanner scanner;
 

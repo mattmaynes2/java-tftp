@@ -12,12 +12,14 @@ import core.cli.Command;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 
+import java.net.SocketAddress;
+
 public abstract class TransferController extends Controller {
 
-    public TransferController (NodeSocket socket){
-        super(socket);
-		this.interpreter.addCommand("read");
-		this.interpreter.addCommand("write");
+    public TransferController (SocketAddress address){
+        super(address);
+        this.interpreter.addCommand("read");
+        this.interpreter.addCommand("write");
     }
 
     @Override
@@ -39,7 +41,7 @@ public abstract class TransferController extends Controller {
         FileOutputStream out;
         try {
             out = new FileOutputStream(filename);
-            runner = new ReadTransferRunner(this.socket, out);
+            runner = new ReadTransferRunner(new NodeSocket(this.getAddress()), out);
 
             runner.sendRequest(filename);
             (new Thread(runner)).start();
@@ -55,7 +57,7 @@ public abstract class TransferController extends Controller {
 
         try {
             in = new FileInputStream(filename);
-            runner = new WriteTransferRunner(this.socket, in);
+            runner = new WriteTransferRunner(new NodeSocket(this.getAddress()), in);
 
             runner.sendRequest(filename);
 
