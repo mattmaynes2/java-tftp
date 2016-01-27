@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import java.util.Arrays;
 
-public class WriteTransfer implements Runnable {
+public class WriteTransfer extends Transfer {
 
     private NodeSocket socket;
     private InputStream in;
@@ -30,7 +30,7 @@ public class WriteTransfer implements Runnable {
 
     public void run () {
         try {
-            while (this.sendData(this.in)){
+        	while (this.sendData(this.in)){
                 this.getAcknowledge();
             }
 
@@ -55,8 +55,15 @@ public class WriteTransfer implements Runnable {
         byte[] data = new byte[Transfer.BLOCK_SIZE];
 
         read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
-        return new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
+        
+        DataMessage message;
+        
+        if (read >= 0){
+        	message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
+        }else{
+        	message =  new DataMessage(this.currentBlock, new byte[0]); 
+        }
+        return message;
     }
-
 
 }
