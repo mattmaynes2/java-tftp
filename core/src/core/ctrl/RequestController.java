@@ -1,6 +1,6 @@
-package core.run;
+package core.ctrl;
 
-import core.run.Controller;
+import core.ctrl.Controller;
 
 import core.net.NodeSocket;
 import core.net.ReadTransfer;

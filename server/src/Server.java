@@ -1,6 +1,6 @@
 
 import core.net.RequestListener;
-import core.run.RequestController;
+import core.ctrl.RequestController;
 
 import java.net.SocketException;
 
@@ -9,7 +9,7 @@ public class Server extends RequestController {
     private static final int SERVER_PORT = 69;
 
     private RequestListener listener;
-    
+
     public Server () throws SocketException {
         super();
         this.listener = new RequestListener(SERVER_PORT);
@@ -21,7 +21,7 @@ public class Server extends RequestController {
     	super.start();
         listener.execute();
     }
-    
+
     @Override
     public void usage () {
 
@@ -29,7 +29,7 @@ public class Server extends RequestController {
 
     public static void main (String[] args) {
         Server server;
-        
+
         try {
             server = new Server();
             server.start();
