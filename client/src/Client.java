@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 
 import core.cli.CommandInterpreter;
 import core.net.NodeSocket;
-import core.run.TransferController;
+import core.ctrl.TransferController;
 
 public class Client extends TransferController {
 
