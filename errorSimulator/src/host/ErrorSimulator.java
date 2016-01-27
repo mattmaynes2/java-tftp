@@ -12,14 +12,14 @@ public class ErrorSimulator {
 
 	
 	public static void main(String[] args) {
-		int client_port;
+		
 		DatagramSocket requestSocket;
 		try {
 			requestSocket = new DatagramSocket(68);
 			while(true){
 				DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
 				requestSocket.receive(packet);
-				
+				new SimulatorThread(packet).start();
 			}
 			
 		} catch (IOException e) {
