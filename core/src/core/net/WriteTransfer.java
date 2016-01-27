@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import java.util.Arrays;
 
-public class WriteTransfer implements Runnable {
+public class WriteTransfer extends Transfer {
 
     private NodeSocket socket;
     private InputStream in;
