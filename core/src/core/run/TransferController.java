@@ -3,8 +3,8 @@ package core.run;
 import core.run.Controller;
 
 import core.net.NodeSocket;
-import core.net.ReadTransferRunner;
-import core.net.WriteTransferRunner;
+import core.net.ReadTransfer;
+import core.net.WriteTransfer;
 
 import core.cli.Command;
 
@@ -40,11 +40,11 @@ public abstract class TransferController extends Controller {
     }
 
     public void read (String filename){
-        ReadTransferRunner runner;
+        ReadTransfer runner;
         FileOutputStream out;
         try {
             out = new FileOutputStream(filename);
-            runner = new ReadTransferRunner(new NodeSocket(this.getAddress()), out);
+            runner = new ReadTransfer(new NodeSocket(this.getAddress()), out);
 
             runner.sendRequest(filename);
             (new Thread(runner)).start();
@@ -55,12 +55,12 @@ public abstract class TransferController extends Controller {
     }
 
     public void write (String filename){
-        WriteTransferRunner runner;
+        WriteTransfer runner;
         FileInputStream in;
 
         try {
             in = new FileInputStream(filename);
-            runner = new WriteTransferRunner(new NodeSocket(this.getAddress()), in);
+            runner = new WriteTransfer(new NodeSocket(this.getAddress()), in);
 
             runner.sendRequest(filename);
 
