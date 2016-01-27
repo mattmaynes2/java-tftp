@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class WriteTransfer {
 
     private NodeSocket socket;
-    private int currentBlock;
+    private short currentBlock;
     private static final int DATA_SIZE = 512;
 
     public WriteTransfer (NodeSocket socket){
