@@ -1,4 +1,6 @@
-package core.req;
+package core.net;
+
+import core.req.Request;
 
 public interface RequestHandler {
 
