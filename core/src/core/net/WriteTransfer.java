@@ -1,32 +1,50 @@
 package core.net;
 
-import core.net.Transfer;
 import core.net.NodeSocket;
 
+import core.req.WriteRequest;
 import core.req.DataMessage;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 
 import java.util.Arrays;
 
-public class WriteTransfer extends Transfer {
+public class WriteTransfer implements Runnable {
 
     private NodeSocket socket;
+    private InputStream in;
     private short currentBlock;
 
-    public WriteTransfer (NodeSocket socket){
+    public WriteTransfer (NodeSocket socket, InputStream in){
         this.socket = socket;
+        this.in = in;
         this.currentBlock = 1;
     }
 
-    public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
+    public void sendRequest (String filename) throws IOException {
+        this.socket.send(new WriteRequest(filename));
+    }
+
+    public void run () {
+        try {
+            while (this.sendData(this.in)){
+                this.getAcknowledge();
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private AckMessage getAcknowledge () throws IOException, InvalidMessageException {
         return (AckMessage) this.socket.receive();
     }
 
-    public boolean sendData (InputStream in) throws IOException {
+    private boolean sendData (InputStream in) throws IOException {
         DataMessage msg = this.createMessage(in);
         this.socket.send(msg);
         return msg.getData().length > 0;
@@ -39,5 +57,6 @@ public class WriteTransfer extends Transfer {
         read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
         return new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
     }
+
 
 }
