@@ -19,7 +19,7 @@ public class WriteTransfer {
 
     public WriteTransfer (NodeSocket socket){
         this.socket = socket;
-        this.currentBlock = 0;
+        this.currentBlock = 1;
     }
 
     public void getAcknowledge () throws IOException, InvalidMessageException {

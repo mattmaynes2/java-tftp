@@ -7,8 +7,8 @@ import core.req.InvalidMessageException;
 
 public class ReadRequest extends Request {
 
-    public ReadRequest () {
-        super(OpCode.READ);
+    public ReadRequest (String filename) {
+        super(OpCode.READ, filename);
     }
 
     public ReadRequest (byte[] data) throws InvalidMessageException {

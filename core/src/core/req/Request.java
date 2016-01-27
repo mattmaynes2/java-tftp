@@ -16,8 +16,9 @@ public abstract class Request extends Message {
     private RequestMode mode;
     private String filename;
 
-    public Request (OpCode code) {
+    public Request (OpCode code, String filename) {
         super(code);
+        this.filename = filename;
     }
 
     public Request (byte[] data) throws InvalidMessageException {

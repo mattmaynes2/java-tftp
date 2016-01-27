@@ -1,6 +1,6 @@
-package core.net;
+package core.run;
 
-public enum NodeCommand {
+public enum ControllerCommand {
     READ        ("read"),
     WRITE       ("write"),
     SHUTDOWN    ("shutdown"),
@@ -8,7 +8,7 @@ public enum NodeCommand {
 
     private String command;
 
-    NodeCommand (String command){
+    ControllerCommand (String command){
         this.command = command;
     }
 
@@ -16,8 +16,8 @@ public enum NodeCommand {
         return this.command;
     }
 
-    public static NodeCommand createCommand(String command){
-        for(NodeCommand cmd : NodeCommand.values()){
+    public static ControllerCommand createCommand(String command){
+        for(ControllerCommand cmd : ControllerCommand.values()){
             if(cmd.getCommand().equals(command)){
                 return cmd;
             }

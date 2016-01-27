@@ -1,4 +1,6 @@
-package core.net;
+package core.run;
+
+import core.run.ControllerCommand;
 
 import core.net.NodeSocket;
 
@@ -9,12 +11,16 @@ import core.cli.Command;
 
 import java.net.SocketException;
 
-public abstract class Node implements CommandHandler {
+public abstract class Controller implements CommandHandler {
 
     NodeSocket socket;
     CommandInterpreter interpreter;
 
     private CLI cli;
+
+    public Controller (NodeSocket socket){
+        this.socket = socket;
+    }
 
     public void start () {
         this.cli = new CLI(this.interpreter, System.in, System.out);
@@ -30,7 +36,7 @@ public abstract class Node implements CommandHandler {
     public abstract void usage();
 
     public void handleCommand (Command command){
-        switch(NodeCommand.createCommand(command.getToken())){
+        switch (ControllerCommand.createCommand(command.getToken())){
             case SHUTDOWN:
                 this.stop();
                 break;
