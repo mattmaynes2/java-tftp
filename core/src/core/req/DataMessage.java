@@ -8,6 +8,8 @@ import core.util.ByteUtils;
 
 public class DataMessage extends AckMessage {
 
+    public static final int BLOCK_SIZE = 512;
+
     private byte[] data;
     public DataMessage(byte[] bytes) throws InvalidMessageException {
         super(bytes);
@@ -49,5 +51,9 @@ public class DataMessage extends AckMessage {
 
     public byte[] getData() {
         return data;
+    }
+
+    public boolean isLastBlock () {
+        return this.data.length < BLOCK_SIZE;
     }
 }
