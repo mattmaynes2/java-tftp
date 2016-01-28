@@ -20,6 +20,7 @@ public class RequestListener extends Worker {
 
     public RequestListener (int port) throws SocketException {
         super();
+        handlers = new ArrayList<RequestHandler>();
         this.socket = new NodeSocket(port);
     }
 
@@ -28,21 +29,28 @@ public class RequestListener extends Worker {
     }
 
     public void listen () throws IOException, InvalidMessageException {
-        Request req = (Request) this.socket.receive();
+    	try {
+	        Request req = (Request) this.socket.receive();
 
-        for (RequestHandler handler : this.handlers){
-            handler.handleRequest(req);
-        }
+	        for (RequestHandler handler : this.handlers){
+	            handler.handleRequest(req, socket.getAddress());
+	        }
+    	} catch (SocketException ex){
+    		if (this.isRunning()){
+    			throw ex;
+    		}
+    	}
     }
-
+    
     public void setup () {}
+    
     public void teardown () {
         this.socket.close();
     };
 
     public void execute () {
         try {
-            this.listen();
+        	this.listen();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
