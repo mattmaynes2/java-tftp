@@ -17,7 +17,6 @@ public class ReadTransfer extends Transfer {
 
     public ReadTransfer (NodeSocket socket, String filename){
         super(socket, filename);
-        this.logger = Logger.getLogger("readTransfer");
     }
 
     public void sendRequest (String filename) throws IOException {
@@ -54,14 +53,9 @@ public class ReadTransfer extends Transfer {
 
     private DataMessage getData () throws IOException, InvalidMessageException {
         DataMessage data;
-        AckMessage ack;
 
         data = (DataMessage) this.getSocket().receive();
-        this.logMessage(data);
-
-        ack = new AckMessage(data.getBlock());
-        this.logMessage(ack);
-        this.getSocket().send(ack);
+        this.getSocket().send(new AckMessage(data.getBlock()));
 
         return data;
     }
