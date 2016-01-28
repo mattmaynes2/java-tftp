@@ -44,8 +44,7 @@ public abstract class RequestController extends Controller implements RequestHan
 
         try {
             in = new FileInputStream(filename);
-            NodeSocket socket = new NodeSocket();
-            socket.setAddress(address);
+            NodeSocket socket = new NodeSocket(address);
             runner = new WriteTransfer(socket, in);
 
             (new Thread(runner)).start();
@@ -61,11 +60,10 @@ public abstract class RequestController extends Controller implements RequestHan
 
         try {
             out = new FileOutputStream(filename);
-            NodeSocket socket = new NodeSocket();
-            socket.setAddress(address);
-            runner = new ReadTransfer(new NodeSocket(), out);
+            NodeSocket socket = new NodeSocket(address);
+            runner = new ReadTransfer(socket, out);
  
-            // Send the initial Ack
+            // Send the initial Ack           
             socket.send(new AckMessage((short)0));
 
             (new Thread(runner)).start();

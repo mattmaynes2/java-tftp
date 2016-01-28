@@ -40,7 +40,7 @@ public class WriteTransfer implements Runnable {
         }
     }
 
-    private AckMessage getAcknowledge () throws IOException, InvalidMessageException {
+    public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
         return (AckMessage) this.socket.receive();
     }
 

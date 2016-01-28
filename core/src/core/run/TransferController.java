@@ -61,9 +61,10 @@ public abstract class TransferController extends Controller {
         try {
             in = new FileInputStream(filename);
             runner = new WriteTransfer(new NodeSocket(this.getAddress()), in);
-
+            
             runner.sendRequest(filename);
-
+            runner.getAcknowledge();
+         
             (new Thread(runner)).start();
         } catch (Exception e){
             e.printStackTrace();
