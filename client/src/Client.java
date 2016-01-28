@@ -6,7 +6,11 @@ import java.net.UnknownHostException;
 
 import core.cli.CommandInterpreter;
 import core.net.NodeSocket;
+import core.net.TransferListener;
+import core.req.Message;
 import core.ctrl.TransferController;
+import core.log.Logger;
+import java.util.logging.Level;
 
 public class Client extends TransferController {
 
@@ -23,7 +27,7 @@ public class Client extends TransferController {
 
     public static void main(String[] args){
         Client client;
-
+        Logger.init(Level.ALL);
         try {
             InetSocketAddress address =
                 new InetSocketAddress(InetAddress.getLocalHost(), SERVER_PORT);
@@ -35,4 +39,18 @@ public class Client extends TransferController {
         }
     }
 
+	@Override
+	public void handleStart() {
+		this.cli.message("Transfer started");
+	}
+
+	@Override
+	public void handleMessage(Message msg) {
+		Logger.log("Client", Level.FINEST, "Received transfer message: " + msg.toString());
+	}
+
+	@Override
+	public void handleComplete() {
+		this.cli.message("Transfer complete");
+	}
 }
