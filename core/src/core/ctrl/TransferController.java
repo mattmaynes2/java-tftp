@@ -4,6 +4,7 @@ import core.ctrl.Controller;
 
 import core.net.NodeSocket;
 import core.net.ReadTransfer;
+import core.net.Transfer;
 import core.net.WriteTransfer;
 
 import core.cli.Command;
@@ -43,7 +44,7 @@ public abstract class TransferController extends Controller {
             runner = new ReadTransfer(new NodeSocket(this.getAddress()), filename);
 
             runner.sendRequest(filename);
-            (new Thread(runner)).start();
+            performTransfer(runner);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -59,11 +60,17 @@ public abstract class TransferController extends Controller {
             runner.sendRequest(filename);
             runner.getAcknowledge();
 
-            (new Thread(runner)).start();
+            performTransfer(runner);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
+    }
+    
+    public void performTransfer(Transfer transfer) throws InterruptedException{
+        Thread transferThread = new Thread(transfer);
+        transferThread.start();
+        transferThread.join();
     }
 
 
