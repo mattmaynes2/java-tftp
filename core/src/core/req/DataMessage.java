@@ -44,7 +44,7 @@ public class DataMessage extends AckMessage {
 
     @Override
     public String toString() {
-        return super.toString() + ByteUtils.bytesToHexString(this.data);
+        return super.toString() + " data: " + Arrays.toString(this.data);
     }
 
     public byte[] getData() {
