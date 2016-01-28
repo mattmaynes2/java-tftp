@@ -8,9 +8,6 @@ import core.net.WriteTransfer;
 
 import core.cli.Command;
 
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-
 import java.net.SocketAddress;
 
 public abstract class TransferController extends Controller {
@@ -41,10 +38,9 @@ public abstract class TransferController extends Controller {
 
     public void read (String filename){
         ReadTransfer runner;
-        FileOutputStream out;
+
         try {
-            out = new FileOutputStream(filename);
-            runner = new ReadTransfer(new NodeSocket(this.getAddress()), out);
+            runner = new ReadTransfer(new NodeSocket(this.getAddress()), filename);
 
             runner.sendRequest(filename);
             (new Thread(runner)).start();
@@ -56,15 +52,13 @@ public abstract class TransferController extends Controller {
 
     public void write (String filename){
         WriteTransfer runner;
-        FileInputStream in;
 
         try {
-            in = new FileInputStream(filename);
-            runner = new WriteTransfer(new NodeSocket(this.getAddress()), in);
-            
+            runner = new WriteTransfer(new NodeSocket(this.getAddress()), filename);
+
             runner.sendRequest(filename);
             runner.getAcknowledge();
-         
+
             (new Thread(runner)).start();
         } catch (Exception e){
             e.printStackTrace();

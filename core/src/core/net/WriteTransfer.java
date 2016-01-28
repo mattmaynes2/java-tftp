@@ -7,33 +7,35 @@ import core.req.DataMessage;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.Arrays;
 
 public class WriteTransfer extends Transfer {
 
-    private NodeSocket socket;
-    private InputStream in;
     private short currentBlock;
 
-    public WriteTransfer (NodeSocket socket, InputStream in){
-        this.socket = socket;
-        this.in = in;
+    public WriteTransfer (NodeSocket socket, String filename){
+        super(socket, filename);
         this.currentBlock = 1;
     }
 
     public void sendRequest (String filename) throws IOException {
-        this.socket.send(new WriteRequest(filename));
+        this.getSocket().send(new WriteRequest(filename));
     }
 
     public void run () {
+        FileInputStream in;
+
         try {
-        	while (this.sendData(this.in)){
+            in = new FileInputStream(this.getFilename());
+
+            while (this.sendData(in)){
                 this.getAcknowledge();
             }
 
+            in.close();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -41,28 +43,30 @@ public class WriteTransfer extends Transfer {
     }
 
     public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
-        return (AckMessage) this.socket.receive();
+        return (AckMessage) this.getSocket().receive();
     }
 
-    private boolean sendData (InputStream in) throws IOException {
+    private boolean sendData (FileInputStream in) throws IOException {
         DataMessage msg = this.createMessage(in);
-        this.socket.send(msg);
+        this.getSocket().send(msg);
         return msg.getData().length > 0;
     }
 
-    private DataMessage createMessage(InputStream in) throws IOException {
+    private DataMessage createMessage(FileInputStream in) throws IOException {
+        DataMessage message;
         int read;
         byte[] data = new byte[Transfer.BLOCK_SIZE];
 
         read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
-        
-        DataMessage message;
-        
-        if (read >= 0){
-        	message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
-        }else{
-        	message =  new DataMessage(this.currentBlock, new byte[0]); 
+
+
+        if (read >= 0) {
+            message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
         }
+        else {
+            message =  new DataMessage(this.currentBlock, new byte[0]);
+        }
+
         return message;
     }
 
