@@ -2,7 +2,6 @@ package core.ctrl;
 
 import core.ctrl.Controller;
 
-import core.net.NodeSocket;
 import core.net.ReadTransfer;
 import core.net.WriteTransfer;
 import core.net.RequestHandler;
@@ -23,10 +22,10 @@ public abstract class RequestController extends Controller implements RequestHan
     public void handleRequest (Request req, SocketAddress address){
         switch(req.getOpCode()){
             case READ:
-                this.read(req.getFilename(), address);
+                this.read(address, req.getFilename());
                 break;
             case WRITE:
-                this.write(req.getFilename(), address);
+                this.write(address, req.getFilename());
                 break;
         }
     }
@@ -36,29 +35,23 @@ public abstract class RequestController extends Controller implements RequestHan
         super.start();
     }
 
-    public void read (String filename, SocketAddress address){
-        WriteTransfer runner;
-
+    public void read (SocketAddress address, String filename){
         try {
-            NodeSocket socket = new NodeSocket(address);
-            runner = new WriteTransfer(socket, filename);
-
-            (new Thread(runner)).start();
+            (new Thread(new WriteTransfer(address, filename))).start();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    public void write (String filename, SocketAddress address){
+    public void write (SocketAddress address, String filename){
         ReadTransfer runner;
 
         try {
-            NodeSocket socket = new NodeSocket(address);
-            runner = new ReadTransfer(socket, filename);
+            runner = new ReadTransfer(address, filename);
 
             // Send the initial Ack
-            socket.send(new AckMessage((short)0));
+            runner.getSocket().send(new AckMessage((short)0));
 
             (new Thread(runner)).start();
         } catch (Exception e){

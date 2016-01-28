@@ -10,6 +10,9 @@ import core.req.InvalidMessageException;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.net.SocketAddress;
+import java.net.SocketException;
+
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -17,8 +20,8 @@ public class WriteTransfer extends Transfer {
 
     private short currentBlock;
 
-    public WriteTransfer (NodeSocket socket, String filename){
-        super(socket, filename);
+    public WriteTransfer (SocketAddress address, String filename) throws SocketException {
+        super(address, filename);
         this.currentBlock = 0;
     }
 
@@ -37,6 +40,8 @@ public class WriteTransfer extends Transfer {
             while (this.sendData(in)){
                 this.notifyMessage(this.getAcknowledge());
             }
+
+            this.getSocket().close();
 
             this.notifyComplete();
 

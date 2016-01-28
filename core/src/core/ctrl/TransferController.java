@@ -42,7 +42,7 @@ public abstract class TransferController extends Controller implements TransferL
         ReadTransfer runner;
 
         try {
-            runner = new ReadTransfer(new NodeSocket(this.getAddress()), filename);
+            runner = new ReadTransfer(this.getAddress(), filename);
 
             runner.sendRequest();
             performTransfer(runner);
@@ -56,7 +56,7 @@ public abstract class TransferController extends Controller implements TransferL
         WriteTransfer runner;
 
         try {
-            runner = new WriteTransfer(new NodeSocket(this.getAddress()), filename);
+            runner = new WriteTransfer(this.getAddress(), filename);
 
             runner.sendRequest();
             runner.getAcknowledge();

@@ -8,6 +8,9 @@ import core.req.Message;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import java.net.SocketAddress;
+import java.net.SocketException;
+
 /**
  * Transfer
  *
@@ -42,12 +45,14 @@ public abstract class Transfer implements Runnable {
     /**
      * Constructs a transfer with a socket which will move the specified file
      *
-     * @param socket - Socket to send file over
+     * @param address - Address to use as the endpoint
      * @param filename - Path of file to transfer
+     *
+     * @throws SocketException - If the socket cannot be created
      */
-    public Transfer (NodeSocket socket, String filename){
-        this.socket = socket;
+    public Transfer (SocketAddress address, String filename) throws SocketException {
         this.filename = filename;
+        this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
     }
 
