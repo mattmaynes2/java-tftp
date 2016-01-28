@@ -28,16 +28,24 @@ public class ReadTransfer extends Transfer {
         FileOutputStream out;
         DataMessage msg;
 
+        this.notifyStart();
+
         try {
+
             out = new FileOutputStream(this.getFilename());
             msg = this.getData();
+
             while (msg.getData().length == Transfer.BLOCK_SIZE){
+                this.notifyMessage(msg);
                 this.forwardData(msg, out);
                 msg = this.getData();
             }
 
+            this.notifyMessage(msg);
             this.forwardData(msg, out);
             out.close();
+
+            this.notifyComplete();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -47,10 +55,10 @@ public class ReadTransfer extends Transfer {
     private DataMessage getData () throws IOException, InvalidMessageException {
         DataMessage data;
         AckMessage ack;
-        
+
         data = (DataMessage) this.getSocket().receive();
         this.logMessage(data);
-        
+
         ack = new AckMessage(data.getBlock());
         this.logMessage(ack);
         this.getSocket().send(ack);

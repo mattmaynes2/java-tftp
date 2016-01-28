@@ -30,12 +30,17 @@ public class WriteTransfer extends Transfer {
     public void run () {
         FileInputStream in;
 
+        this.notifyStart();
+
         try {
             in = new FileInputStream(this.getFilename());
 
             while (this.sendData(in)){
-                this.getAcknowledge();
+                this.notifyMessage(this.getAcknowledge());
             }
+
+            this.notifyMessage(this.getAcknowledge());
+            this.notifyComplete();
 
             in.close();
         } catch (Exception e){
