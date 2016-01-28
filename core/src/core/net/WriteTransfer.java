@@ -42,7 +42,7 @@ public class WriteTransfer extends Transfer {
         }
     }
 
-    private AckMessage getAcknowledge () throws IOException, InvalidMessageException {
+    public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
         AckMessage ack = (AckMessage) this.socket.receive();
         this.logMessage(ack);
         return ack;
