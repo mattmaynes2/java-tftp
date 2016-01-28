@@ -18,9 +18,9 @@ public class Logger {
 		java.util.logging.Logger.getGlobal().setLevel(logLevel);
 	}
 	
-	public static void log(String className, Level logLevel,String message) throws UnitializedLoggerException{
+	public static void log(String className, Level logLevel,String message) throws UninitializedLoggerException{
 		if (systemLogLevel == null){
-			throw new UnitializedLoggerException("Logger has not been initialized");
+			throw new UninitializedLoggerException("Logger has not been initialized");
 		}else{
 			java.util.logging.Logger.getGlobal().log(logLevel, message);
 		}
