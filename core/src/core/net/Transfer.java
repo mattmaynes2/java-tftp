@@ -7,14 +7,11 @@ import core.req.Message;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 public abstract class Transfer implements Runnable {
 
     private ArrayList<TransferListener> listeners;
     public static final int BLOCK_SIZE = 512;
-
-    protected Logger logger;
 
     private String filename;
     private NodeSocket socket;
@@ -57,7 +54,4 @@ public abstract class Transfer implements Runnable {
         }
     }
 
-    public void logMessage(Message msg) {
-        this.logger.info(msg.toString());
-    }
 }

@@ -20,7 +20,6 @@ public class WriteTransfer extends Transfer {
     public WriteTransfer (NodeSocket socket, String filename){
         super(socket, filename);
         this.currentBlock = 0;
-        this.logger = Logger.getLogger("writeTransfer");
     }
 
     public void sendRequest (String filename) throws IOException {
@@ -49,15 +48,12 @@ public class WriteTransfer extends Transfer {
     }
 
     public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
-        AckMessage ack = (AckMessage) this.getSocket().receive();
-        this.logMessage(ack);
-        return ack;
+        return (AckMessage) this.getSocket().receive();
     }
 
     private boolean sendData (FileInputStream in) throws IOException {
         DataMessage msg = this.createMessage(in);
         this.getSocket().send(msg);
-        this.logMessage(msg);
         return msg.getData().length > 0;
     }
 
