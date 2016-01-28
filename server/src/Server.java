@@ -17,9 +17,16 @@ public class Server extends RequestController {
     }
 
     @Override
+    public void stop(){
+    	super.stop();
+    	this.listener.stop();
+    	this.listener.teardown();
+    }
+    
+    @Override
     public void start(){
     	super.start();
-        listener.execute();
+        listener.start();
     }
 
     @Override
