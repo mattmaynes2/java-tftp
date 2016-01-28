@@ -39,18 +39,18 @@ public class Client extends TransferController {
         }
     }
 
-	@Override
-	public void handleStart() {
-		this.cli.message("Transfer started");
-	}
+    @Override
+    public void handleStart() {
+        this.cli.message("Transfer started");
+    }
 
-	@Override
-	public void handleMessage(Message msg) {
-		Logger.log("Client", Level.FINEST, "Received transfer message: " + msg.toString());
-	}
+    @Override
+    public void handleMessage(Message msg) {
+        Logger.log("Client", Level.FINEST, "Received transfer message: " + msg.toString());
+    }
 
-	@Override
-	public void handleComplete() {
-		this.cli.message("Transfer complete");
-	}
+    @Override
+    public void handleComplete() {
+        this.cli.message("Transfer complete");
+    }
 }

@@ -12,7 +12,7 @@ import core.cli.Command;
 
 import java.net.SocketAddress;
 
-public abstract class TransferController extends Controller implements TransferListener {
+public abstract class TransferController extends Controller {
 
 
     public static final String READ_COMMAND     = "read";
@@ -74,11 +74,4 @@ public abstract class TransferController extends Controller implements TransferL
         transferThread.start();
         transferThread.join();
     }
-
-    public abstract void handleStart ();
-
-    public abstract void handleMessage (Message msg);
-
-    public abstract void handleComplete ();
-
 }

@@ -36,8 +36,13 @@ public abstract class RequestController extends Controller implements RequestHan
     }
 
     public void read (SocketAddress address, String filename){
+        WriteTransfer runner;
+
         try {
-            (new Thread(new WriteTransfer(address, filename))).start();
+            runner = new WriteTransfer(address, filename);
+
+            runner.addTransferListener(this);
+            (new Thread(runner)).start();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -50,6 +55,7 @@ public abstract class RequestController extends Controller implements RequestHan
         try {
             runner = new ReadTransfer(address, filename);
 
+            runner.addTransferListener(this);
             // Send the initial Ack
             runner.getSocket().send(new AckMessage((short)0));
 

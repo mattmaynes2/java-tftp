@@ -1,6 +1,9 @@
 package core.ctrl;
 
+import core.req.Message;
+
 import core.net.NodeSocket;
+import core.net.TransferListener;
 
 import core.cli.CLI;
 import core.cli.CommandHandler;
@@ -10,7 +13,7 @@ import core.cli.Command;
 import java.net.SocketException;
 import java.net.SocketAddress;
 
-public abstract class Controller implements CommandHandler {
+public abstract class Controller implements CommandHandler, TransferListener {
 
     public static final String SHUTDOWN_COMMAND     = "shutdown";
     public static final String HELP_COMMAND         = "help";
@@ -61,5 +64,12 @@ public abstract class Controller implements CommandHandler {
                 break;
         }
     }
+
+    public abstract void handleStart ();
+
+    public abstract void handleMessage (Message msg);
+
+    public abstract void handleComplete ();
+
 
 }
