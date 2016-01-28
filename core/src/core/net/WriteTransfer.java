@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class WriteTransfer extends Transfer {
 
@@ -22,6 +23,7 @@ public class WriteTransfer extends Transfer {
         this.socket = socket;
         this.in = in;
         this.currentBlock = 1;
+        this.logger = Logger.getLogger("writeTransfer");
     }
 
     public void sendRequest (String filename) throws IOException {
@@ -41,12 +43,15 @@ public class WriteTransfer extends Transfer {
     }
 
     private AckMessage getAcknowledge () throws IOException, InvalidMessageException {
-        return (AckMessage) this.socket.receive();
+        AckMessage ack = (AckMessage) this.socket.receive();
+        this.logMessage(ack);
+        return ack;
     }
 
     private boolean sendData (InputStream in) throws IOException {
         DataMessage msg = this.createMessage(in);
         this.socket.send(msg);
+        this.logMessage(msg);
         return msg.getData().length > 0;
     }
 
@@ -57,6 +62,5 @@ public class WriteTransfer extends Transfer {
         read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
         return new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
     }
-
 
 }
