@@ -22,8 +22,8 @@ public class WriteTransfer extends Transfer {
         this.currentBlock = 0;
     }
 
-    public void sendRequest (String filename) throws IOException {
-        this.getSocket().send(new WriteRequest(filename));
+    public void sendRequest () throws IOException {
+        this.getSocket().send(new WriteRequest(this.getFilename()));
     }
 
     public void run () {

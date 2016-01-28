@@ -44,7 +44,7 @@ public abstract class TransferController extends Controller implements TransferL
         try {
             runner = new ReadTransfer(new NodeSocket(this.getAddress()), filename);
 
-            runner.sendRequest(filename);
+            runner.sendRequest();
             performTransfer(runner);
         } catch (Exception e){
             e.printStackTrace();
@@ -58,7 +58,7 @@ public abstract class TransferController extends Controller implements TransferL
         try {
             runner = new WriteTransfer(new NodeSocket(this.getAddress()), filename);
 
-            runner.sendRequest(filename);
+            runner.sendRequest();
             runner.getAcknowledge();
 
             performTransfer(runner);
@@ -67,7 +67,7 @@ public abstract class TransferController extends Controller implements TransferL
             System.exit(1);
         }
     }
-    
+
     public void performTransfer(Transfer transfer) throws InterruptedException{
         Thread transferThread = new Thread(transfer);
         transfer.addTransferListener(this);

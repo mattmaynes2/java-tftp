@@ -80,10 +80,8 @@ public abstract class Transfer implements Runnable {
 
     /**
      * Sends the initializing request to start this request
-     *
-     * @param filename - The name of the file to transfer
      */
-    public abstract void sendRequest(String filename) throws IOException;
+    public abstract void sendRequest() throws IOException;
 
     /**
      * Notifies all listeners that the transfer has started

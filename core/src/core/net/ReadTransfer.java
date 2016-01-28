@@ -13,14 +13,39 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * ReadTransfer
+ *
+ * Runnable transfer moves a file from an external endpoint to this location.
+ * A read operation reads a packets from a socket until the transfer is complete
+ * and then closes the socket.
+ *
+ * Example
+ * (new Thread(
+ *      new ReadTransfer(
+ *          ENDPOINT, "myTestFile"
+ *      )
+ * )).start()
+ *
+ */
 public class ReadTransfer extends Transfer {
 
+    /**
+     * Constructs a new transfer that will read data from a socket and
+     * store it in a file with the given name
+     *
+     * @param socket - Socket that this transfer will read from
+     * @param filename - Name of file to store incoming data
+     */
     public ReadTransfer (NodeSocket socket, String filename){
         super(socket, filename);
     }
 
-    public void sendRequest (String filename) throws IOException {
-        this.getSocket().send(new ReadRequest(filename));
+    /**
+     * Sends a request to this transfer's endpoint to start the transfer
+     */
+    public void sendRequest () throws IOException {
+        this.getSocket().send(new ReadRequest(this.getFilename()));
     }
 
     public void run () {
