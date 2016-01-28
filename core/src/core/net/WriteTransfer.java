@@ -39,7 +39,6 @@ public class WriteTransfer extends Transfer {
                 this.notifyMessage(this.getAcknowledge());
             }
 
-            this.notifyMessage(this.getAcknowledge());
             this.notifyComplete();
 
             in.close();
