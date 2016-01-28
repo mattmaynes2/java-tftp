@@ -19,7 +19,7 @@ public class WriteTransfer extends Transfer {
 
     public WriteTransfer (NodeSocket socket, String filename){
         super(socket, filename);
-        this.currentBlock = 1;
+        this.currentBlock = 0;
         this.logger = Logger.getLogger("writeTransfer");
     }
 
@@ -67,8 +67,8 @@ public class WriteTransfer extends Transfer {
         int read;
         byte[] data = new byte[Transfer.BLOCK_SIZE];
 
-        read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
-
+        this.currentBlock++;
+        read = in.read(data);
 
         if (read >= 0) {
             message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
