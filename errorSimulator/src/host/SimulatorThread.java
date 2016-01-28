@@ -33,10 +33,9 @@ public class SimulatorThread extends Thread {
 	
 	@Override
 	public void run() {
-		//client will always be the first to send packets
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
 		System.out.println("Received Packet From "+packetIn.getSocketAddress()); 
-		System.out.print("Bytes are: "+ByteUtils.bytesToHexString(packetIn.getData()));
+		System.out.println("Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		try {
 			Message msg=MessageFactory.createMessage(bytes);
 			System.out.println(msg);

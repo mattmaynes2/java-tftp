@@ -5,10 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import core.ctrl.Controller;
 import core.req.Message;
 
 
-public class ErrorSimulator {
+public class ErrorSimulator extends Controller{
 
 	
 	public static void main(String[] args) {
@@ -27,5 +28,10 @@ public class ErrorSimulator {
 		}
 		
 		
+	}
+
+	@Override
+	public void usage() {
+		System.out.println("Usage:\n\tShutdown\n\tHelp");		
 	}
 }
