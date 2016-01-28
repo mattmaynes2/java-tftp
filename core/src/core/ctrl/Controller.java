@@ -18,7 +18,7 @@ public abstract class Controller implements CommandHandler {
     protected SocketAddress address;
     protected CommandInterpreter interpreter;
 
-    private CLI cli;
+    protected CLI cli;
 
     protected Controller () {
         this.interpreter = new CommandInterpreter();

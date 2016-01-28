@@ -5,13 +5,14 @@ import core.ctrl.Controller;
 import core.net.NodeSocket;
 import core.net.ReadTransfer;
 import core.net.Transfer;
+import core.net.TransferListener;
 import core.net.WriteTransfer;
-
+import core.req.Message;
 import core.cli.Command;
 
 import java.net.SocketAddress;
 
-public abstract class TransferController extends Controller {
+public abstract class TransferController extends Controller implements TransferListener {
 
 
     public static final String READ_COMMAND     = "read";
@@ -69,9 +70,15 @@ public abstract class TransferController extends Controller {
     
     public void performTransfer(Transfer transfer) throws InterruptedException{
         Thread transferThread = new Thread(transfer);
+        transfer.addTransferListener(this);
         transferThread.start();
         transferThread.join();
     }
 
+    public abstract void handleStart ();
+
+    public abstract void handleMessage (Message msg);
+
+    public abstract void handleComplete ();
 
 }

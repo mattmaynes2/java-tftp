@@ -27,7 +27,7 @@ public class Client extends TransferController {
 
     public static void main(String[] args){
         Client client;
-        Logger.init(Level.ALL);
+        Logger.init(System.out,Level.FINEST);
         try {
             InetSocketAddress address =
                 new InetSocketAddress(InetAddress.getLocalHost(), SERVER_PORT);
