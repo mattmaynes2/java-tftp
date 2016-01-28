@@ -11,13 +11,11 @@ import core.req.Request;
 import core.req.OpCode;
 import core.req.AckMessage;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
 public abstract class RequestController extends Controller implements RequestHandler {
-    
+
     public RequestController () throws SocketException {
         super();
     }
@@ -35,17 +33,15 @@ public abstract class RequestController extends Controller implements RequestHan
 
     @Override
     public void start(){
-    	super.start();
+        super.start();
     }
-    
+
     public void read (String filename, SocketAddress address){
         WriteTransfer runner;
-        FileInputStream in;
 
         try {
-            in = new FileInputStream(filename);
             NodeSocket socket = new NodeSocket(address);
-            runner = new WriteTransfer(socket, in);
+            runner = new WriteTransfer(socket, filename);
 
             (new Thread(runner)).start();
         } catch (Exception e){
@@ -56,14 +52,12 @@ public abstract class RequestController extends Controller implements RequestHan
 
     public void write (String filename, SocketAddress address){
         ReadTransfer runner;
-        FileOutputStream out;
 
         try {
-            out = new FileOutputStream(filename);
             NodeSocket socket = new NodeSocket(address);
-            runner = new ReadTransfer(socket, out);
- 
-            // Send the initial Ack           
+            runner = new ReadTransfer(socket, filename);
+
+            // Send the initial Ack
             socket.send(new AckMessage((short)0));
 
             (new Thread(runner)).start();
