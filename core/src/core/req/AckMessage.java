@@ -45,7 +45,7 @@ public class AckMessage extends Message {
         }
         super.decode(bytes);
         
-        ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 4);
+        ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 2);
         
         this.block= wrapper.getShort();
     }
