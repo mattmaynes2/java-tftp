@@ -25,7 +25,7 @@ public class SimulatorThread extends Thread {
 	private DatagramSocket socket;
 	private DatagramPacket packetIn;
 	private SocketAddress sendAddress;
-	
+
 	/**
 	 * Creates a new socket and sets the timeout to 1000
 	 * @param packet  the datagram packet
@@ -36,16 +36,15 @@ public class SimulatorThread extends Thread {
 		this.packetIn=packet;
 		this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
 		socket= new DatagramSocket();
-		socket.setSoTimeout(1000);
 	}
-	
+
 	/**
 	 * Allows the thread to run.  Completes an entire transaction
 	 */
 	@Override
 	public void run() {
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		try {
 			Message msg=MessageFactory.createMessage(bytes);
@@ -57,17 +56,17 @@ public class SimulatorThread extends Thread {
 				Logger.log(Level.INFO,"Message is "+msg);
 				sendPacket(msg);
 			}
-			
-			//Receives the last packet 
+
+			//Receives the last packet
 			msg=receivePacket();
 			Logger.log(Level.INFO,"Message is "+msg);
 			sendPacket(msg);
-			
+
 		} catch (IOException | InvalidMessageException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Receives a packet and returns it as a Message
 	 * @return Message created from received packet
@@ -77,11 +76,11 @@ public class SimulatorThread extends Thread {
 	private Message receivePacket() throws IOException, InvalidMessageException {
 		socket.receive(packetIn);
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		return MessageFactory.createMessage(bytes);
 	}
-	
+
 	/**
 	 * Takes a message and uses it to create and send a packet
 	 * @param message
