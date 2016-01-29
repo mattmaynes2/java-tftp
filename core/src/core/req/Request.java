@@ -11,37 +11,72 @@ import java.util.Arrays;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Defines functionality for a request message
+ *
+ */
 public abstract class Request extends Message {
 
     private RequestMode mode;
     private String filename;
 
+    /**
+     * Sets the request information
+     * @param code  the opcode
+     * @param filename  the file name
+     */
     public Request (OpCode code, String filename) {
         super(code);
         this.mode = RequestMode.BINARY;
         this.filename = filename;
     }
 
+    /**
+     * Sets the request information passed in as a byte array
+     * @param data  the byte array 
+     * @throws InvalidMessageException
+     */
     public Request (byte[] data) throws InvalidMessageException {
         super(data);
     }
 
+    /**
+     * Sets the transfer mode
+     * @param mode  the transfer mode
+     */
     public void setMode (RequestMode mode){
         this.mode = mode;
     }
 
+    /**
+     * Gets the transfer mode
+     * @return  the transfer mode
+     */
     public RequestMode getMode () {
         return this.mode;
     }
 
+    /**
+     * Sets the filename
+     * @param filename
+     */
     public void setFilename (String filename){
         this.filename = filename;
     }
 
+    /**
+     * Gets the filename
+     * @return
+     */
     public String getFilename () {
         return this.filename;
     }
 
+    /** 
+     * @param bytes  a byte list to decode
+     * The method verifies the byte list is in a valid form for a request packet
+     * If verified, it decodes the filename and transfer mode into Strings that are locally stored
+     */
     protected void decode (byte[] data) throws InvalidMessageException {
         int fileIndex, modeIndex;
 
@@ -57,6 +92,9 @@ public abstract class Request extends Message {
 
     }
 
+    /**
+     * Writes the data to a byte stream and returns it as a byte array
+     */
     public byte[] toBytes () {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
@@ -75,6 +113,9 @@ public abstract class Request extends Message {
         return buffer.toByteArray();
     }
 
+    /**
+     * Returns a string representation of the data contained in the message
+     */
     public String toString() {
         return super.toString() +
             "\nMode: " + this.mode +

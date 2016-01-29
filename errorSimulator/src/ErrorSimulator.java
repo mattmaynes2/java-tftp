@@ -1,38 +1,61 @@
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.SocketException;
-
+import java.util.logging.Level;
 import core.ctrl.Controller;
+import core.log.Logger;
+import core.net.TransferListener;
 import core.req.Message;
 
 
 public class ErrorSimulator extends Controller {
 
+    public static final int SIMULATOR_PORT = 68;
+   
+    private ReceiveWorker recieveListener;
+   
+    public ErrorSimulator() throws SocketException  {
+		recieveListener = new ReceiveWorker(SIMULATOR_PORT);
+	}
+    
     public void handleComplete () {}
-    public void handleMessage(Message msg){}
-    public void handleStart () {}
-
-    public static void main(String[] args) {
-        DatagramSocket requestSocket;
-
-        try {
-            requestSocket = new DatagramSocket(68);
-            while(true){
-                DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-                requestSocket.receive(packet);
-                new SimulatorThread(packet).start();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+    
+    public void handleMessage(Message msg){
+    	System.out.println(msg);
     }
-
+    public void handleStart () {}
+        
     @Override
+    public void start() {
+    	super.start();
+    	recieveListener.start();
+    }
+    
+    @Override
+    public void stop() {
+    	super.stop();
+    	recieveListener.stop();
+    	recieveListener.teardown();
+    }
+   
+	@Override
     public void usage() {
         System.out.println("Usage:\n\tShutdown\n\tHelp");
     }
+	
+    
+    public static void main(String[] args) {
+    	Logger.init(Level.INFO);
+    	ErrorSimulator simulator;
+        try {
+			simulator= new ErrorSimulator();
+			simulator.start();
+		} catch (SocketException e) {
+			Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
+		}
+    }
+
+	@Override
+	public void handleSendMessage(Message msg) {
+		
+	}
+	
 }
