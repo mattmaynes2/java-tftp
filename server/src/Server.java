@@ -43,6 +43,12 @@ public class Server extends RequestController {
     	Logger.log(Level.FINE, "Received message: " + msg.toString());
     }
 
+	@Override
+	public void handleSendMessage(Message msg) {
+		Logger.log(Level.FINE, "Sending message: " + msg.toString());
+	}
+
+    
     public void handleComplete () {
     	this.cli.message("Completed a transfer");
     }
@@ -64,5 +70,4 @@ public class Server extends RequestController {
             System.out.println("Ensure that you have sufficient privileges to bind to this port");
         }
     }
-
 }

@@ -26,7 +26,9 @@ public class WriteTransfer extends Transfer {
     }
 
     public void sendRequest () throws IOException {
-        this.getSocket().send(new WriteRequest(this.getFilename()));
+    	WriteRequest request = new WriteRequest(this.getFilename());
+    	notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
     public void run () {
@@ -58,6 +60,7 @@ public class WriteTransfer extends Transfer {
 
     private boolean sendData (FileInputStream in) throws IOException {
         DataMessage msg = this.createMessage(in);
+    	notifySendMessage(msg);
         this.getSocket().send(msg);
         return msg.getData().length > 0;
     }

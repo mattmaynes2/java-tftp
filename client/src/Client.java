@@ -37,6 +37,12 @@ public class Client extends TransferController {
         Logger.log(Level.FINE, "Received transfer message: " + msg.toString());
     }
 
+	@Override
+	public void handleSendMessage(Message msg) {
+		Logger.log(Level.FINE, "Sending message: " + msg.toString());
+		
+	}
+	
     @Override
     public void handleComplete() {
         this.cli.message("Transfer complete");

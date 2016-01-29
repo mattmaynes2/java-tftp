@@ -109,6 +109,16 @@ public abstract class Transfer implements Runnable {
     }
 
     /**
+     * Notifies all listeners that a message is being sent
+     * @param msg - Message being sent
+     */
+    protected void notifySendMessage(Message msg){
+        for (TransferListener listener : this.listeners) {
+            listener.handleSendMessage(msg);
+        }
+    }
+    
+    /**
      * Notifies all listeners that the transfer has completed
      */
     protected void notifyComplete () {

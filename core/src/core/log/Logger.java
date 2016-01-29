@@ -19,7 +19,7 @@ public class Logger {
 		if (systemLogLevel == null){
 			throw new UninitializedLoggerException("Logger has not been initialized");
 		}else{
-			java.util.logging.Logger.getGlobal().log(logLevel, message);
+			java.util.logging.Logger.getGlobal().log(logLevel, message + "\n");
 		}
 	}
 }

@@ -52,7 +52,9 @@ public class ReadTransfer extends Transfer {
      * @throws IOException - If the endpoint is not listening or the send fails
      */
     public void sendRequest () throws IOException {
-        this.getSocket().send(new ReadRequest(this.getFilename()));
+    	ReadRequest request = new ReadRequest(this.getFilename());
+    	notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
     /**
@@ -104,7 +106,9 @@ public class ReadTransfer extends Transfer {
         DataMessage data;
 
         data = (DataMessage) this.getSocket().receive();
-        this.getSocket().send(new AckMessage(data.getBlock()));
+        AckMessage ack = new AckMessage(data.getBlock());
+        this.notifySendMessage(ack);
+        this.getSocket().send(ack);
 
         return data;
     }
