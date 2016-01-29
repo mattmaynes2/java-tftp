@@ -2,10 +2,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-
-import core.log.Logger;
 import core.util.Worker;
 
 public class ReceiveWorker extends Worker {
