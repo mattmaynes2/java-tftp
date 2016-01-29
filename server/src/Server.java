@@ -13,25 +13,8 @@ public class Server extends RequestController {
 
     private static final int SERVER_PORT = 69;
 
-    private RequestReceiver listener;
-
     public Server () throws SocketException {
-        super();
-        this.listener = new RequestReceiver(SERVER_PORT);
-        listener.addRequestListener(this);
-    }
-
-    @Override
-    public void stop(){
-        super.stop();
-        this.listener.stop();
-        this.listener.teardown();
-    }
-
-    @Override
-    public void start(){
-        super.start();
-        listener.start();
+        super(SERVER_PORT);
     }
 
     @Override

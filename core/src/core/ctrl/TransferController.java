@@ -12,18 +12,39 @@ import core.cli.Command;
 
 import java.net.SocketAddress;
 
+/**
+ * Transfer Controller
+ *
+ * Spawns transfers when user enters CLI commands
+ */
 public abstract class TransferController extends Controller {
 
+    /**
+     * Command to initialize a read command
+     */
+    public static final String READ_COMMAND = "read";
 
-    public static final String READ_COMMAND     = "read";
-    public static final String WRITE_COMMAND    = "write";
+    /**
+     * Command to initialize a write request
+     */
+    public static final String WRITE_COMMAND = "write";
 
-    public TransferController (SocketAddress address){
+    /**
+     * Constructs a transfer controller with a read and write command
+     *
+     * @param address - Address of endpoint to communicate with
+     */
+    public TransferController (SocketAddress address) {
         super(address);
         this.interpreter.addCommand(READ_COMMAND);
         this.interpreter.addCommand(WRITE_COMMAND);
     }
 
+    /**
+     * Handles the read and write commands from the CLI
+     *
+     * @param command - Command from the user interface
+     */
     @Override
     public void handleCommand (Command command){
         super.handleCommand(command);
@@ -38,6 +59,12 @@ public abstract class TransferController extends Controller {
         }
     }
 
+    /**
+     * Performs a read transfer of the given filename from an endpoint
+     * to this controller
+     *
+     * @param filename - Name of file to transfer
+     */
     public void read (String filename){
         ReadTransfer runner;
 
@@ -53,6 +80,12 @@ public abstract class TransferController extends Controller {
         }
     }
 
+    /**
+     * Performs a write transfer of the given filename from this controller
+     * to another endpoint
+     *
+     * @param filename - Name of file to transfer
+     */
     public void write (String filename){
         WriteTransfer runner;
 
@@ -69,7 +102,12 @@ public abstract class TransferController extends Controller {
         }
     }
 
-    public void performTransfer(Transfer transfer) throws InterruptedException{
+    /**
+     * Runs a transfer in a background thread
+     *
+     * @param transfer - Transfer to run in background thread
+     */
+    public void performTransfer (Transfer transfer) throws InterruptedException{
         Thread transferThread = new Thread(transfer);
         transferThread.start();
         transferThread.join();
