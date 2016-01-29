@@ -18,9 +18,13 @@ public class Server extends RequestController {
     }
 
     @Override
-    public void usage () {
-
+    public void usage() {
+        System.out.println("TFTP Server");
+        System.out.println("  Commands:");
+        System.out.println("    help           Prints this message");
+        System.out.println("    shutdown       Exits the server");
     }
+
 
     public void handleMessage(Message msg){
         Logger.log(Level.FINE, "Received message: " + msg.toString());
