@@ -80,7 +80,7 @@ public class WriteTransfer extends Transfer {
                 msg = createMessage(in);
                 this.sendDataMessage(msg);
                 this.notifyMessage(this.getAcknowledge());
-            } while(msg.getData().length > 0);
+            } while(msg.getData().length == 512);
 
             // Close the input stream and socket
             in.close();
