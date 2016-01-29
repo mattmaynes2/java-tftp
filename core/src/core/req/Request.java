@@ -33,7 +33,7 @@ public abstract class Request extends Message {
 
     /**
      * Sets the request information passed in as a byte array
-     * @param data  the byte array 
+     * @param data  the byte array
      * @throws InvalidMessageException
      */
     public Request (byte[] data) throws InvalidMessageException {
@@ -72,8 +72,8 @@ public abstract class Request extends Message {
         return this.filename;
     }
 
-    /** 
-     * @param bytes  a byte list to decode
+    /**
+     * @param data byte list to decode
      * The method verifies the byte list is in a valid form for a request packet
      * If verified, it decodes the filename and transfer mode into Strings that are locally stored
      */
