@@ -11,54 +11,104 @@ import core.req.InvalidMessageException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import java.net.SocketAddress;
+import java.net.SocketException;
+
 import java.util.logging.Logger;
 
+/**
+ * ReadTransfer
+ *
+ * Runnable transfer moves a file from an external endpoint to this location.
+ * A read operation reads a packets from a socket until the transfer is complete
+ *
+ * Example
+ * (new Thread(
+ *      new ReadTransfer(
+ *          ENDPOINT, "myTestFile"
+ *      )
+ * )).start()
+ *
+ */
 public class ReadTransfer extends Transfer {
 
-    public ReadTransfer (NodeSocket socket, String filename){
-        super(socket, filename);
-        this.logger = Logger.getLogger("readTransfer");
+    /**
+     * Constructs a new transfer that will read data from a socket and
+     * store it in a file with the given name
+     *
+     * @param address - Address of endpoint to read from
+     * @param filename - Name of file to store incoming data
+     *
+     * @throws SocketException - If the socket cannot be created
+     */
+    public ReadTransfer (SocketAddress address, String filename) throws SocketException {
+        super(address, filename);
     }
 
-    public void sendRequest (String filename) throws IOException {
-        this.getSocket().send(new ReadRequest(filename));
+    /**
+     * Sends a request to this transfer's endpoint to start the transfer
+     *
+     * @throws IOException - If the endpoint is not listening or the send fails
+     */
+    public void sendRequest () throws IOException {
+    	ReadRequest request = new ReadRequest(this.getFilename());
+    	notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
+    /**
+     * Performs a read operation by reading data messages from the socket and
+     * writing them to the output file
+     */
     public void run () {
         FileOutputStream out;
         DataMessage msg;
 
         try {
+            // Starting the transfer
+            this.notifyStart();
+
+            // Create a stream to write the file too
             out = new FileOutputStream(this.getFilename());
-            msg = this.getData();
+            msg = this.getNext();
+
+            // We should continue to read until we get a block
+            // that is less than the standard data block size
             while (msg.getData().length == Transfer.BLOCK_SIZE){
-                this.forwardData(msg, out);
-                msg = this.getData();
+
+                // Forward the data to the output file
+                out.write(msg.getData());
+
+                // Get the next message
+                msg = this.getNext();
             }
 
-            this.forwardData(msg, out);
+            //Write the last data message to the file
+            out.write(msg.getData());
+
+            // Close the output stream and the socket
             out.close();
+            this.getSocket().close();
+
+            // Notify that the transfer is complete
+            this.notifyComplete();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private DataMessage getData () throws IOException, InvalidMessageException {
+    private DataMessage getNext () throws IOException, InvalidMessageException {
         DataMessage data;
-        AckMessage ack;
-        
+
         data = (DataMessage) this.getSocket().receive();
-        this.logMessage(data);
-        
-        ack = new AckMessage(data.getBlock());
-        this.logMessage(ack);
+        AckMessage ack = new AckMessage(data.getBlock());
+        this.notifyMessage(data);
+        this.notifySendMessage(ack);
         this.getSocket().send(ack);
 
         return data;
     }
 
-    private void forwardData(DataMessage msg, FileOutputStream out) throws IOException {
-        out.write(msg.getData());
-    }
 }

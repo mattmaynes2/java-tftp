@@ -10,6 +10,9 @@ import core.req.InvalidMessageException;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.net.SocketAddress;
+import java.net.SocketException;
+
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -17,25 +20,36 @@ public class WriteTransfer extends Transfer {
 
     private short currentBlock;
 
-    public WriteTransfer (NodeSocket socket, String filename){
-        super(socket, filename);
-        this.currentBlock = 1;
-        this.logger = Logger.getLogger("writeTransfer");
+    public WriteTransfer (SocketAddress address, String filename) throws SocketException {
+        super(address, filename);
+        this.currentBlock = 0;
     }
 
-    public void sendRequest (String filename) throws IOException {
-        this.getSocket().send(new WriteRequest(filename));
+    public void sendRequest () throws IOException {
+    	WriteRequest request = new WriteRequest(this.getFilename());
+    	notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
     public void run () {
         FileInputStream in;
 
+        this.notifyStart();
+
         try {
             in = new FileInputStream(this.getFilename());
 
-            while (this.sendData(in)){
-                this.getAcknowledge();
-            }
+            DataMessage msg;
+            
+            do {
+                msg = createMessage(in);
+            	this.sendDataMessage(msg);
+                this.notifyMessage(this.getAcknowledge());
+            } while(msg.getData().length > 0);
+
+            this.getSocket().close();
+
+            this.notifyComplete();
 
             in.close();
         } catch (Exception e){
@@ -45,16 +59,12 @@ public class WriteTransfer extends Transfer {
     }
 
     public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
-        AckMessage ack = (AckMessage) this.getSocket().receive();
-        this.logMessage(ack);
-        return ack;
+        return (AckMessage) this.getSocket().receive();
     }
 
-    private boolean sendData (FileInputStream in) throws IOException {
-        DataMessage msg = this.createMessage(in);
+    private void sendDataMessage(DataMessage msg) throws IOException {
+    	notifySendMessage(msg);
         this.getSocket().send(msg);
-        this.logMessage(msg);
-        return msg.getData().length > 0;
     }
 
     private DataMessage createMessage(FileInputStream in) throws IOException {
@@ -62,8 +72,8 @@ public class WriteTransfer extends Transfer {
         int read;
         byte[] data = new byte[Transfer.BLOCK_SIZE];
 
-        read = in.read(data, Transfer.BLOCK_SIZE * (this.currentBlock - 1), Transfer.BLOCK_SIZE);
-
+        this.currentBlock++;
+        read = in.read(data);
 
         if (read >= 0) {
             message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));

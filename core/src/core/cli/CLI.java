@@ -62,4 +62,8 @@ public class CLI extends Worker {
             e.printStackTrace();
         }
     }
+    
+    public void message(String message){
+    	write(message + "\n");
+    }
 }
