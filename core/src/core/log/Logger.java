@@ -8,6 +8,8 @@ public class Logger {
 	
 	
 	public static synchronized void init(Level logLevel){
+		// disable passing the logs up to the default parent logger
+		java.util.logging.Logger.getGlobal().setUseParentHandlers(false);
 		systemLogLevel = logLevel;
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setLevel(logLevel);
