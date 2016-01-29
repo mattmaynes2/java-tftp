@@ -13,11 +13,26 @@ import core.cli.Command;
 import java.net.SocketException;
 import java.net.SocketAddress;
 
+/**
+ * Controller
+ *
+ * Handles requests from a command line interface and spawns transfers
+ */
 public abstract class Controller implements CommandHandler, TransferListener {
 
-    public static final String SHUTDOWN_COMMAND     = "shutdown";
-    public static final String HELP_COMMAND         = "help";
+    /**
+     * Command to shutdown this controller
+     */
+    public static final String SHUTDOWN_COMMAND = "shutdown";
 
+    /**
+     * Command to request usage information for this proces
+     */
+    public static final String HELP_COMMAND = "help";
+
+    /**
+     * Address
+     */
     protected SocketAddress address;
     protected CommandInterpreter interpreter;
 
