@@ -1,6 +1,7 @@
 package core.cli;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
@@ -31,8 +32,14 @@ public class CommandInterpreter {
      */
     public Command parseCommand(String input) throws CommandInputException {
         StringTokenizer tokenizer = new StringTokenizer(input);
-
-        return this.interpretCommand(tokenizer.nextToken().toLowerCase(), tokenizer);
+        String token;
+        
+        try{
+        	token = tokenizer.nextToken().toLowerCase();
+        }catch(NoSuchElementException ex){
+        	throw new CommandInputException("Please enter a command");
+        }
+        return this.interpretCommand(token, tokenizer);
     }
 
     private Command interpretCommand(String commandToken, StringTokenizer tokenizer)

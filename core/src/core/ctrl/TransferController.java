@@ -4,12 +4,11 @@ import core.ctrl.Controller;
 
 import core.net.NodeSocket;
 import core.net.ReadTransfer;
+import core.net.Transfer;
+import core.net.TransferListener;
 import core.net.WriteTransfer;
-
+import core.req.Message;
 import core.cli.Command;
-
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
 
 import java.net.SocketAddress;
 
@@ -41,13 +40,12 @@ public abstract class TransferController extends Controller {
 
     public void read (String filename){
         ReadTransfer runner;
-        FileOutputStream out;
-        try {
-            out = new FileOutputStream(filename);
-            runner = new ReadTransfer(new NodeSocket(this.getAddress()), out);
 
-            runner.sendRequest(filename);
-            (new Thread(runner)).start();
+        try {
+            runner = new ReadTransfer(this.getAddress(), filename);
+
+            runner.sendRequest();
+            performTransfer(runner);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -56,20 +54,24 @@ public abstract class TransferController extends Controller {
 
     public void write (String filename){
         WriteTransfer runner;
-        FileInputStream in;
 
         try {
-            in = new FileInputStream(filename);
-            runner = new WriteTransfer(new NodeSocket(this.getAddress()), in);
+            runner = new WriteTransfer(this.getAddress(), filename);
 
-            runner.sendRequest(filename);
+            runner.sendRequest();
+            runner.getAcknowledge();
 
-            (new Thread(runner)).start();
+            performTransfer(runner);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-
+    public void performTransfer(Transfer transfer) throws InterruptedException{
+        Thread transferThread = new Thread(transfer);
+        transfer.addTransferListener(this);
+        transferThread.start();
+        transferThread.join();
+    }
 }

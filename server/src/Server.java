@@ -2,6 +2,8 @@
 import core.net.RequestListener;
 import core.ctrl.RequestController;
 
+import core.req.Message;
+
 import java.net.SocketException;
 
 public class Server extends RequestController {
@@ -17,14 +19,30 @@ public class Server extends RequestController {
     }
 
     @Override
+    public void stop(){
+    	super.stop();
+    	this.listener.stop();
+    	this.listener.teardown();
+    }
+
+    @Override
     public void start(){
     	super.start();
-        listener.execute();
+        listener.start();
     }
 
     @Override
     public void usage () {
 
+    }
+
+    public void handleMessage(Message msg){
+    }
+
+    public void handleComplete () {
+    }
+
+    public void handleStart (){
     }
 
     public static void main (String[] args) {

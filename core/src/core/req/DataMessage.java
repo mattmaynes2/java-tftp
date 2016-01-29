@@ -12,6 +12,8 @@ import core.util.ByteUtils;
  */
 public class DataMessage extends AckMessage {
 
+    public static final int BLOCK_SIZE = 512;
+
     private byte[] data;
     public DataMessage(byte[] bytes) throws InvalidMessageException {
         super(bytes);
@@ -30,7 +32,7 @@ public class DataMessage extends AckMessage {
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
         super.decode(bytes);
-        if(bytes.length>4) {
+        if(bytes.length>=4) {
             this.data=Arrays.copyOfRange(bytes, 4, bytes.length);
         }else {
             this.data=null;
@@ -59,7 +61,7 @@ public class DataMessage extends AckMessage {
      */
     @Override
     public String toString() {
-        return super.toString() + ByteUtils.bytesToHexString(this.data);
+        return super.toString() + " data: " + Arrays.toString(this.data);
     }
 
     /**
@@ -68,5 +70,9 @@ public class DataMessage extends AckMessage {
      */
     public byte[] getData() {
         return data;
+    }
+
+    public boolean isLastBlock () {
+        return this.data.length < BLOCK_SIZE;
     }
 }

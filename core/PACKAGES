@@ -1,1 +1,1 @@
-core/util core/ctrl core/req core/net core/cli
+core/util core/ctrl core/req core/net core/cli core/log

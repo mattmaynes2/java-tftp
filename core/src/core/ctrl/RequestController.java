@@ -1,19 +1,17 @@
 package core.ctrl;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
-import core.net.NodeSocket;
 import core.net.ReadTransfer;
 import core.net.RequestHandler;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
 import core.req.Request;
 
+
 public abstract class RequestController extends Controller implements RequestHandler {
-    
+
     public RequestController () throws SocketException {
         super();
     }
@@ -21,29 +19,26 @@ public abstract class RequestController extends Controller implements RequestHan
     public void handleRequest (Request req, SocketAddress address){
         switch(req.getOpCode()){
             case READ:
-                this.read(req.getFilename(), address);
+                this.read(address, req.getFilename());
                 break;
             case WRITE:
-                this.write(req.getFilename(), address);
+                this.write(address, req.getFilename());
                 break;
         }
     }
 
     @Override
     public void start(){
-    	super.start();
+        super.start();
     }
-    
-    public void read (String filename, SocketAddress address){
+
+    public void read (SocketAddress address, String filename){
         WriteTransfer runner;
-        FileInputStream in;
 
         try {
-            in = new FileInputStream(filename);
-            NodeSocket socket = new NodeSocket();
-            socket.setAddress(address);
-            runner = new WriteTransfer(socket, in);
+            runner = new WriteTransfer(address, filename);
 
+            runner.addTransferListener(this);
             (new Thread(runner)).start();
         } catch (Exception e){
             e.printStackTrace();
@@ -51,18 +46,15 @@ public abstract class RequestController extends Controller implements RequestHan
         }
     }
 
-    public void write (String filename, SocketAddress address){
+    public void write (SocketAddress address, String filename){
         ReadTransfer runner;
-        FileOutputStream out;
 
         try {
-            out = new FileOutputStream(filename);
-            NodeSocket socket = new NodeSocket();
-            socket.setAddress(address);
-            runner = new ReadTransfer(new NodeSocket(), out);
- 
+            runner = new ReadTransfer(address, filename);
+
+            runner.addTransferListener(this);
             // Send the initial Ack
-            socket.send(new AckMessage((short)0));
+            runner.getSocket().send(new AckMessage((short)0));
 
             (new Thread(runner)).start();
         } catch (Exception e){

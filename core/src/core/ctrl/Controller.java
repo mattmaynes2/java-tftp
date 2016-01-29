@@ -1,5 +1,8 @@
 package core.ctrl;
 
+import core.req.Message;
+import core.net.TransferListener;
+
 import java.net.SocketAddress;
 
 import core.cli.CLI;
@@ -7,7 +10,7 @@ import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
 
-public abstract class Controller implements CommandHandler {
+public abstract class Controller implements CommandHandler, TransferListener {
 
     public static final String SHUTDOWN_COMMAND     = "shutdown";
     public static final String HELP_COMMAND         = "help";
@@ -15,7 +18,7 @@ public abstract class Controller implements CommandHandler {
     protected SocketAddress address;
     protected CommandInterpreter interpreter;
 
-    private CLI cli;
+    protected CLI cli;
 
     protected Controller () {
         this.interpreter = new CommandInterpreter();
@@ -58,5 +61,12 @@ public abstract class Controller implements CommandHandler {
                 break;
         }
     }
+
+    public abstract void handleStart ();
+
+    public abstract void handleMessage (Message msg);
+
+    public abstract void handleComplete ();
+
 
 }
