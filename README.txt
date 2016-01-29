@@ -26,6 +26,29 @@ Repeat this process for the 'server' project and the 'errorSimulator' project.
 Eclipse should now be configured properly.
 
 
+## Running Instructions
+
+### Server
+To run the server, run the server project from eclipse.
+To shutdown the server, type 'shutdown' in the servers command line interface.
+
+### Error Simulator
+To run the Error Simulator, run the error simulator from eclipse.
+To shutdown the Error Simulator, type 'shutdown' in the error simulators command line interface.
+
+### Client
+By default, client will connect directly to the ser when run through eclipse.  To have the client run through the error simulator, run the client with the -t command line argument.
+To see the usage information, type 'help' in the cli.  
+To perform a read operation from the server to the client, type 'read' followed by a space and the filename.
+To perform a write operation from the client to the server, type 'write' followed by a space and the filename.
+
+#### Command Line Arguments
+To enter a command line argument in eclipse:
+-Right click on the client project and select 'Run as' -> 'Run Configurations'
+-Ensure that the client project is selected in the tree view in the left hand side of the popup window
+-Select the 'Arguments' tab on the right hand side
+-In the 'Program Arguments' text box, add -t
+
 ## Project Structure
 The file TeamResponsibilities.txt describes the responsibilities of each team member for this iteration.  The document is split into a different section for each member, and lists their contributions. 
 The file TestPlan.pdf describes the test procedure followed to ensure correct functionality of the program.  It also describes the command line arguments and cli commands available for the client, server, and error simulator.
@@ -89,6 +112,6 @@ This class contains static methods to find the index of a value in a byte array,
 ##### Worker.java
 This is an abstract base class for long running asynchronous jobs.
 
-For further details on any specific class, from any package, refer to the provided javadoc.  
+For further details on any specific class from a core package, refer to the provided javadoc.  
 
 
