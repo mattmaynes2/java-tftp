@@ -1,5 +1,9 @@
 package core.req;
 
+/**
+ * Factory that creates a specific type of Message based on an opcode byte
+ *
+ */
 public class MessageFactory {
 	
 	public static Message createMessage(byte[] bytes) throws InvalidMessageException {
@@ -7,6 +11,7 @@ public class MessageFactory {
 			throw new InvalidMessageException("The first byte of the opCode is not 0.");
 		}
 		
+		// Takes the opcode byte and runs a switch on it, throws an exception if it is not a valid opcode
 		switch(OpCode.convert(bytes[1])) {
 			case READ:
 				return new ReadRequest(bytes);
