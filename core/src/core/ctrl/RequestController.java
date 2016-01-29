@@ -1,20 +1,16 @@
 package core.ctrl;
 
-import core.ctrl.Controller;
-
-import core.net.NodeSocket;
-import core.net.ReadTransfer;
-import core.net.WriteTransfer;
-import core.net.RequestHandler;
-import core.net.RequestListener;
-import core.req.Request;
-import core.req.OpCode;
-import core.req.AckMessage;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.SocketAddress;
 import java.net.SocketException;
+
+import core.net.NodeSocket;
+import core.net.ReadTransfer;
+import core.net.RequestHandler;
+import core.net.WriteTransfer;
+import core.req.AckMessage;
+import core.req.Request;
 
 public abstract class RequestController extends Controller implements RequestHandler {
     

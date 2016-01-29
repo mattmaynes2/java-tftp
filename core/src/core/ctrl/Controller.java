@@ -1,14 +1,11 @@
 package core.ctrl;
 
-import core.net.NodeSocket;
+import java.net.SocketAddress;
 
 import core.cli.CLI;
+import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
-import core.cli.Command;
-
-import java.net.SocketException;
-import java.net.SocketAddress;
 
 public abstract class Controller implements CommandHandler {
 
