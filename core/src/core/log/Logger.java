@@ -1,16 +1,13 @@
 package core.log;
-import java.io.OutputStream;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 public class Logger {
 	
 	private static Level systemLogLevel = null;
 	
 	
-	public static synchronized void init(OutputStream stream, Level logLevel){
+	public static synchronized void init(Level logLevel){
 		systemLogLevel = logLevel;
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setLevel(logLevel);
@@ -18,7 +15,7 @@ public class Logger {
 		java.util.logging.Logger.getGlobal().setLevel(logLevel);
 	}
 	
-	public static void log(String className, Level logLevel,String message) throws UninitializedLoggerException{
+	public static void log(Level logLevel,String message) throws UninitializedLoggerException{
 		if (systemLogLevel == null){
 			throw new UninitializedLoggerException("Logger has not been initialized");
 		}else{

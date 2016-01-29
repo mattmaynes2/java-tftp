@@ -34,7 +34,7 @@ public class Client extends TransferController {
 
     @Override
     public void handleMessage(Message msg) {
-        Logger.log("Client", Level.FINEST, "Received transfer message: " + msg.toString());
+        Logger.log(Level.FINE, "Received transfer message: " + msg.toString());
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Client extends TransferController {
         if (quietMode){
         	logLevel = Level.SEVERE;
         }
-    	Logger.init(System.out, logLevel);
+    	Logger.init(logLevel);
         
         try {
             InetSocketAddress address =
