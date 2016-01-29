@@ -1,0 +1,7 @@
+INDEX VERSION 1.127+M:\3303\java-tftp\.metadata\.plugins\org.eclipse.jdt.core
+2461411560.index
+3534984224.index
+2520859361.index
+262142283.index
+1896386436.index
+1266009388.index
