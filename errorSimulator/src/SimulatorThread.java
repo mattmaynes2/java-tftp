@@ -7,7 +7,9 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.logging.Level;
 
+import core.log.Logger;
 import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
@@ -43,8 +45,8 @@ public class SimulatorThread extends Thread {
 	@Override
 	public void run() {
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		System.out.println("Received Packet From "+packetIn.getSocketAddress()); 
-		System.out.println("Bytes are: "+ByteUtils.bytesToHexString(bytes));
+		Logger.log("Simulator Thread",Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		try {
 			Message msg=MessageFactory.createMessage(bytes);
 			System.out.println(msg);
@@ -52,13 +54,13 @@ public class SimulatorThread extends Thread {
 			//Loops until it is about to receive the last message
 			while(!MessageFactory.isLastMessage(msg)) {
 				msg=receivePacket();
-				System.out.println("Message is "+msg);
+				Logger.log("Simulator Thread",Level.INFO,"Message is "+msg);
 				sendPacket(msg);
 			}
 			
 			//Receives the last packet 
 			msg=receivePacket();
-			System.out.println("Message is "+msg);
+			Logger.log("Simulator Thread",Level.INFO,"Message is "+msg);
 			sendPacket(msg);
 			
 		} catch (IOException | InvalidMessageException e) {
@@ -75,8 +77,8 @@ public class SimulatorThread extends Thread {
 	private Message receivePacket() throws IOException, InvalidMessageException {
 		socket.receive(packetIn);
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		System.out.println("Received Packet From "+packetIn.getSocketAddress()); 
-		System.out.print("Bytes are: "+ByteUtils.bytesToHexString(packetIn.getData()));
+		Logger.log("Simulator Thread",Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		return MessageFactory.createMessage(bytes);
 	}
 	
@@ -86,8 +88,11 @@ public class SimulatorThread extends Thread {
 	 * @throws IOException
 	 */
 	private void sendPacket(Message message) throws IOException {
+		Logger.log("Simulator Thread",Level.INFO,"Sending message to: "+sendAddress);
+		Logger.log("Simulator Thread",Level.INFO,"Message is: "+message);
+		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
 		socket.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
 		sendAddress=packetIn.getSocketAddress();
-		System.out.println("Set next address to send "+sendAddress);
+		Logger.log("Simulator Thread",Level.INFO,"Set next address to send "+sendAddress);
 	}
 }
