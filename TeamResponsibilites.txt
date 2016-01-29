@@ -1,0 +1,24 @@
+This document describes the role of each team member for Iteration 1
+
+Matthew Maynes
+- Core network library
+- Javadoc
+- UCM
+
+Connor Matthews
+- Message encoding/decoding library
+- Logging
+
+Jeremy Dunsmore
+- Message encoding/decoding library
+- Core network library
+- UML
+ 
+Peter Mark
+- CLI library
+- Javadoc
+
+Cameron Blanchard
+- CLI library
+- Core network library
+- Test Plan

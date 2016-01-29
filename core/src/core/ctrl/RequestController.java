@@ -4,13 +4,13 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import core.net.ReadTransfer;
-import core.net.RequestHandler;
+import core.net.RequestListener;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
 import core.req.Request;
 
 
-public abstract class RequestController extends Controller implements RequestHandler {
+public abstract class RequestController extends Controller implements RequestListener {
 
     public RequestController () throws SocketException {
         super();

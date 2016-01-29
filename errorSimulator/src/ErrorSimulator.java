@@ -6,7 +6,7 @@ import core.net.TransferListener;
 import core.req.Message;
 
 
-public class ErrorSimulator extends Controller implements TransferListener {
+public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
    
@@ -43,14 +43,19 @@ public class ErrorSimulator extends Controller implements TransferListener {
 	
     
     public static void main(String[] args) {
-    	Logger.init(System.out,Level.INFO);
+    	Logger.init(Level.INFO);
     	ErrorSimulator simulator;
         try {
 			simulator= new ErrorSimulator();
 			simulator.start();
 		} catch (SocketException e) {
-			Logger.log("ErrorSimulator", Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
+			Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
 		}
     }
+
+	@Override
+	public void handleSendMessage(Message msg) {
+		
+	}
 	
 }

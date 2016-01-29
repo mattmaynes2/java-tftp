@@ -16,60 +16,125 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+/**
+ * Write Transfer
+ *
+ * Runnable transfer moves a file from this location to an external endpoint.
+ * A write operation chunks a file into block sized packets and writes them
+ * to a socket.
+ *
+ * Example
+ * ( new Thread(
+ *      new WriteTransfer(EDNPOINT, "myTestFile")
+ * )).start()
+ */
 public class WriteTransfer extends Transfer {
 
+    /**
+     * Current data block being transferred
+     */
     private short currentBlock;
 
+    /**
+     * Constructs a new transfer will write data to a socket from
+     * the file with the given name
+     *
+     * @param address - Address of endpoint to send data
+     * @param filename - Name of file to send to server
+     *
+     * @throws SocketException - If the socket cannot be created
+     */
     public WriteTransfer (SocketAddress address, String filename) throws SocketException {
         super(address, filename);
         this.currentBlock = 0;
     }
 
+    /**
+     * Sends a request to start this transfer
+     *
+     * @throws IOException - If the endpoint is not listening or the write fails
+     */
     public void sendRequest () throws IOException {
-        this.getSocket().send(new WriteRequest(this.getFilename()));
+        WriteRequest request = new WriteRequest(this.getFilename());
+        notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
+    /**
+     * Performs a write operation by taking block sized chunks from a file
+     * and writing them to the socket
+     */
     public void run () {
         FileInputStream in;
-
-        this.notifyStart();
+        DataMessage msg;
 
         try {
+            // Starting the transfer
+            this.notifyStart();
+
+            // Create a new stream to read the file
             in = new FileInputStream(this.getFilename());
 
-            while (this.sendData(in)){
+            // Continue to send data until all of the data has been sent
+            do {
+                msg = createMessage(in);
+                this.sendDataMessage(msg);
                 this.notifyMessage(this.getAcknowledge());
-            }
+            } while(msg.getData().length == 512);
 
+            // Close the input stream and socket
+            in.close();
             this.getSocket().close();
 
+            // Notify that the transfer is complete
             this.notifyComplete();
-
-            in.close();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
     }
 
+    /**
+     * Synchronously blocks and waits for an acknowledgment from the
+     * socket endpoint
+     *
+     * @return An acknowledge message
+     *
+     * @throws IOException - If the socket is closed
+     * @throws InvalidMessageException - If the received message has an invalid encoding
+     */
     public AckMessage getAcknowledge () throws IOException, InvalidMessageException {
         return (AckMessage) this.getSocket().receive();
     }
 
-    private boolean sendData (FileInputStream in) throws IOException {
-        DataMessage msg = this.createMessage(in);
+    /**
+     * Sends a data message to the endpoint
+     *
+     * @param msg - Message to send to endpoint
+     */
+    private void sendDataMessage(DataMessage msg) throws IOException {
+        this.notifySendMessage(msg);
         this.getSocket().send(msg);
-        return msg.getData().length > 0;
     }
 
-    private DataMessage createMessage(FileInputStream in) throws IOException {
+    /**
+     * Creates a data message out of the next block in the given input stream
+     *
+     * @param in - The input stream it read the next block from
+     */
+    private DataMessage createMessage (FileInputStream in) throws IOException {
         DataMessage message;
         int read;
-        byte[] data = new byte[Transfer.BLOCK_SIZE];
+        byte[] data;
 
+        // Increment the block
         this.currentBlock++;
+        data = new byte[DataMessage.BLOCK_SIZE];
         read = in.read(data);
 
+        // If there are only 0 bytes read in then we need to send
+        // a data packet with no data. Otherwise we will truncate the
+        // data to only use the data read in
         if (read >= 0) {
             message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
         }

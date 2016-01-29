@@ -18,16 +18,14 @@ import java.net.SocketException;
 import java.util.logging.Logger;
 
 /**
- * ReadTransfer
+ * Read Transfer
  *
  * Runnable transfer moves a file from an external endpoint to this location.
  * A read operation reads a packets from a socket until the transfer is complete
  *
  * Example
  * (new Thread(
- *      new ReadTransfer(
- *          ENDPOINT, "myTestFile"
- *      )
+ *      new ReadTransfer(ENDPOINT, "myTestFile")
  * )).start()
  *
  */
@@ -52,7 +50,9 @@ public class ReadTransfer extends Transfer {
      * @throws IOException - If the endpoint is not listening or the send fails
      */
     public void sendRequest () throws IOException {
-        this.getSocket().send(new ReadRequest(this.getFilename()));
+        ReadRequest request = new ReadRequest(this.getFilename());
+        notifySendMessage(request);
+        this.getSocket().send(request);
     }
 
     /**
@@ -73,9 +73,7 @@ public class ReadTransfer extends Transfer {
 
             // We should continue to read until we get a block
             // that is less than the standard data block size
-            while (msg.getData().length == Transfer.BLOCK_SIZE){
-                // Notify that a message has been received
-                this.notifyMessage(msg);
+            while (msg.getData().length == DataMessage.BLOCK_SIZE){
 
                 // Forward the data to the output file
                 out.write(msg.getData());
@@ -84,8 +82,7 @@ public class ReadTransfer extends Transfer {
                 msg = this.getNext();
             }
 
-            // Notify of the last message and write it to the file
-            this.notifyMessage(msg);
+            // Write the last data message to the file
             out.write(msg.getData());
 
             // Close the output stream and the socket
@@ -100,12 +97,25 @@ public class ReadTransfer extends Transfer {
         }
     }
 
+    /**
+     * Synchronously receive the next data packet and sends an acknowledgement
+     *
+     * @return The next data packet read from the socket
+     *
+     * @throws IOException - If the socket is closed or there is a sending error
+     * @throws InvalidMessageException - If there is on error decoding the packet
+     */
     private DataMessage getNext () throws IOException, InvalidMessageException {
         DataMessage data;
+        AckMessage ack;
 
         data = (DataMessage) this.getSocket().receive();
-        this.getSocket().send(new AckMessage(data.getBlock()));
+        ack = new AckMessage(data.getBlock());
 
+        this.notifyMessage(data);
+        this.notifySendMessage(ack);
+
+        this.getSocket().send(ack);
         return data;
     }
 

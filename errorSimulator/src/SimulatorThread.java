@@ -45,8 +45,8 @@ public class SimulatorThread extends Thread {
 	@Override
 	public void run() {
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		Logger.log("Simulator Thread",Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
-		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
+		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		try {
 			Message msg=MessageFactory.createMessage(bytes);
 			System.out.println(msg);
@@ -54,13 +54,13 @@ public class SimulatorThread extends Thread {
 			//Loops until it is about to receive the last message
 			while(!MessageFactory.isLastMessage(msg)) {
 				msg=receivePacket();
-				Logger.log("Simulator Thread",Level.INFO,"Message is "+msg);
+				Logger.log(Level.INFO,"Message is "+msg);
 				sendPacket(msg);
 			}
 			
 			//Receives the last packet 
 			msg=receivePacket();
-			Logger.log("Simulator Thread",Level.INFO,"Message is "+msg);
+			Logger.log(Level.INFO,"Message is "+msg);
 			sendPacket(msg);
 			
 		} catch (IOException | InvalidMessageException e) {
@@ -77,8 +77,8 @@ public class SimulatorThread extends Thread {
 	private Message receivePacket() throws IOException, InvalidMessageException {
 		socket.receive(packetIn);
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		Logger.log("Simulator Thread",Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
-		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
+		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress()); 
+		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
 		return MessageFactory.createMessage(bytes);
 	}
 	
@@ -88,11 +88,11 @@ public class SimulatorThread extends Thread {
 	 * @throws IOException
 	 */
 	private void sendPacket(Message message) throws IOException {
-		Logger.log("Simulator Thread",Level.INFO,"Sending message to: "+sendAddress);
-		Logger.log("Simulator Thread",Level.INFO,"Message is: "+message);
-		Logger.log("Simulator Thread",Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
+		Logger.log(Level.INFO,"Sending message to: "+sendAddress);
+		Logger.log(Level.INFO,"Message is: "+message);
+		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
 		socket.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
 		sendAddress=packetIn.getSocketAddress();
-		Logger.log("Simulator Thread",Level.INFO,"Set next address to send "+sendAddress);
+		Logger.log(Level.INFO,"Set next address to send "+sendAddress);
 	}
 }
