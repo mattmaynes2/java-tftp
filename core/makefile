@@ -44,7 +44,7 @@ DOC = doc
 #
 # Flags
 #
-FLAGS = -classpath $(LIB)/*.jar:$(BIN):. -sourcepath $(SRC)
+FLAGS = -classpath $(LIB):$(BIN):. -sourcepath $(SRC)
 
 #
 # The default directive is used when only make is called. It
@@ -72,8 +72,8 @@ classes: sh
 # Compiles the project verbosely with all of the java compiler messages
 #
 verbose: sh
-	$(JC) -version -Xlint $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
-	$(JC) -version -Xlint $(FLAGS) -d $(BIN) $(foreach package, $(TESTPACKAGES), $(SRC)/$(package)/*.java)
+	$(JC) -version -Xlint:all $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
+	$(JC) -version -Xlint:all $(FLAGS) -d $(BIN) $(foreach package, $(TESTPACKAGES), $(SRC)/$(package)/*.java)
 
 #
 # Compiles and outputs all of the javadoc into the API folder

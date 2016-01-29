@@ -21,12 +21,6 @@ import java.net.SocketException;
 public abstract class Transfer implements Runnable {
 
     /**
-     * Data block payload size. All datagram packet will contain
-     * this block size worth of bytes (not including the header bytes)
-     */
-    public static final int BLOCK_SIZE = 512;
-
-    /**
      * Listeners to the stages of a transfer
      */
     private ArrayList<TransferListener> listeners;
@@ -117,7 +111,7 @@ public abstract class Transfer implements Runnable {
             listener.handleSendMessage(msg);
         }
     }
-    
+
     /**
      * Notifies all listeners that the transfer has completed
      */

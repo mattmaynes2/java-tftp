@@ -8,6 +8,10 @@ import core.util.ByteUtils;
 
 public class DataMessage extends AckMessage {
 
+    /**
+     * Data block payload size. All datagram packet will contain
+     * this block size worth of bytes (not including the header bytes)
+     */
     public static final int BLOCK_SIZE = 512;
 
     private byte[] data;
