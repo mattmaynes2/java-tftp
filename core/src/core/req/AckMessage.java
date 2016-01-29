@@ -3,6 +3,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * This class is responsible for handling acknowledge packets
+ *
+ */
 public class AckMessage extends Message {
 
     private short block;
@@ -25,19 +29,35 @@ public class AckMessage extends Message {
         this.block=block;
     }
 
+    /**
+     * 
+     * @return the block number 
+     */
     public short getBlock() {
         return this.block;
     }
 
+    /**
+     * set the block number
+     * @param block
+     */
     public void setBlock(short block) {
         this.block = block;
     }
 
+    /**
+     * Returns a string representation of the block number
+     */
     @Override
     public String toString() {
         return super.toString()+" block number: "+this.block;
     }
 
+    /** 
+     * Param bytes  a byte list to decode
+     * The method verifies the byte list is in a valid form for an acknowledgement packet
+     * If verified, it sets the block number to the appropriate value  
+     */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
         if (bytes.length<4){
@@ -45,11 +65,15 @@ public class AckMessage extends Message {
         }
         super.decode(bytes);
         
+        //stores the block number in a byte buffer to be converted into a short
         ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 2);
         
         this.block= wrapper.getShort();
     }
 
+    /**
+     * Converts the opcode to a byte array and returns it
+     */
     @Override
     public byte[] toBytes() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -57,7 +81,7 @@ public class AckMessage extends Message {
 	    b.putShort(this.block);
 	
 	    byte[] result = b.array();
-	      
+	    
         try {
             out.write(super.toBytes());
             out.write(result);

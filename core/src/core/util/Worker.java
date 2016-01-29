@@ -1,7 +1,6 @@
 
 package core.util;
 
-
 public abstract class Worker implements Runnable {
 
     private boolean running;
