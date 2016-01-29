@@ -39,9 +39,13 @@ public class WriteTransfer extends Transfer {
         try {
             in = new FileInputStream(this.getFilename());
 
-            while (this.sendData(in)){
+            DataMessage msg;
+            
+            do {
+                msg = createMessage(in);
+            	this.sendDataMessage(msg);
                 this.notifyMessage(this.getAcknowledge());
-            }
+            } while(msg.getData().length > 0);
 
             this.getSocket().close();
 
@@ -58,11 +62,9 @@ public class WriteTransfer extends Transfer {
         return (AckMessage) this.getSocket().receive();
     }
 
-    private boolean sendData (FileInputStream in) throws IOException {
-        DataMessage msg = this.createMessage(in);
+    private void sendDataMessage(DataMessage msg) throws IOException {
     	notifySendMessage(msg);
         this.getSocket().send(msg);
-        return msg.getData().length > 0;
     }
 
     private DataMessage createMessage(FileInputStream in) throws IOException {
