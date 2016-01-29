@@ -25,4 +25,19 @@ public class MessageFactory {
 				throw new InvalidMessageException("The second byte of the opCode does not represent a valid message.");		
 		}
 	}
+	
+	/**
+	 * Checks to see if the message is a data message, and if so, if it is the last block
+	 * @param message 
+	 * @return True if it is the last block in a data message.  Otherwise False.
+	 */
+	public static boolean isLastMessage(Message message) {
+		if(message.getOpCode().equals(OpCode.DATA)) {
+			return (((DataMessage) message).isLastBlock());
+		}
+		else {
+			return false;
+		}
+		
+	}
 }
