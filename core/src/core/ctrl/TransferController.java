@@ -43,6 +43,7 @@ public abstract class TransferController extends Controller {
 
         try {
             runner = new ReadTransfer(this.getAddress(), filename);
+            runner.addTransferListener(this);
 
             runner.sendRequest();
             performTransfer(runner);
@@ -57,7 +58,7 @@ public abstract class TransferController extends Controller {
 
         try {
             runner = new WriteTransfer(this.getAddress(), filename);
-
+            runner.addTransferListener(this);
             runner.sendRequest();
             runner.getAcknowledge();
 
@@ -70,7 +71,6 @@ public abstract class TransferController extends Controller {
 
     public void performTransfer(Transfer transfer) throws InterruptedException{
         Thread transferThread = new Thread(transfer);
-        transfer.addTransferListener(this);
         transferThread.start();
         transferThread.join();
     }

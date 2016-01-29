@@ -76,8 +76,6 @@ public class ReadTransfer extends Transfer {
             // We should continue to read until we get a block
             // that is less than the standard data block size
             while (msg.getData().length == Transfer.BLOCK_SIZE){
-                // Notify that a message has been received
-                this.notifyMessage(msg);
 
                 // Forward the data to the output file
                 out.write(msg.getData());
@@ -86,8 +84,7 @@ public class ReadTransfer extends Transfer {
                 msg = this.getNext();
             }
 
-            // Notify of the last message and write it to the file
-            this.notifyMessage(msg);
+            //Write the last data message to the file
             out.write(msg.getData());
 
             // Close the output stream and the socket
@@ -107,6 +104,7 @@ public class ReadTransfer extends Transfer {
 
         data = (DataMessage) this.getSocket().receive();
         AckMessage ack = new AckMessage(data.getBlock());
+        this.notifyMessage(data);
         this.notifySendMessage(ack);
         this.getSocket().send(ack);
 
