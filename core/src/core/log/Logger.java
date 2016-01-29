@@ -16,6 +16,8 @@ public class Logger {
 	 * @param logLevel The minimum severity of messages to log
 	 */
 	public static synchronized void init(Level logLevel){
+		// disable passing the logs up to the default parent logger
+		java.util.logging.Logger.getGlobal().setUseParentHandlers(false);
 		systemLogLevel = logLevel;
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setLevel(logLevel);

@@ -11,6 +11,9 @@ import core.req.Request;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
+import core.log.Logger;
+import java.util.logging.Level;
+
 /**
  * Request Controller
  *
@@ -41,6 +44,8 @@ public abstract class RequestController extends Controller implements RequestLis
      * @param address - Sender's address
      */
     public void handleRequest (Request req, SocketAddress address){
+    	Logger.log(Level.FINE, "Received request from client " + req.toString());
+
         switch(req.getOpCode()){
             case READ:
                 this.read(address, req.getFilename());
@@ -81,7 +86,6 @@ public abstract class RequestController extends Controller implements RequestLis
         WriteTransfer runner;
 
         try {
-
             runner = new WriteTransfer(address, filename);
             runner.addTransferListener(this);
             (new Thread(runner)).start();
