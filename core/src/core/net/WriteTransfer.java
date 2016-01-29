@@ -1,7 +1,5 @@
 package core.net;
 
-import core.net.NodeSocket;
-
 import core.req.WriteRequest;
 import core.req.DataMessage;
 import core.req.AckMessage;
@@ -14,7 +12,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 /**
  * Write Transfer
