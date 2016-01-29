@@ -8,20 +8,22 @@ If that did not work, follow these steps:
 Ensure the Java Perspective is open in Eclipse.
 
 Create the Core project:
--In the package explorer in eclipse, right click and select 'New' -> 'Java Project'
--In the Project name text box, type in 'core'
--Click Finish
-This project will now be recognized and imported.  Repeat this process with the project names: 'client', 'server', and 'errorSimulator'.
 
-The client, server, and errorSimulator projects will now show errors.  The 'core' project is required to be on the buildpath of the other three projects.  To add the 'core' project to the buildpath or 'client':
--Right click on the 'client' project
--Click 'properties'
--Click 'java build path'
--Click the 'projects' tab
--Click the 'add' button
--Select the checkbox next to the 'core' project
--Click OK
-Repeat this process for the 'server' project and the 'errorSimulator' project.
+- In the package explorer in eclipse, right click and select `New` -> `Java Project`
+- In the Project name text box, type in `core`
+- Click Finish
+This project will now be recognized and imported.  Repeat this process with the project names: `client`, `server`, and `errorSimulator`.
+
+The client, server, and errorSimulator projects will now show errors.  The `core` project is required to be on the buildpath of the other three projects.  To add the `core` project to the buildpath or `client`:
+
+- Right click on the `client` project
+- Click `properties`
+- Click `java build path`
+- Click the `projects` tab
+- Click the `add` button
+- Select the checkbox next to the `core` project
+- Click OK
+Repeat this process for the `server` project and the `errorSimulator` project.
 
 Eclipse should now be configured properly.
 
@@ -30,24 +32,24 @@ Eclipse should now be configured properly.
 
 ### Server
 To run the server, run the server project from eclipse.
-To shutdown the server, type 'shutdown' in the servers command line interface.
+To shutdown the server, type `shutdown` in the servers command line interface.
 
 ### Error Simulator
 To run the Error Simulator, run the error simulator from eclipse.
-To shutdown the Error Simulator, type 'shutdown' in the error simulators command line interface.
+To shutdown the Error Simulator, type `shutdown` in the error simulators command line interface.
 
 ### Client
 By default, client will connect directly to the ser when run through eclipse.  To have the client run through the error simulator, run the client with the -t command line argument.
-To see the usage information, type 'help' in the cli.  
-To perform a read operation from the server to the client, type 'read' followed by a space and the filename.
-To perform a write operation from the client to the server, type 'write' followed by a space and the filename.
+To see the usage information, type `help` in the cli.  
+To perform a read operation from the server to the client, type `read` followed by a space and the filename.
+To perform a write operation from the client to the server, type `write` followed by a space and the filename.
 
 #### Command Line Arguments
 To enter a command line argument in eclipse:
--Right click on the client project and select 'Run as' -> 'Run Configurations'
+-Right click on the client project and select `Run as` -> `Run Configurations`
 -Ensure that the client project is selected in the tree view in the left hand side of the popup window
--Select the 'Arguments' tab on the right hand side
--In the 'Program Arguments' text box, add -t
+-Select the `Arguments` tab on the right hand side
+-In the `Program Arguments` text box, add -t
 
 ## Project Structure
 The file TeamResponsibilities.txt describes the responsibilities of each team member for this iteration.  The document is split into a different section for each member, and lists their contributions. 
@@ -80,7 +82,7 @@ This shows the steady state transfer when writing to a file on the server from t
 The client project contains only the client class.  This class is responsible for parsing command line arguments, starting the clients command line interface, and starting the client.  This contains the main method for the client application.
 
 ### Error Simulator
-The error simulator project is responsible for relaying datagram packets between the client and the server.  The main method for the error simulator application is contained in the 'ErrorSimulator.java' class.
+The error simulator project is responsible for relaying datagram packets between the client and the server.  The main method for the error simulator application is contained in the `ErrorSimulator.java` class.
 
 ### Server
 The server project contains only the server class.  This class is responsible for starting the servers command line interface, and starting the server.  This class contains the main method for the server application
