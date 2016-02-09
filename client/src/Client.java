@@ -1,12 +1,16 @@
+import core.req.Message;
+import core.req.ErrorMessage;
+
+import core.log.Logger;
+import core.ctrl.TransferController;
+
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import core.req.Message;
-import core.ctrl.TransferController;
-import core.log.Logger;
-import java.util.logging.Level;
 
+import java.util.logging.Level;
 
 public class Client extends TransferController {
 
@@ -45,7 +49,10 @@ public class Client extends TransferController {
     @Override
     public void handleSendMessage(Message msg) {
         Logger.log(Level.FINE, "Sending message: " + msg.toString());
+    }
 
+    public void handleErrorMessage (ErrorMessage err) {
+        Logger.log(Level.SEVERE, "Received error message: " + err.toString());
     }
 
     @Override

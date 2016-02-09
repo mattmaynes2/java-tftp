@@ -52,8 +52,11 @@ public class RequestReceiver extends Worker {
     }
 
     public void listen () throws IOException {
+        Request req;
+
         try {
-            Request req = (Request) this.socket.receive();
+            this.socket.reset();
+            req = (Request) this.socket.receive();
 
             for (RequestListener handler : this.listeners){
                 handler.handleRequest(req, socket.getAddress());
