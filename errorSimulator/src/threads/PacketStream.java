@@ -9,17 +9,15 @@ import java.net.SocketException;
 public class PacketStream implements SimulatorStream{
 
 	private DatagramSocket socket;
-	private int numPackets;
+	
 	
 	public PacketStream() throws SocketException {
 		this.socket= new DatagramSocket();
-		numPackets=0;
 	}
 	
 	public DatagramPacket receive() throws IOException {
 		DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
 		socket.receive(packet);
-		numPackets++;
 		return packet;
 	}
 	
@@ -28,8 +26,5 @@ public class PacketStream implements SimulatorStream{
 		socket.send(packet);
 	}
 	
-	protected int getNumPackets() {
-		return numPackets;
-	}
 
 }
