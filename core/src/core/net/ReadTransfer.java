@@ -91,7 +91,10 @@ public class ReadTransfer extends Transfer {
 
             // Notify that the transfer is complete
             this.notifyComplete();
-        } catch (Exception e){
+        } catch (InvalidMessageException e){
+            this.handleInvalidMessage(e);
+        }
+        catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
