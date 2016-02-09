@@ -4,6 +4,9 @@ import core.net.NodeSocket;
 import core.net.TransferListener;
 
 import core.req.Message;
+import core.req.ErrorCode;
+import core.req.ErrorMessage;
+import core.req.InvalidMessageException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +51,17 @@ public abstract class Transfer implements Runnable {
         this.filename = filename;
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
+    }
+
+    protected void handleInvalidMessage (InvalidMessageException error) {
+        try {
+            // TODO Log Error
+            this.socket.send(
+                new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage()));
+        } catch (IOException e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     /**

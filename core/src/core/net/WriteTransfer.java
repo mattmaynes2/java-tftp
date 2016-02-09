@@ -85,6 +85,8 @@ public class WriteTransfer extends Transfer {
 
             // Notify that the transfer is complete
             this.notifyComplete();
+        } catch (InvalidMessageException e) {
+            this.handleInvalidMessage(e);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
