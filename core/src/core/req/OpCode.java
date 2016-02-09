@@ -1,18 +1,19 @@
 package core.req;
 
 /**
- * Enum containing the valid byte possibilities of an opcode, and some functionality associated to them. 
+ * Enum containing the valid byte possibilities of an opcode, and some functionality associated to them.
  *
  */
 public enum OpCode {
     READ    ((byte) 0x01),
     WRITE   ((byte) 0x02),
     DATA    ((byte) 0x03),
-    ACK     ((byte) 0x04);
+    ACK     ((byte) 0x04),
+    ERROR   ((byte) 0x05);
 
     private byte code;
 
-    /** 
+    /**
      * Sets the opcode byte
      * @param code  the byte to set the opcode
      */
