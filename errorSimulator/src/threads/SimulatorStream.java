@@ -10,4 +10,5 @@ public interface SimulatorStream {
 
 	public DatagramPacket receive() throws IOException;
 	public void send(DatagramPacket packet) throws IOException;
+	public int  getNumberPacketsOfPackets();
 }
