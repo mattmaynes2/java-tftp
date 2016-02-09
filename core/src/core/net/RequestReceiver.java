@@ -5,6 +5,8 @@ import core.net.RequestListener;
 
 import core.req.Request;
 import core.req.InvalidMessageException;
+import core.req.ErrorCode;
+import core.req.ErrorMessage;
 
 import core.util.Worker;
 
@@ -49,13 +51,16 @@ public class RequestReceiver extends Worker {
         this.listeners.add(handler);
     }
 
-    public void listen () throws IOException, InvalidMessageException {
+    public void listen () throws IOException {
         try {
             Request req = (Request) this.socket.receive();
 
             for (RequestListener handler : this.listeners){
                 handler.handleRequest(req, socket.getAddress());
             }
+        } catch (InvalidMessageException e){
+            this.socket.send(
+                new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage()));
         } catch (SocketException ex){
             if (this.isRunning()){
                 throw ex;
