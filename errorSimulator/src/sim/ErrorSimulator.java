@@ -1,8 +1,8 @@
+package sim;
 import java.net.SocketException;
 import java.util.logging.Level;
 import core.ctrl.Controller;
 import core.log.Logger;
-import core.net.TransferListener;
 import core.req.Message;
 
 
@@ -18,9 +18,7 @@ public class ErrorSimulator extends Controller {
 
     public void handleComplete () {}
 
-    public void handleMessage(Message msg){
-        System.out.println(msg);
-    }
+    public void handleMessage(Message msg){}
     public void handleStart () {}
 
     @Override
@@ -56,8 +54,6 @@ public class ErrorSimulator extends Controller {
     }
 
     @Override
-    public void handleSendMessage(Message msg) {
-
-    }
+    public void handleSendMessage(Message msg) {}
 
 }

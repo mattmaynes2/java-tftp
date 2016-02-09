@@ -1,3 +1,4 @@
+package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -19,7 +20,7 @@ import core.util.ByteUtils;
  * Performs the communication between a client and a server once communication has been started
  *
  */
-public class SimulatorThread extends Thread {
+public abstract class SimulatorThread extends Thread {
 
 
 	private DatagramSocket socket;
@@ -51,21 +52,14 @@ public class SimulatorThread extends Thread {
 			System.out.println(msg);
 			sendPacket(msg);
 			//Loops until it is about to receive the last message
-			while(!MessageFactory.isLastMessage(msg)) {
-				msg=receivePacket();
-				Logger.log(Level.INFO,"Message is "+msg);
-				sendPacket(msg);
-			}
-
-			//Receives the last packet
-			msg=receivePacket();
-			Logger.log(Level.INFO,"Message is "+msg);
-			sendPacket(msg);
+			handleMessage(msg);
 
 		} catch (IOException | InvalidMessageException e) {
 			e.printStackTrace();
 		}
 	}
+
+	abstract void handleMessage(Message msg) throws IOException, InvalidMessageException;
 
 	/**
 	 * Receives a packet and returns it as a Message
@@ -73,7 +67,7 @@ public class SimulatorThread extends Thread {
 	 * @throws IOException
 	 * @throws InvalidMessageException
 	 */
-	private Message receivePacket() throws IOException, InvalidMessageException {
+	protected Message receivePacket() throws IOException, InvalidMessageException {
 		socket.receive(packetIn);
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
 		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
@@ -86,7 +80,7 @@ public class SimulatorThread extends Thread {
 	 * @param message
 	 * @throws IOException
 	 */
-	private void sendPacket(Message message) throws IOException {
+	protected void sendPacket(Message message) throws IOException {
 		Logger.log(Level.INFO,"Sending message to: "+sendAddress);
 		Logger.log(Level.INFO,"Message is: "+message);
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
