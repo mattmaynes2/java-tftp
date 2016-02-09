@@ -20,13 +20,12 @@ import core.util.ByteUtils;
  * Performs the communication between a client and a server once communication has been started
  *
  */
-public abstract class SimulatorThread extends Thread {
+public  class SimulatorThread extends Thread {
 
 
-	private DatagramSocket socket;
 	private DatagramPacket packetIn;
 	private SocketAddress sendAddress;
-
+	private SimulatorStream stream;
 	/**
 	 * Creates a new socket and sets the timeout to 1000
 	 * @param packet  the datagram packet
@@ -36,7 +35,8 @@ public abstract class SimulatorThread extends Thread {
 	public SimulatorThread(DatagramPacket packet) throws SocketException, UnknownHostException {
 		this.packetIn=packet;
 		this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
-		socket= new DatagramSocket();
+		//TODO add logic to make different streams
+		stream= new PacketStream();
 	}
 
 	/**
@@ -51,16 +51,23 @@ public abstract class SimulatorThread extends Thread {
 			Message msg=MessageFactory.createMessage(bytes);
 			System.out.println(msg);
 			sendPacket(msg);
-			//Loops until it is about to receive the last message
-			handleMessage(msg);
-
+			while(!MessageFactory.isLastMessage(msg)) {
+				packetIn=stream.receive();
+				msg=MessageFactory.createMessage(Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength()));
+				Logger.log(Level.INFO,"Message is "+msg);
+				sendPacket(msg);
+			}
+			//Receives the last packet
+			msg=receivePacket();
+			Logger.log(Level.INFO,"Message is "+msg);
+			sendPacket(msg);
 		} catch (IOException | InvalidMessageException e) {
 			e.printStackTrace();
 		}
 	}
 
-	abstract void handleMessage(Message msg) throws IOException, InvalidMessageException;
 
+	
 	/**
 	 * Receives a packet and returns it as a Message
 	 * @return Message created from received packet
@@ -68,7 +75,7 @@ public abstract class SimulatorThread extends Thread {
 	 * @throws InvalidMessageException
 	 */
 	protected Message receivePacket() throws IOException, InvalidMessageException {
-		socket.receive(packetIn);
+		packetIn=stream.receive();
 		byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
 		Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
@@ -84,7 +91,7 @@ public abstract class SimulatorThread extends Thread {
 		Logger.log(Level.INFO,"Sending message to: "+sendAddress);
 		Logger.log(Level.INFO,"Message is: "+message);
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
-		socket.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
+		stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
 		sendAddress=packetIn.getSocketAddress();
 		Logger.log(Level.INFO,"Set next address to send "+sendAddress);
 	}
