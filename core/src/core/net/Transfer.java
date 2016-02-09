@@ -4,9 +4,11 @@ import core.net.NodeSocket;
 import core.net.TransferListener;
 
 import core.req.Message;
+import core.req.OpCode;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 import core.req.InvalidMessageException;
+import core.req.ErrorMessageException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +63,14 @@ public abstract class Transfer implements Runnable {
         } catch (IOException e){
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    protected void checkMessage (Message msg) throws ErrorMessageException {
+        if (msg.getOpCode() == OpCode.ERROR) {
+            // TODO Log Message
+            this.notifyError((ErrorMessage) msg);
+            throw new ErrorMessageException((ErrorMessage) msg);
         }
     }
 
@@ -123,6 +133,12 @@ public abstract class Transfer implements Runnable {
     protected void notifySendMessage(Message msg){
         for (TransferListener listener : this.listeners) {
             listener.handleSendMessage(msg);
+        }
+    }
+
+    protected void notifyError (ErrorMessage msg) {
+        for (TransferListener listener : this.listeners) {
+            listener.handleErrorMessage(msg);
         }
     }
 

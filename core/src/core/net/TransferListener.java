@@ -1,6 +1,7 @@
 package core.net;
 
 import core.req.Message;
+import core.req.ErrorMessage;
 
 /**
  * Transfer Listener
@@ -18,6 +19,11 @@ public interface TransferListener {
      * Invoked when a send message is send from a transfer
      */
     public void handleSendMessage (Message msg);
+
+    /**
+     * Invoked when an error message has been received
+     */
+    public void handleErrorMessage (ErrorMessage err);
 
     /**
      * Invoked when a message has been received
