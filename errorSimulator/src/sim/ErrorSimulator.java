@@ -3,6 +3,7 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import core.ctrl.Controller;
 import core.log.Logger;
+import core.req.ErrorMessage;
 import core.req.Message;
 
 
@@ -55,5 +56,11 @@ public class ErrorSimulator extends Controller {
 
     @Override
     public void handleSendMessage(Message msg) {}
+
+	@Override
+	public void handleErrorMessage(ErrorMessage err) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
