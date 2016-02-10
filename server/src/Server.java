@@ -3,10 +3,12 @@ import core.net.RequestReceiver;
 import core.ctrl.RequestController;
 
 import core.req.Message;
+import core.req.ErrorMessage;
+
+import core.log.Logger;
+import core.log.Logger;
 
 import java.net.SocketException;
-import core.log.Logger;
-import core.log.Logger;
 import java.util.logging.Level;
 
 public class Server extends RequestController {
@@ -38,6 +40,10 @@ public class Server extends RequestController {
 
     public void handleComplete () {
         this.cli.message("Completed a transfer");
+    }
+
+    public void handleErrorMessage (ErrorMessage err){
+        Logger.log(Level.SEVERE, "Received error message: " + err.toString());
     }
 
     public void handleStart (){

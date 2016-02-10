@@ -3,6 +3,8 @@ package core.net;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.InvalidMessageException;
+import core.req.ErrorCode;
+import core.req.ErrorMessage;
 
 import java.util.Arrays;
 
@@ -73,7 +75,7 @@ public class NodeSocket {
      * @return Communication endpoint address
      */
     public SocketAddress getAddress(){
-        return address;
+        return this.address;
     }
 
     /**
@@ -83,6 +85,10 @@ public class NodeSocket {
      */
     public void setAddress(SocketAddress address){
         this.address = address;
+    }
+
+    public void reset () {
+        this.address = null;
     }
 
     /**
@@ -121,18 +127,22 @@ public class NodeSocket {
      */
     public Message receive() throws IOException, InvalidMessageException {
         // Create a packet to buffer the data received
-        DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
+        DatagramPacket packet;
 
-        // Block and receive the packet
-        this.socket.receive(packet);
+        do {
+            // Receive the packets from the socket
+            packet = new DatagramPacket(new byte[1024], 1024);
+            this.socket.receive(packet);
+        }
+        // If the sender is invalid then receive another packet
+        while(!this.validateEndpoint(packet));
 
         // The packet will contain an address of the sender. Capture that
         // address for future communication
         this.address = packet.getSocketAddress();
 
         return MessageFactory.createMessage(
-                Arrays.copyOfRange(packet.getData(), 0, packet.getLength())
-                );
+            Arrays.copyOfRange(packet.getData(), 0, packet.getLength()));
     }
 
     /**
@@ -140,5 +150,16 @@ public class NodeSocket {
      */
     public void close () {
         this.socket.close();
+    }
+
+    private boolean validateEndpoint (DatagramPacket packet) throws IOException {
+        // TODO Log this error
+        if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
+            this.send(
+                new ErrorMessage(ErrorCode.UNKNOWN_TID, "Unknown transfer ID"),
+                packet.getSocketAddress());
+            return false;
+        }
+        return true;
     }
 }

@@ -8,6 +8,7 @@ import core.req.Message;
 import core.req.ReadRequest;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
+import core.req.ErrorMessageException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,6 +92,10 @@ public class ReadTransfer extends Transfer {
 
             // Notify that the transfer is complete
             this.notifyComplete();
+        } catch (ErrorMessageException e){
+            // TODO Do something here
+        } catch (InvalidMessageException e){
+            this.handleInvalidMessage(e);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -105,11 +110,15 @@ public class ReadTransfer extends Transfer {
      * @throws IOException - If the socket is closed or there is a sending error
      * @throws InvalidMessageException - If there is on error decoding the packet
      */
-    private DataMessage getNext () throws IOException, InvalidMessageException {
+    private DataMessage getNext () throws IOException, InvalidMessageException, ErrorMessageException {
+        Message msg;
         DataMessage data;
         AckMessage ack;
 
-        data = (DataMessage) this.getSocket().receive();
+        msg = this.getSocket().receive();
+        this.checkMessage(msg);
+
+        data = (DataMessage) msg;
         ack = new AckMessage(data.getBlock());
 
         this.notifyMessage(data);

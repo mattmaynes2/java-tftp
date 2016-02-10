@@ -17,6 +17,10 @@ public class ErrorMessage extends Message {
         this.message = message;
     }
 
+    public ErrorMessage (byte[] bytes) throws InvalidMessageException {
+        super(bytes);
+    }
+
     public ErrorCode getErrorCode () {
         return this.errorCode;
     }

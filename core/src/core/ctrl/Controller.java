@@ -1,14 +1,16 @@
 package core.ctrl;
 
 import core.req.Message;
-import core.net.TransferListener;
+import core.req.ErrorMessage;
 
-import java.net.SocketAddress;
+import core.net.TransferListener;
 
 import core.cli.CLI;
 import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
+
+import java.net.SocketAddress;
 
 /**
  * Controller
@@ -121,6 +123,13 @@ public abstract class Controller implements CommandHandler, TransferListener {
      * @param msg - The message received
      */
     public abstract void handleMessage (Message msg);
+
+    /**
+     * Invoked when an error is received during a transfer
+     *
+     * @param err - The error received
+     */
+    public abstract void handleErrorMessage (ErrorMessage err);
 
     /**
      * Invoked when the transfer is complete
