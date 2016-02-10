@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import core.util.Worker;
+import threads.SimulationTypes;
 import threads.SimulatorThread;
 
 
@@ -21,7 +22,7 @@ public class ReceiveWorker extends Worker {
          DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
          try {
 			requestSocket.receive(packet);
-			(new SimulatorThread(packet)).start();
+			(new SimulatorThread(packet,SimulationTypes.PASS_THROUGH,0,null)).start();
 		} catch (SocketException e) {
 			// Ignore socket exception if not currently running
 			if(this.isRunning()) {

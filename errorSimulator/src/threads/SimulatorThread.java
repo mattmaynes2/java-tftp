@@ -32,11 +32,11 @@ public  class SimulatorThread extends Thread {
 	 * @throws SocketException
 	 * @throws UnknownHostException
 	 */
-	public SimulatorThread(DatagramPacket packet) throws SocketException, UnknownHostException {
+	//TODO change inputs so that there aren't as many and one won't potentially be null
+	public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, DatagramPacket replacePacket) throws SocketException, UnknownHostException {
 		this.packetIn=packet;
 		this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
-		//TODO add logic to make different streams
-		stream= new PacketStream();
+		this.stream=SimulatorStreamFactory.createSimulationStream(simulation, replacePacket, packetToModify);
 	}
 
 	/**
