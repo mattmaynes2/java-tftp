@@ -84,7 +84,11 @@
   </enumeration>  
   <interface id="10" language="java" name="core.cli.CommandHandler" project="core" 
     file="/core/src/core/cli/CommandHandler.java" binary="false" corner="BOTTOM_RIGHT">    
+<<<<<<< HEAD
     <position height="-1" width="-1" x="1656" y="1026"/>    
+=======
+    <position height="-1" width="-1" x="1628" y="955"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -111,7 +115,11 @@
   </interface>  
   <class id="13" language="java" name="core.cli.CommandInterpreter" project="core" 
     file="/core/src/core/cli/CommandInterpreter.java" binary="false" corner="BOTTOM_RIGHT">    
+<<<<<<< HEAD
     <position height="-1" width="-1" x="1519" y="341"/>    
+=======
+    <position height="-1" width="-1" x="1349" y="977"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -183,7 +191,11 @@
   </class>  
   <class id="21" language="java" name="core.net.ReadTransfer" project="core" file="/core/src/core/net/ReadTransfer.java" 
     binary="false" corner="BOTTOM_RIGHT">    
+<<<<<<< HEAD
     <position height="-1" width="-1" x="485" y="944"/>    
+=======
+    <position height="-1" width="-1" x="507" y="949"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -192,7 +204,11 @@
   </class>  
   <class id="22" language="java" name="core.cli.CLI" project="core" file="/core/src/core/cli/CLI.java" binary="false" 
     corner="BOTTOM_RIGHT">    
+<<<<<<< HEAD
     <position height="-1" width="-1" x="1654" y="715"/>    
+=======
+    <position height="-1" width="-1" x="1613" y="702"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -219,22 +235,42 @@
   </class>  
   <class id="25" language="java" name="core.net.NodeSocket" project="core" file="/core/src/core/net/NodeSocket.java" 
     binary="false" corner="BOTTOM_RIGHT">    
+<<<<<<< HEAD
     <position height="-1" width="-1" x="822" y="950"/>    
+=======
+    <position height="297" width="231" x="681" y="838"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
+<<<<<<< HEAD
   <class id="26" language="java" name="core.net.RequestReceiver" project="core" 
     file="/core/src/core/net/RequestReceiver.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1095" y="943"/>    
+=======
+  <interface id="26" language="java" name="core.net.RequestListener" project="core" 
+    file="/core/src/core/net/RequestListener.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1267" y="602"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="27" language="java" name="core.net.RequestReceiver" project="core" 
+    file="/core/src/core/net/RequestReceiver.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1059" y="993"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
+<<<<<<< HEAD
   <class id="27" language="java" name="stream.InjectPacketStream" project="errorSimulator" 
     file="/errorSimulator/src/stream/InjectPacketStream.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2084" y="1452"/>    
@@ -386,10 +422,37 @@
     <end type="SOURCE" refId="26" navigable="false">      
       <attribute id="46" name="socket"/>      
       <multiplicity id="47" minimum="0" maximum="1"/>    
+=======
+  <association id="28">    
+    <end type="SOURCE" refId="27" navigable="false">      
+      <attribute id="29" name="listeners"/>      
+      <multiplicity id="30" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="26" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="31">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="26"/>  
+  </realization>  
+  <association id="32">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="33" name="receiver"/>      
+      <multiplicity id="34" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="35">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="36" name="socket"/>      
+      <multiplicity id="37" minimum="0" maximum="1"/>    
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
     </end>    
     <end type="TARGET" refId="25" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+<<<<<<< HEAD
   <generalization id="48">    
     <end type="SOURCE" refId="28"/>    
     <end type="TARGET" refId="16"/>  
@@ -580,11 +643,99 @@
       </attribute>      
       <multiplicity id="105" minimum="0" maximum="1">        
         <position height="0" width="0" x="31" y="4"/>      
+=======
+  <association id="38">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="39" name="handlers">        
+        <position height="0" width="0" x="54" y="14"/>      
+      </attribute>      
+      <multiplicity id="40" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="54" y="14"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="41">    
+    <end type="SOURCE" refId="27" navigable="false">      
+      <attribute id="42" name="socket"/>      
+      <multiplicity id="43" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="25" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="44">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <generalization id="45">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="46">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="47" name="cli">        
+        <position height="0" width="0" x="23" y="0"/>      
+      </attribute>      
+      <multiplicity id="48" minimum="0" maximum="1">        
+        <position height="0" width="0" x="23" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="22" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="49">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="50">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="51">    
+    <bendpoint x="1401" y="563"/>    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="52" name="interpreter">        
+        <position height="0" width="0" x="30" y="19"/>      
+      </attribute>      
+      <multiplicity id="53" minimum="0" maximum="1">        
+        <position height="0" width="0" x="30" y="19"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="54">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <generalization id="55">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <realization id="56">    
+    <bendpoint x="1422" y="563"/>    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="10"/>  
+  </realization>  
+  <generalization id="57">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <association id="58">    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="59" name="opCode">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="60" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="9" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+<<<<<<< HEAD
   <association id="106">    
     <end type="SOURCE" refId="7" navigable="false">      
       <attribute id="107" name="mode">        
@@ -592,11 +743,21 @@
       </attribute>      
       <multiplicity id="108" minimum="0" maximum="1">        
         <position height="0" width="0" x="24" y="7"/>      
+=======
+  <association id="61">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="62" name="mode">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="63" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="17" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+<<<<<<< HEAD
   <association id="109">    
     <end type="SOURCE" refId="22" navigable="false">      
       <attribute id="110" name="interpreter">        
@@ -604,14 +765,41 @@
       </attribute>      
       <multiplicity id="111" minimum="0" maximum="1">        
         <position height="0" width="0" x="200" y="-617"/>      
+=======
+  <association id="64">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="65" name="interpreter">        
+        <position height="0" width="0" x="30" y="19"/>      
+      </attribute>      
+      <multiplicity id="66" minimum="0" maximum="1">        
+        <position height="0" width="0" x="30" y="19"/>      
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="13" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+<<<<<<< HEAD
   <generalization id="112">    
     <end type="SOURCE" refId="18"/>    
     <end type="TARGET" refId="7"/>  
+=======
+  <generalization id="67">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <generalization id="68">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <generalization id="69">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <generalization id="70">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="15"/>  
+>>>>>>> 36b57341b1843f6f438851c53d268cd706688e6b
   </generalization>  
   <realization id="113">    
     <end type="SOURCE" refId="32"/>    

@@ -6,6 +6,7 @@ import core.req.DataMessage;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
+import core.req.MessageOrderException;
 import core.req.OpCode;
 
 import java.io.FileInputStream;
@@ -108,13 +109,29 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the socket is closed
      * @throws InvalidMessageException - If the received message has an invalid encoding
      */
-    public AckMessage getAcknowledge () throws IOException, InvalidMessageException, ErrorMessageException {
+    public AckMessage getAcknowledge () throws
+            IOException,
+            InvalidMessageException,
+            ErrorMessageException,
+            MessageOrderException {
+
         Message msg;
+        AckMessage ack;
 
         msg = this.getSocket().receive();
+
         this.checkMessage(msg);
         this.checkCast(msg, OpCode.ACK);
-        return (AckMessage) msg;
+        ack = (AckMessage) msg;
+
+        if (ack.getBlock() != this.currentBlock) {
+            throw new MessageOrderException(
+                "Ack message out of order." +
+                " Expected " + this.currentBlock +
+                " Received " + ack.getBlock());
+        }
+
+        return ack;
     }
 
     /**
