@@ -3,6 +3,7 @@ package sim;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.SocketAddress;
 import java.util.Arrays;
 
 import core.req.AckMessage;
@@ -76,12 +77,7 @@ public class PacketModifier {
 				out.write(Arrays.copyOfRange(inBytes, DATA_INDEX, inBytes.length));
 			}
 			
-			byte[] outBytes = out.toByteArray();
-			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
-			} else {
-				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
-			}
+			return(handleLength(out, packetIn.getSocketAddress()));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
@@ -104,18 +100,17 @@ public class PacketModifier {
 				out.write(inMessage.getFilename().getBytes());
 			}
 			
+			out.write(0);
+			
 			if (this.mode != null) {
 				out.write(this.mode.getBytes());
 			} else {
 				out.write(inMessage.getMode().getBytes());
 			}
-			//TODO: maybe?
-			byte[] outBytes = out.toByteArray();
-			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
-			} else {
-				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
-			}
+			
+			out.write(0);
+			
+			return(handleLength(out, packetIn.getSocketAddress()));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
@@ -138,14 +133,31 @@ public class PacketModifier {
 				out.write(Arrays.copyOfRange(inBytes, BLOCK_NUM_INDEX, DATA_INDEX));
 			}
 			
-			byte[] outBytes = out.toByteArray();
-			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
-			} else {
-				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
-			}
+			return(handleLength(out, packetIn.getSocketAddress()));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
+		}
+	}
+	
+	private DatagramPacket handleLength(ByteArrayOutputStream outStream, SocketAddress socket) {
+
+		if (this.length != IGNORE) {
+			if(this.length < outStream.size()) {
+				byte[] outBytes = outStream.toByteArray();
+				return new DatagramPacket(outBytes, this.length, socket);
+			}
+			while(outStream.size() < this.length) {
+				try {
+					outStream.write("0".getBytes());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			byte[] outBytes = outStream.toByteArray();
+			return new DatagramPacket(outBytes, this.length, socket);
+		} else {
+			byte[] outBytes = outStream.toByteArray();
+			return new DatagramPacket(outBytes, outBytes.length, socket);
 		}
 	}
 	public void setOpCode(byte[] opCode) {

@@ -14,14 +14,12 @@ public class ReceiveWorker extends Worker {
 	private DatagramSocket requestSocket;
 	private SimulationTypes type;
 	private int packetNumber;
-	private DatagramPacket changePacket;
 	private PacketModifier modifier;
 	
 	public ReceiveWorker(int port) throws SocketException {
 		requestSocket = new DatagramSocket(port);
 		type = SimulationTypes.PASS_THROUGH;
 		packetNumber = 0;
-		changePacket = null;
 		modifier = null;
 	}
 	
