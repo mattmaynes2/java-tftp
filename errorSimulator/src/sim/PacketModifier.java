@@ -13,6 +13,13 @@ import core.req.MessageFactory;
 import core.req.OpCode;
 import core.req.Request;
 
+/**
+ * This is responsible for taking a configuration, and modifying a datagram packet accordingly
+ */
+/**
+ * @author Peter
+ *
+ */
 public class PacketModifier {
 	
 	private static final int BLOCK_NUM_INDEX = 2;
@@ -44,6 +51,12 @@ public class PacketModifier {
 		endByte = true;
 	}
 	
+	/**
+	 * Determines the message type of a given datagram packet, and calls the appropriate modify method
+	 * @param packet  the packet received 
+	 * @return
+	 * @throws InvalidMessageException
+	 */
 	public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {		
 		packetIn = packet;
 		inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
@@ -62,6 +75,12 @@ public class PacketModifier {
 		}
 	}
 
+	/**
+	 * Modifies a data packet according to the passed in configuration
+	 * @param inMessage  the message passed in
+	 * @param packetIn  the packet passed in 
+	 * @return
+	 */
 	private DatagramPacket modifyDataPacket(DataMessage inMessage, DatagramPacket packetIn) {
 		byte[] inBytes = inMessage.toBytes();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -81,6 +100,12 @@ public class PacketModifier {
 		}
 	}
 
+	/**
+	 * Modifies a request packet according to the passed in configuration
+	 * @param inMessage  the message passed in
+	 * @param packetIn  the packet passed in 
+	 * @return
+	 */
 	private DatagramPacket modifyRequestPacket(Request inMessage, DatagramPacket packetIn) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
@@ -113,6 +138,12 @@ public class PacketModifier {
 		}
 	}
 
+	/**
+	 * Modifies an acknowledgement packet according to the passed in configuration
+	 * @param inMessage  the message passed in
+	 * @param packetIn  the packet passed in 
+	 * @return
+	 */
 	private DatagramPacket modifyAckPacket(AckMessage inMessage, DatagramPacket packetIn) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
@@ -125,6 +156,12 @@ public class PacketModifier {
 		}
 	}
 	
+	/**
+	 * Check to see if the length must be changed.  If so, change it
+	 * @param outStream  the current output stream to be converted into a byte array
+	 * @return
+	 * @throws IOException
+	 */
 	private DatagramPacket handleLength(ByteArrayOutputStream outStream) throws IOException {
 
 		if (this.length != IGNORE) {
@@ -143,6 +180,11 @@ public class PacketModifier {
 		}
 	}
 	
+	/**
+	 * Check to see if the opcode must be changed.  If so, change it
+	 * @return
+	 * @throws IOException
+	 */
 	private byte[] handleOpCode() throws IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		if (this.opCode != null) {
@@ -154,6 +196,11 @@ public class PacketModifier {
 		return outStream.toByteArray();
 	}
 	
+	/**
+	 * Check to see if the block number must be changed.  If so, change it
+	 * @return
+	 * @throws IOException
+	 */
 	private byte[] handleBlockNum() throws IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		if (this.blockNum != IGNORE) {
@@ -164,7 +211,6 @@ public class PacketModifier {
 		return outStream.toByteArray();
 	}
 	
-
 	public void setOpCode(byte[] opCode) {
 		this.opCode = opCode;
 	}
