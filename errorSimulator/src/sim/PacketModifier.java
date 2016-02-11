@@ -3,7 +3,6 @@ package sim;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.SocketAddress;
 import java.util.Arrays;
 
 import core.req.AckMessage;
@@ -26,6 +25,9 @@ public class PacketModifier {
 	private String filename;
 	private int blockNum;	
 	private int length;
+	private DatagramPacket packetIn;
+	private Message messageIn;
+	private byte[] inBytes;
 	
 	public PacketModifier () {
 		opCode = null;
@@ -36,40 +38,30 @@ public class PacketModifier {
 		length = IGNORE;
 	}
 	
-	public DatagramPacket modifyPacket(DatagramPacket packetIn) throws InvalidMessageException {
-		byte[] inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-		Message inMessage;
-		inMessage = MessageFactory.createMessage(inBytes);
-		OpCode inOpCode = inMessage.getOpCode();
+	public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {
+		inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
+		packetIn = packet;
+		messageIn = MessageFactory.createMessage(inBytes);
+		OpCode inOpCode = messageIn.getOpCode();
 		switch(inOpCode) {
 		case READ:
 		case WRITE:
-			return modifyRequestPacket((Request)inMessage, packetIn);
+			return modifyRequestPacket((Request)messageIn, packetIn);
 		case ACK:
-			return modifyAckPacket((AckMessage)inMessage, packetIn);
+			return modifyAckPacket((AckMessage)messageIn, packetIn);
 		case DATA:
-			return modifyDataPacket((DataMessage)inMessage, packetIn);
+			return modifyDataPacket((DataMessage)messageIn, packetIn);
 		default:
 			return packetIn;
 		}
 	}
 
 	private DatagramPacket modifyDataPacket(DataMessage inMessage, DatagramPacket packetIn) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			if (this.opCode != null) {
-				out.write(this.opCode);
-			} else {
-				out.write(0);
-				out.write(inMessage.getOpCode().getCode());
-			}
-			
-			if (this.blockNum != IGNORE) {
-				out.write(this.blockNum);
-			} else {
-				out.write(Arrays.copyOfRange(inBytes, BLOCK_NUM_INDEX, DATA_INDEX));
-			}
+			out.write(handleOpCode());
+			out.write(handleBlockNum());
 			
 			if (this.data != null) {
 				out.write(this.data);
@@ -77,7 +69,7 @@ public class PacketModifier {
 				out.write(Arrays.copyOfRange(inBytes, DATA_INDEX, inBytes.length));
 			}
 			
-			return(handleLength(out, packetIn.getSocketAddress()));
+			return(handleLength(out));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
@@ -87,12 +79,7 @@ public class PacketModifier {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
 		try {
-			if (this.opCode != null) {
-				out.write(this.opCode);
-			} else {
-				out.write(0);
-				out.write(inMessage.getOpCode().getCode());
-			}
+			out.write(handleOpCode());
 			
 			if (this.filename != null) {
 				out.write(this.filename.getBytes());
@@ -110,7 +97,7 @@ public class PacketModifier {
 			
 			out.write(0);
 			
-			return(handleLength(out, packetIn.getSocketAddress()));
+			return(handleLength(out));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
@@ -120,46 +107,54 @@ public class PacketModifier {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
 		try {
-			if (this.opCode != null) {
-				out.write(this.opCode);
-			} else {
-				out.write(0);
-				out.write(inMessage.getOpCode().getCode());
-			}
-			
-			if (this.blockNum != IGNORE) {
-				out.write(this.blockNum);
-			} else {
-				out.write(Arrays.copyOfRange(inBytes, BLOCK_NUM_INDEX, DATA_INDEX));
-			}
-			
-			return(handleLength(out, packetIn.getSocketAddress()));
+			out.write(handleOpCode());
+			out.write(handleBlockNum());			
+			return(handleLength(out));
 		} catch(IOException e) {
 			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
 	}
 	
-	private DatagramPacket handleLength(ByteArrayOutputStream outStream, SocketAddress socket) {
+	private DatagramPacket handleLength(ByteArrayOutputStream outStream) throws IOException {
 
 		if (this.length != IGNORE) {
 			if(this.length < outStream.size()) {
 				byte[] outBytes = outStream.toByteArray();
-				return new DatagramPacket(outBytes, this.length, socket);
+				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
 			}
 			while(outStream.size() < this.length) {
-				try {
-					outStream.write("0".getBytes());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				outStream.write("0".getBytes());
 			}
 			byte[] outBytes = outStream.toByteArray();
-			return new DatagramPacket(outBytes, this.length, socket);
+			return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
 		} else {
 			byte[] outBytes = outStream.toByteArray();
-			return new DatagramPacket(outBytes, outBytes.length, socket);
+			return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
 		}
 	}
+	
+	private byte[] handleOpCode() throws IOException {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		if (this.opCode != null) {
+			outStream.write(this.opCode);
+		} else {
+			outStream.write(0);
+			outStream.write(messageIn.getOpCode().getCode());
+		}
+		return outStream.toByteArray();
+	}
+	
+	private byte[] handleBlockNum() throws IOException {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		if (this.blockNum != IGNORE) {
+			outStream.write(this.blockNum);
+		} else {
+			outStream.write(Arrays.copyOfRange(inBytes, BLOCK_NUM_INDEX, DATA_INDEX));
+		}
+		return outStream.toByteArray();
+	}
+	
+
 	public void setOpCode(byte[] opCode) {
 		this.opCode = opCode;
 	}

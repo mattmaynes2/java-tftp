@@ -54,11 +54,11 @@ public class ErrorSimulator extends Controller {
     public void usage() {
         System.out.println("TFTP Error Simulator");
         System.out.println("    Commands:");
-        System.out.println("    help           Prints this message");
-        System.out.println("    shutdown       Exits the simulator");
-        System.out.println("    change-opcode  packetNumber opCode        Changes the opcode of a specified packet");
-        System.out.println("    wrong-sender   packetNumber               Changes the sender address of a specified packet");
-        System.out.println("    change-length  packetNumber packetLength  Changes the length of a specified packet" );
+        System.out.println("    help                                          Prints this message");
+        System.out.println("    shutdown                                      Exits the simulator");
+        System.out.println("    change-opcode  <packetNumber> <opCode>        Changes the opcode of a specified packet");
+        System.out.println("    wrong-sender   <packetNumber>                 Changes the sender address of a specified packet");
+        System.out.println("    change-length  <packetNumber> <packetLength>  Changes the length of a specified packet" );
     }
 
     public static void main(String[] args) {
