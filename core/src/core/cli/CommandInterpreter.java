@@ -44,12 +44,21 @@ public class CommandInterpreter {
 
     private Command interpretCommand(String commandToken, StringTokenizer tokenizer)
         throws CommandInputException {
-
+    	
+    	
         for(String token : this.commands){
             if(token.equals(commandToken)){
-                return tokenizer.hasMoreTokens() ?
-                    new Command(commandToken, tokenizer.nextToken()) :
-                    new Command(commandToken);
+            	if(tokenizer.hasMoreTokens()) {
+            		ArrayList<String> parameters = new ArrayList<String>();
+            		while(tokenizer.hasMoreTokens()) {
+            			parameters.add(tokenizer.nextToken());
+            		}
+            		return new Command(commandToken, parameters);
+            	}
+            	
+            	else {
+            		return new Command(commandToken);
+            	}
             }
         }
 

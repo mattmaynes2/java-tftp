@@ -6,6 +6,8 @@ import core.req.DataMessage;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
+import core.req.MessageOrderException;
+import core.req.OpCode;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,6 +59,7 @@ public class WriteTransfer extends Transfer {
         WriteRequest request = new WriteRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
+        this.getSocket().reset();
     }
 
     /**
@@ -106,13 +109,29 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the socket is closed
      * @throws InvalidMessageException - If the received message has an invalid encoding
      */
-    public AckMessage getAcknowledge () throws IOException, InvalidMessageException, ErrorMessageException {
+    public AckMessage getAcknowledge () throws
+            IOException,
+            InvalidMessageException,
+            ErrorMessageException,
+            MessageOrderException {
+
         Message msg;
+        AckMessage ack;
 
         msg = this.getSocket().receive();
-        this.checkMessage(msg);
 
-        return (AckMessage) msg;
+        this.checkMessage(msg);
+        this.checkCast(msg, OpCode.ACK);
+        ack = (AckMessage) msg;
+
+        if (ack.getBlock() != this.currentBlock) {
+            throw new MessageOrderException(
+                "Ack message out of order." +
+                " Expected " + this.currentBlock +
+                " Received " + ack.getBlock());
+        }
+
+        return ack;
     }
 
     /**
@@ -147,7 +166,7 @@ public class WriteTransfer extends Transfer {
             message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
         }
         else {
-            message =  new DataMessage(this.currentBlock, new byte[0]);
+            message = new DataMessage(this.currentBlock, new byte[0]);
         }
 
         return message;

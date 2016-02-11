@@ -1,18 +1,16 @@
 package core.ctrl;
 
-import core.net.ReadTransfer;
-import core.net.WriteTransfer;
-import core.net.RequestListener;
-import core.net.RequestReceiver;
-
-import core.req.AckMessage;
-import core.req.Request;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.logging.Level;
 
 import core.log.Logger;
-import java.util.logging.Level;
+import core.net.ReadTransfer;
+import core.net.RequestListener;
+import core.net.RequestReceiver;
+import core.net.WriteTransfer;
+import core.req.AckMessage;
+import core.req.Request;
 
 /**
  * Request Controller
@@ -31,8 +29,8 @@ public abstract class RequestController extends Controller implements RequestLis
      *
      * @param port - Port to listen for requests on
      */
-    public RequestController (int port) throws SocketException {
-        super();
+    public RequestController (int port, String[] commandLineArgs) throws SocketException {
+        super(commandLineArgs);
         this.receiver = new RequestReceiver(port);
         this.receiver.addRequestListener(this);
     }
@@ -53,6 +51,8 @@ public abstract class RequestController extends Controller implements RequestLis
             case WRITE:
                 this.write(address, req.getFilename());
                 break;
+            default:
+            	break;
         }
     }
 

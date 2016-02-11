@@ -1,22 +1,18 @@
 
-import core.net.RequestReceiver;
-import core.ctrl.RequestController;
-
-import core.req.Message;
-import core.req.ErrorMessage;
-
-import core.log.Logger;
-import core.log.Logger;
-
 import java.net.SocketException;
 import java.util.logging.Level;
+
+import core.ctrl.RequestController;
+import core.log.Logger;
+import core.req.ErrorMessage;
+import core.req.Message;
 
 public class Server extends RequestController {
 
     private static final int SERVER_PORT = 69;
 
-    public Server () throws SocketException {
-        super(SERVER_PORT);
+    public Server (String[] commandLineArgs) throws SocketException {
+        super(SERVER_PORT, commandLineArgs);
     }
 
     @Override
@@ -39,7 +35,8 @@ public class Server extends RequestController {
 
 
     public void handleComplete () {
-        this.cli.message("Completed a transfer");
+        this.cli.message("\nCompleted a transfer");
+        this.cli.prompt();
     }
 
     public void handleErrorMessage (ErrorMessage err){
@@ -47,16 +44,16 @@ public class Server extends RequestController {
     }
 
     public void handleStart (){
-        this.cli.message("Starting transfer");
+        this.cli.message("\nStarting transfer");
+        this.cli.prompt();
     }
 
     public static void main (String[] args) {
         Server server;
-        Logger.init(Level.ALL);
-
+        
         try {
 
-            server = new Server();
+            server = new Server(args);
             server.start();
         } catch (SocketException e){
             System.out.println("Socket could not bind to port: " + SERVER_PORT);

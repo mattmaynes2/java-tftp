@@ -9,16 +9,25 @@ import core.cli.CLI;
 import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
+import core.log.Logger;
 
 import java.net.SocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
+import java.util.logging.Level;
 /**
  * Controller
  *
  * Handles requests from a command line interface and spawns transfers
  */
 public abstract class Controller implements CommandHandler, TransferListener {
-
+	
+	/**
+	 * Command line option to turn on quiet mode logging
+	 */
+    private final static String QUIET_MODE_FLAG = "q";
+	
     /**
      * Command to shutdown this controller
      */
@@ -43,15 +52,22 @@ public abstract class Controller implements CommandHandler, TransferListener {
      * Command line interface to communicate with user
      */
     protected CLI cli;
+    
+    /**
+     * Map of command line options specified by the user
+     */
+    protected Map<String, Boolean> commandLineOptions;
 
     /**
      * Constructs a new controller with some default CLI commands
      */
-    protected Controller () {
+    protected Controller (String[] commandLineArgs) {
         this.interpreter = new CommandInterpreter();
-
         this.interpreter.addCommand(SHUTDOWN_COMMAND);
         this.interpreter.addCommand(HELP_COMMAND);
+        this.commandLineOptions = new HashMap<String, Boolean>();
+        setCommandLineOptions(commandLineArgs);
+        applyCommandLineOptions();
     }
 
     /**
@@ -59,9 +75,30 @@ public abstract class Controller implements CommandHandler, TransferListener {
      *
      * @param address - Address of endpoint to communicate with
      */
-    public Controller (SocketAddress address){
-        this();
+    public Controller (SocketAddress address, String[] commandLineArgs){
+        this(commandLineArgs);
         this.address = address;
+    }
+    
+    private void setCommandLineOptions(String[] args){
+        for (int i=0; i < args.length; i++){
+            if (args[i].startsWith("-") && args[i].length() > 1){
+                setOption(args[i].substring(1));
+            }
+        }
+    }
+
+    private void setOption(String option){
+    	this.commandLineOptions.put(option, true);
+    }
+    
+
+    protected void applyCommandLineOptions(){
+    	if (this.commandLineOptions.getOrDefault(QUIET_MODE_FLAG, false)){
+    		Logger.init(Level.INFO);
+    	}else{
+    		Logger.init(Level.ALL);
+    	}
     }
 
     /**
@@ -80,6 +117,7 @@ public abstract class Controller implements CommandHandler, TransferListener {
         this.cli = new CLI(this.interpreter, System.in, System.out);
         this.cli.addCommandHandler(this);
         this.cli.start();
+        this.usage();
     }
 
     /**

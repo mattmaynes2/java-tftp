@@ -1,22 +1,17 @@
 package core.net;
 
-import core.net.Transfer;
-import core.net.NodeSocket;
-
+import core.req.AckMessage;
 import core.req.DataMessage;
+import core.req.ErrorMessageException;
+import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.ReadRequest;
-import core.req.AckMessage;
-import core.req.InvalidMessageException;
-import core.req.ErrorMessageException;
+import core.req.OpCode;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
-
-import java.util.logging.Logger;
 
 /**
  * Read Transfer
@@ -54,6 +49,7 @@ public class ReadTransfer extends Transfer {
         ReadRequest request = new ReadRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
+        this.getSocket().reset();
     }
 
     /**
@@ -118,6 +114,7 @@ public class ReadTransfer extends Transfer {
         msg = this.getSocket().receive();
         this.checkMessage(msg);
 
+        this.checkCast(msg, OpCode.DATA);
         data = (DataMessage) msg;
         ack = new AckMessage(data.getBlock());
 

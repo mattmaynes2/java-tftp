@@ -74,6 +74,13 @@ public abstract class Transfer implements Runnable {
         }
     }
 
+    protected boolean checkCast (Message msg, OpCode code) throws InvalidMessageException {
+        if (msg.getOpCode() == code){
+            return true;
+        }
+        throw new InvalidMessageException("Invalid message in stream");
+    }
+
     /**
      * Returns the name of the file that is being transfered
      *

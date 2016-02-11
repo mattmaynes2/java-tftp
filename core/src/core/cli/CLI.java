@@ -18,7 +18,7 @@ public class CLI extends Worker {
     private InputStream in;
     private OutputStream out;
     private ArrayList<CommandHandler> handlers;
-    private final String PROMPT = "> ";
+    private final String PROMPT = "tftp> ";
     private CommandInterpreter interpreter;
     private Scanner scanner;
 
@@ -97,5 +97,9 @@ public class CLI extends Worker {
     
     public void message(String message){
     	write(message + "\n");
+    }
+    
+    public void prompt(){
+    	write(PROMPT);
     }
 }
