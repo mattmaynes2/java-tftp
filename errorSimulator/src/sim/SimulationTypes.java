@@ -1,4 +1,4 @@
-package threads;
+package sim;
 
 public enum SimulationTypes {
 	REPLACE_PACKET,

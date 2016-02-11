@@ -1,7 +1,11 @@
 package threads;
 
 import java.net.SocketException;
-
+import sim.SimulationTypes;
+import stream.InjectPacketStream;
+import stream.PacketStream;
+import stream.SimulatorStream;
+import stream.WrongSenderStream;
 import sim.PacketModifier;
 
 public class SimulatorStreamFactory {

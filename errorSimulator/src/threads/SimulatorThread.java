@@ -15,6 +15,8 @@ import core.req.Message;
 import core.req.MessageFactory;
 import core.util.ByteUtils;
 import sim.PacketModifier;
+import sim.SimulationTypes;
+import stream.SimulatorStream;
 
 /**
  * Performs the communication between a client and a server once communication has been started

@@ -1,4 +1,4 @@
-package threads;
+package stream;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

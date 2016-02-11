@@ -8,8 +8,7 @@ import core.ctrl.Controller;
 import core.log.Logger;
 import core.req.ErrorMessage;
 import core.req.Message;
-import core.util.ByteUtils;
-import threads.SimulationTypes;
+
 
 
 public class ErrorSimulator extends Controller {
