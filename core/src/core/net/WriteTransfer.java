@@ -6,6 +6,7 @@ import core.req.DataMessage;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
+import core.req.OpCode;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -112,7 +113,7 @@ public class WriteTransfer extends Transfer {
 
         msg = this.getSocket().receive();
         this.checkMessage(msg);
-
+        this.checkCast(msg, OpCode.ACK);
         return (AckMessage) msg;
     }
 
@@ -148,7 +149,7 @@ public class WriteTransfer extends Transfer {
             message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
         }
         else {
-            message =  new DataMessage(this.currentBlock, new byte[0]);
+            message = new DataMessage(this.currentBlock, new byte[0]);
         }
 
         return message;
