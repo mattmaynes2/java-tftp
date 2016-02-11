@@ -34,11 +34,11 @@ public class MessageFactory {
      * @return True if it is the last block in a data message.  Otherwise False.
      */
     public static boolean isLastMessage(Message message) {
-        if(message.getOpCode().equals(OpCode.DATA)) {
+        if(OpCode.DATA.equals(message.getOpCode())) {
             return (((DataMessage) message).isLastBlock());
         }
         else {
-            return false;
+            return  OpCode.ERROR.equals(message.getOpCode());
         }
 
     }
