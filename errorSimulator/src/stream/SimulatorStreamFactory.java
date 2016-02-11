@@ -1,4 +1,4 @@
-package threads;
+package stream;
 
 import java.net.SocketException;
 import sim.SimulationTypes;
