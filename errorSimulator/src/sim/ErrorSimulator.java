@@ -20,6 +20,7 @@ public class ErrorSimulator extends Controller {
      */
     private static final String OPCODE_COMMAND = "change-opcode";
     private static final String WRONG_SENDER_COMMAND = "wrong-sender";
+    private static final String LENGTH_COMMAND = "change-length";
     
     private ReceiveWorker recieveListener;
 
@@ -27,6 +28,7 @@ public class ErrorSimulator extends Controller {
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
         this.interpreter.addCommand(OPCODE_COMMAND);
         this.interpreter.addCommand(WRONG_SENDER_COMMAND);
+        this.interpreter.addCommand(LENGTH_COMMAND);
     }
 
     public void handleComplete () {}
@@ -51,11 +53,12 @@ public class ErrorSimulator extends Controller {
     @Override
     public void usage() {
         System.out.println("TFTP Error Simulator");
-        System.out.println("  Commands:");
+        System.out.println("    Commands:");
         System.out.println("    help           Prints this message");
         System.out.println("    shutdown       Exits the simulator");
-        System.out.println("    change-opcode  Changes the opcode of a packet");
-        System.out.println("    wrong-sender packetNumber");
+        System.out.println("    change-opcode  packetNumber opCode        Changes the opcode of a specified packet");
+        System.out.println("    wrong-sender   packetNumber               Changes the sender address of a specified packet");
+        System.out.println("    change-length  packetNumber packetLength  Changes the length of a specified packet" );
     }
 
     public static void main(String[] args) {
@@ -83,7 +86,7 @@ public class ErrorSimulator extends Controller {
 		super.handleCommand(command);
         switch (command.getToken()){
         case OPCODE_COMMAND:
-            this.changeOpcode(command.getArguments());
+            this.changeOpcodeSimulation(command.getArguments());
             break;
         case WRONG_SENDER_COMMAND:
         	try{
@@ -91,6 +94,9 @@ public class ErrorSimulator extends Controller {
         	}catch (IndexOutOfBoundsException e) {
         		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
 			}
+        	break;
+        case LENGTH_COMMAND:
+        	this.changeLengthSimulation(command.getArguments());
         	break;
         }
 	}
@@ -105,7 +111,20 @@ public class ErrorSimulator extends Controller {
 		
 	}
 	
-	public void changeOpcode(ArrayList<String> args) {
+	private void changeLengthSimulation(ArrayList<String> args) {
+		if(args.size() != 2) {
+			this.cli.message("Incorrect number of parameters for change-length.  Format is change-length packetNumber newLength");
+			return;
+		}
+		
+		int length = Integer.parseInt(args.get(1));
+		PacketModifier modifier = new PacketModifier();
+		modifier.setLength(length);
+		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
+		this.cli.message("Running Change Length Simulation on next request");
+	}
+	
+	private void changeOpcodeSimulation(ArrayList<String> args) {
 
 		if(args.size() != 2) {
 			this.cli.message("Incorrect number of parameters for change-code.  Format is change-opcode packetNumber newOpcode");
@@ -126,7 +145,7 @@ public class ErrorSimulator extends Controller {
 		PacketModifier modifier = new PacketModifier();
 		modifier.setOpCode(opCodeBytes);
 		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-		this.cli.message("Running change Opcode Simulation on next request");
+		this.cli.message("Running Change Opcode Simulation on next request");
 		
 	}
 
