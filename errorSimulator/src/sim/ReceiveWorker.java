@@ -12,17 +12,25 @@ import threads.SimulatorThread;
 public class ReceiveWorker extends Worker {
 
 	private DatagramSocket requestSocket;
+	private SimulationTypes type;
+	private int packetNumber;
+	private DatagramPacket changePacket;
+	private PacketModifier modifier;
 	
 	public ReceiveWorker(int port) throws SocketException {
 		requestSocket = new DatagramSocket(port);
+		type = SimulationTypes.PASS_THROUGH;
+		packetNumber = 0;
+		changePacket = null;
+		modifier = null;
 	}
 	
 	@Override
 	public void execute() {
-         DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
+         DatagramPacket receivePacket = new DatagramPacket(new byte[1024], 1024);
          try {
-			requestSocket.receive(packet);
-			(new SimulatorThread(packet,SimulationTypes.PASS_THROUGH,0,null)).start();
+			requestSocket.receive(receivePacket);
+			(new SimulatorThread(receivePacket, type, packetNumber, this.modifier)).start();
 		} catch (SocketException e) {
 			// Ignore socket exception if not currently running
 			if(this.isRunning()) {
@@ -40,6 +48,12 @@ public class ReceiveWorker extends Worker {
 	@Override
 	public void teardown() {
 		requestSocket.close();
+	}
+	
+	public void setConfiguration(SimulationTypes type, int packetNumber) {
+		
+		this.type = type;
+		this.packetNumber = packetNumber;	
 	}
 
 }

@@ -57,6 +57,7 @@ public class WriteTransfer extends Transfer {
         WriteRequest request = new WriteRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
+        this.getSocket().reset();
     }
 
     /**

@@ -54,6 +54,7 @@ public class ReadTransfer extends Transfer {
         ReadRequest request = new ReadRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
+        this.getSocket().reset();
     }
 
     /**

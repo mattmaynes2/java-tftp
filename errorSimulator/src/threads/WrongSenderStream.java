@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import core.req.InvalidMessageException;
+
 public class WrongSenderStream implements SimulatorStream {
 
 	private SimulatorStream stream;
@@ -22,7 +24,7 @@ public class WrongSenderStream implements SimulatorStream {
 	}
 
 	@Override
-	public void send(DatagramPacket packet) throws IOException {
+	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		if(getNumberPacketsOfPackets()==sendAt) {
 			// send from the wrong socket
 			socket.send(packet);

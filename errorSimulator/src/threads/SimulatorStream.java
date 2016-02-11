@@ -9,6 +9,6 @@ import core.req.Message;
 public interface SimulatorStream {
 
 	public DatagramPacket receive() throws IOException;
-	public void send(DatagramPacket packet) throws IOException;
+	public void send(DatagramPacket packet) throws IOException, InvalidMessageException;
 	public int  getNumberPacketsOfPackets();
 }

@@ -1,7 +1,6 @@
 package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -15,6 +14,7 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.util.ByteUtils;
+import sim.PacketModifier;
 
 /**
  * Performs the communication between a client and a server once communication has been started
@@ -33,10 +33,10 @@ public  class SimulatorThread extends Thread {
 	 * @throws UnknownHostException
 	 */
 	//TODO change inputs so that there aren't as many and one won't potentially be null
-	public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, DatagramPacket replacePacket) throws SocketException, UnknownHostException {
+	public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, PacketModifier modifier) throws SocketException, UnknownHostException {
 		this.packetIn=packet;
 		this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
-		this.stream=SimulatorStreamFactory.createSimulationStream(simulation, replacePacket, packetToModify);
+		this.stream=SimulatorStreamFactory.createSimulationStream(simulation, modifier, packetToModify);
 	}
 
 	/**
@@ -86,8 +86,9 @@ public  class SimulatorThread extends Thread {
 	 * Takes a message and uses it to create and send a packet
 	 * @param message
 	 * @throws IOException
+	 * @throws InvalidMessageException 
 	 */
-	protected void sendPacket(Message message) throws IOException {
+	protected void sendPacket(Message message) throws IOException, InvalidMessageException {
 		Logger.log(Level.INFO,"Sending message to: "+sendAddress);
 		Logger.log(Level.INFO,"Message is: "+message);
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));

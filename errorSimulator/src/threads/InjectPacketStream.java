@@ -3,16 +3,19 @@ package threads;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
+import core.req.InvalidMessageException;
+import sim.PacketModifier;
+
 public class InjectPacketStream implements SimulatorStream {
 
 	private PacketStream stream;
-	private DatagramPacket toInject;
+	private PacketModifier modifier;
 	private int injectAt;
 	
 	
-	public InjectPacketStream(PacketStream stream,DatagramPacket toInject,int injectAt) {
+	public InjectPacketStream(PacketStream stream,PacketModifier modifier,int injectAt) {
 		this.stream=stream;
-		this.toInject=toInject;
+		this.modifier=modifier;
 		this.injectAt=injectAt;
 	}
 	
@@ -22,10 +25,9 @@ public class InjectPacketStream implements SimulatorStream {
 	}
 
 	@Override
-	public void send(DatagramPacket packet) throws IOException {
+	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		if(getNumberPacketsOfPackets()==injectAt) {
-			toInject.setSocketAddress(packet.getSocketAddress());
-			stream.send(toInject);
+			stream.send(modifier.modifyPacket(packet));
 		}else {
 			stream.send(packet);
 		}
