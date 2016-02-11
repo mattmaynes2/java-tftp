@@ -29,8 +29,8 @@ public abstract class RequestController extends Controller implements RequestLis
      *
      * @param port - Port to listen for requests on
      */
-    public RequestController (int port) throws SocketException {
-        super();
+    public RequestController (int port, String[] commandLineArgs) throws SocketException {
+        super(commandLineArgs);
         this.receiver = new RequestReceiver(port);
         this.receiver.addRequestListener(this);
     }

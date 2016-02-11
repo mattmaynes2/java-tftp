@@ -24,7 +24,8 @@ public class ErrorSimulator extends Controller {
     
     private ReceiveWorker recieveListener;
 
-    public ErrorSimulator() throws SocketException  {
+    public ErrorSimulator(String[] commandLineArgs) throws SocketException  {
+    	super(commandLineArgs);
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
         this.interpreter.addCommand(OPCODE_COMMAND);
         this.interpreter.addCommand(WRONG_SENDER_COMMAND);
@@ -62,10 +63,9 @@ public class ErrorSimulator extends Controller {
     }
 
     public static void main(String[] args) {
-        Logger.init(Level.INFO);
         ErrorSimulator simulator;
         try {
-            simulator= new ErrorSimulator();
+            simulator= new ErrorSimulator(args);
             simulator.start();
         } catch (SocketException e) {
             Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);

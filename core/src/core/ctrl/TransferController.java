@@ -29,8 +29,8 @@ public abstract class TransferController extends Controller {
      *
      * @param address - Address of endpoint to communicate with
      */
-    public TransferController (SocketAddress address) {
-        super(address);
+    public TransferController (SocketAddress address, String[] commandLineArgs) {
+        super(address, commandLineArgs);
         this.interpreter.addCommand(READ_COMMAND);
         this.interpreter.addCommand(WRITE_COMMAND);
     }

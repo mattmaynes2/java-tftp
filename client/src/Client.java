@@ -17,15 +17,18 @@ public class Client extends TransferController {
     private static final int SERVER_PORT = 69;
     private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
-    private final static String QUIET_MODE_FLAG = "q";
-
-    private static Boolean testMode = false;
-    private static Boolean quietMode = false;
-
-    public Client (SocketAddress address){
-        super(address);
+    
+    public Client (SocketAddress address, String[] commandLineArgs){
+        super(address, commandLineArgs);
+        if (this.commandLineOptions.getOrDefault(TEST_MODE_FLAG, false)){
+            try {
+				this.address = new InetSocketAddress(InetAddress.getLocalHost(), ERROR_SIMULATOR_PORT);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+        }
     }
-
+    
     @Override
     public void usage() {
         System.out.println("TFTP Client");
@@ -62,43 +65,15 @@ public class Client extends TransferController {
 
     public static void main(String[] args){
         Client client;
-        setCommandLineOptions(args);
-
-        int port = SERVER_PORT;
-        if (testMode){
-            port = ERROR_SIMULATOR_PORT;
-        }
-
-        Level logLevel = Level.FINEST;
-        if (quietMode){
-            logLevel = Level.SEVERE;
-        }
-        Logger.init(logLevel);
 
         try {
             InetSocketAddress address =
-                new InetSocketAddress(InetAddress.getLocalHost(), port);
+                new InetSocketAddress(InetAddress.getLocalHost(), SERVER_PORT);
 
-            client = new Client(address);
+            client = new Client(address, args);
             client.start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void setCommandLineOptions(String[] args){
-        for (int i=0; i < args.length; i++){
-            if (args[i].startsWith("-") && args[i].length() > 1){
-                setOption(args[i].substring(1));
-            }
-        }
-    }
-
-    private static void setOption(String option){
-        if (option.equals(TEST_MODE_FLAG)){
-            testMode = true;
-        }else if(option.equals(QUIET_MODE_FLAG)){
-            quietMode = true;
         }
     }
 }
