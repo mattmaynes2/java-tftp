@@ -51,8 +51,9 @@ public class RequestReceiver extends Worker {
         this.listeners.add(handler);
     }
 
-    public void listen () throws IOException {
+    public void listen () throws IOException, SocketException {
         Request req;
+        NodeSocket errorSocket;
 
         try {
             this.socket.reset();
@@ -62,8 +63,9 @@ public class RequestReceiver extends Worker {
                 handler.handleRequest(req, socket.getAddress());
             }
         } catch (InvalidMessageException e){
-            this.socket.send(
-                new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage()));
+            errorSocket = new NodeSocket(this.socket.getAddress());
+            errorSocket.send(new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage()));
+            errorSocket.close();
         } catch (SocketException ex){
             if (this.isRunning()){
                 throw ex;
