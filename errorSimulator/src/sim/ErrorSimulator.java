@@ -1,5 +1,6 @@
 package sim;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import core.cli.Command;
@@ -7,7 +8,7 @@ import core.ctrl.Controller;
 import core.log.Logger;
 import core.req.ErrorMessage;
 import core.req.Message;
-import core.req.OpCode;
+import core.util.ByteUtils;
 import threads.SimulationTypes;
 
 
@@ -80,19 +81,33 @@ public class ErrorSimulator extends Controller {
 		super.handleCommand(command);
         switch (command.getToken()){
         case OPCODE_COMMAND:
-            this.changeOpcode(command.getArgument());
+            this.changeOpcode(command.getArguments());
             break;
         }
 	}
 	
-	public void changeOpcode(String args) {
-		String[] argArray = args.split(" ");
-		if(argArray.length != 2) {
+	public void changeOpcode(ArrayList<String> args) {
+
+		if(args.size() != 2) {
 			this.cli.message("Incorrect number of parameters for change-code.  Format is change-opcode packetNumber newOpcode");
 			return;
 		}
-
-		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(argArray[0]));
+		
+		String opCode = args.get(1);
+		
+		if(opCode.length() != 2) {
+			this.cli.message("Incorrect opcode, two digits required.");
+			return;
+		}
+		byte[] opCodeBytes = new byte[2];
+		String[] opCodeArray = opCode.split("");
+		opCodeBytes[0] = Byte.parseByte(opCodeArray[0]);
+		opCodeBytes[1] = Byte.parseByte(opCodeArray[1]);
+		
+		PacketModifier modifier = new PacketModifier();
+		modifier.setOpCode(opCodeBytes);
+		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
+		Logger.log(Level.INFO,"Running change Opcode Simulation on next request");
 		
 	}
 

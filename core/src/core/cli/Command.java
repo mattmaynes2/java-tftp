@@ -1,5 +1,7 @@
 package core.cli;
 
+import java.util.ArrayList;
+
 /**
  * Defines the layout of a command
  * 
@@ -7,14 +9,14 @@ package core.cli;
 public class Command {
 
     private String token;
-    private String arg;
+    private ArrayList<String> arg;
 
     /**
      * Allows a command to be formed without any arguments
      * @param token  the command token
      */
     public Command (String token) {
-        this(token, "");
+        this(token, new ArrayList<String>());
     }
 
     /**
@@ -22,7 +24,7 @@ public class Command {
      * @param token  the command token
      * @param arg  the command arguments 
      */
-    public Command (String token, String arg){
+    public Command (String token, ArrayList<String> arg){
         this.token = token;
         this.arg = arg;
     }
@@ -39,8 +41,18 @@ public class Command {
      * Get the command arguments
      * @return
      */
-    public String getArgument () {
+    public ArrayList<String> getArguments () {
         return this.arg;
     }
+    
+    /**
+     * Get the command arguments
+     * @return
+     */
+    public String getFirstArgument () {
+        return this.arg.get(0);
+    }
+    
+    
 
 }

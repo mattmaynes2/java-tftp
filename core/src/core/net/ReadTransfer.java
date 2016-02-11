@@ -1,22 +1,16 @@
 package core.net;
 
-import core.net.Transfer;
-import core.net.NodeSocket;
-
-import core.req.DataMessage;
-import core.req.Message;
-import core.req.ReadRequest;
-import core.req.AckMessage;
-import core.req.InvalidMessageException;
-import core.req.ErrorMessageException;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
 
-import java.util.logging.Logger;
+import core.req.AckMessage;
+import core.req.DataMessage;
+import core.req.ErrorMessageException;
+import core.req.InvalidMessageException;
+import core.req.Message;
+import core.req.ReadRequest;
 
 /**
  * Read Transfer

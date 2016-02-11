@@ -1,16 +1,11 @@
 package core.ctrl;
 
-import core.ctrl.Controller;
+import java.net.SocketAddress;
 
-import core.net.NodeSocket;
+import core.cli.Command;
 import core.net.ReadTransfer;
 import core.net.Transfer;
-import core.net.TransferListener;
 import core.net.WriteTransfer;
-import core.req.Message;
-import core.cli.Command;
-
-import java.net.SocketAddress;
 
 /**
  * Transfer Controller
@@ -51,10 +46,10 @@ public abstract class TransferController extends Controller {
 
         switch (command.getToken()){
             case READ_COMMAND:
-                this.read(command.getArgument());
+                this.read(command.getFirstArgument());
                 break;
             case WRITE_COMMAND:
-                this.write(command.getArgument());
+                this.write(command.getFirstArgument());
                 break;
         }
     }

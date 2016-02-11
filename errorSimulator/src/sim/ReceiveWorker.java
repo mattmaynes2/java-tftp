@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+
 import core.util.Worker;
 import threads.SimulationTypes;
 import threads.SimulatorThread;
@@ -50,10 +51,12 @@ public class ReceiveWorker extends Worker {
 		requestSocket.close();
 	}
 	
-	public void setConfiguration(SimulationTypes type, int packetNumber) {
+	public void setConfiguration(SimulationTypes type, int packetNumber, PacketModifier modifier) {
 		
 		this.type = type;
-		this.packetNumber = packetNumber;	
+		this.packetNumber = packetNumber;
+		this.modifier = modifier;
+		
 	}
 
 }

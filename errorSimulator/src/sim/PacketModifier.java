@@ -19,12 +19,12 @@ public class PacketModifier {
 	private static final int DATA_INDEX = 4;
 	private static final int IGNORE = -1;
 	
-	byte[] opCode;
-	byte[] data;
-	String mode;
-	String filename;
-	int blockNum;	
-	int length;
+	private byte[] opCode;
+	private byte[] data;
+	private String mode;
+	private String filename;
+	private int blockNum;	
+	private int length;
 	
 	public PacketModifier () {
 		opCode = null;
@@ -43,17 +43,17 @@ public class PacketModifier {
 		switch(inOpCode) {
 		case READ:
 		case WRITE:
-			return modifyRequestPacket((Request)inMessage);
+			return modifyRequestPacket((Request)inMessage, packetIn);
 		case ACK:
-			return modifyAckPacket((AckMessage)inMessage);
+			return modifyAckPacket((AckMessage)inMessage, packetIn);
 		case DATA:
-			return modifyDataPacket((DataMessage)inMessage);
+			return modifyDataPacket((DataMessage)inMessage, packetIn);
 		default:
 			return packetIn;
 		}
 	}
 
-	private DatagramPacket modifyDataPacket(DataMessage inMessage) {
+	private DatagramPacket modifyDataPacket(DataMessage inMessage, DatagramPacket packetIn) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
 		try {
@@ -78,16 +78,16 @@ public class PacketModifier {
 			
 			byte[] outBytes = out.toByteArray();
 			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length);
+				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
 			} else {
-				return new DatagramPacket(outBytes, outBytes.length);
+				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
 			}
 		} catch(IOException e) {
-			return new DatagramPacket(inBytes, inBytes.length);
+			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
 	}
 
-	private DatagramPacket modifyRequestPacket(Request inMessage) {
+	private DatagramPacket modifyRequestPacket(Request inMessage, DatagramPacket packetIn) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
 		try {
@@ -98,7 +98,7 @@ public class PacketModifier {
 				out.write(inMessage.getOpCode().getCode());
 			}
 			
-			if (!this.filename.equals(null)) {
+			if (this.filename != null) {
 				out.write(this.filename.getBytes());
 			} else {
 				out.write(inMessage.getFilename().getBytes());
@@ -112,16 +112,16 @@ public class PacketModifier {
 			//TODO: maybe?
 			byte[] outBytes = out.toByteArray();
 			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length);
+				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
 			} else {
-				return new DatagramPacket(outBytes, outBytes.length);
+				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
 			}
 		} catch(IOException e) {
-			return new DatagramPacket(inBytes, inBytes.length);
+			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
 	}
 
-	private DatagramPacket modifyAckPacket(AckMessage inMessage) {
+	private DatagramPacket modifyAckPacket(AckMessage inMessage, DatagramPacket packetIn) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] inBytes = inMessage.toBytes();
 		try {
@@ -140,15 +140,14 @@ public class PacketModifier {
 			
 			byte[] outBytes = out.toByteArray();
 			if (this.length != IGNORE) {
-				return new DatagramPacket(outBytes, this.length);
+				return new DatagramPacket(outBytes, this.length, packetIn.getSocketAddress());
 			} else {
-				return new DatagramPacket(outBytes, outBytes.length);
+				return new DatagramPacket(outBytes, outBytes.length, packetIn.getSocketAddress());
 			}
 		} catch(IOException e) {
-			return new DatagramPacket(inBytes, inBytes.length);
+			return new DatagramPacket(inBytes, inBytes.length, packetIn.getSocketAddress());
 		}
 	}
-	
 	public void setOpCode(byte[] opCode) {
 		this.opCode = opCode;
 	}

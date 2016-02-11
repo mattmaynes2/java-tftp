@@ -26,6 +26,7 @@ public class InjectPacketStream implements SimulatorStream {
 
 	@Override
 	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
+		System.out.println("Sending after receiving "+getNumberPacketsOfPackets()+" packets");
 		if(getNumberPacketsOfPackets()==injectAt) {
 			stream.send(modifier.modifyPacket(packet));
 		}else {

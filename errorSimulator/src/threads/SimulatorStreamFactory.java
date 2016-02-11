@@ -1,6 +1,5 @@
 package threads;
 
-import java.net.DatagramPacket;
 import java.net.SocketException;
 
 import sim.PacketModifier;

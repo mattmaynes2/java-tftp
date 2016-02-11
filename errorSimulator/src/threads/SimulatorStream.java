@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 
 import core.req.InvalidMessageException;
-import core.req.Message;
 
 public interface SimulatorStream {
 

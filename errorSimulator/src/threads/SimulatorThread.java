@@ -52,8 +52,8 @@ public  class SimulatorThread extends Thread {
 			System.out.println(msg);
 			sendPacket(msg);
 			while(!MessageFactory.isLastMessage(msg)) {
-				packetIn=stream.receive();
-				msg=MessageFactory.createMessage(Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength()));
+
+				msg=receivePacket();
 				Logger.log(Level.INFO,"Message is "+msg);
 				sendPacket(msg);
 			}
@@ -89,9 +89,6 @@ public  class SimulatorThread extends Thread {
 	 * @throws InvalidMessageException 
 	 */
 	protected void sendPacket(Message message) throws IOException, InvalidMessageException {
-		Logger.log(Level.INFO,"Sending message to: "+sendAddress);
-		Logger.log(Level.INFO,"Message is: "+message);
-		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(message.toBytes()));
 		stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
 		sendAddress=packetIn.getSocketAddress();
 		Logger.log(Level.INFO,"Set next address to send "+sendAddress);
