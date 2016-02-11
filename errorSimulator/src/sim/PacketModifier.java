@@ -16,10 +16,6 @@ import core.req.Request;
 /**
  * This is responsible for taking a configuration, and modifying a datagram packet accordingly
  */
-/**
- * @author Peter
- *
- */
 public class PacketModifier {
 	
 	private static final int BLOCK_NUM_INDEX = 2;
