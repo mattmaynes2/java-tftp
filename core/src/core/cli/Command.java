@@ -47,9 +47,10 @@ public class Command {
     
     /**
      * Get the command arguments
+     * @throws IndexOutOfBoundsException if there are no arguments
      * @return
      */
-    public String getFirstArgument () {
+    public String getFirstArgument () throws IndexOutOfBoundsException{
         return this.arg.get(0);
     }
     

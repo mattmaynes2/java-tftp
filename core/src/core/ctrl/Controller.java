@@ -80,6 +80,7 @@ public abstract class Controller implements CommandHandler, TransferListener {
         this.cli = new CLI(this.interpreter, System.in, System.out);
         this.cli.addCommandHandler(this);
         this.cli.start();
+        this.usage();
     }
 
     /**
