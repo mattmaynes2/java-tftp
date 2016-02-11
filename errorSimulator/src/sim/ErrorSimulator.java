@@ -18,17 +18,23 @@ public class ErrorSimulator extends Controller {
     /**
      * Command to initialize a menu command
      */
-    private static final String OPCODE_COMMAND = "change-opcode";
-    private static final String WRONG_SENDER_COMMAND = "wrong-sender";
-    private static final String LENGTH_COMMAND = "change-length";
+    private static final String NORMAL_COMMAND = "norm";
+    private static final String OPCODE_COMMAND = "op";
+    private static final String WRONG_SENDER_COMMAND = "csa";
+    private static final String LENGTH_COMMAND = "cl";
+    private static final String REQUEST_SEPERATOR_COMMAND = "rrs";
+    private static final String END_COMMAND = "rend";
     
     private ReceiveWorker recieveListener;
 
     public ErrorSimulator() throws SocketException  {
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
+        this.interpreter.addCommand(NORMAL_COMMAND);
         this.interpreter.addCommand(OPCODE_COMMAND);
         this.interpreter.addCommand(WRONG_SENDER_COMMAND);
         this.interpreter.addCommand(LENGTH_COMMAND);
+        this.interpreter.addCommand(REQUEST_SEPERATOR_COMMAND);
+        this.interpreter.addCommand(END_COMMAND);
     }
 
     public void handleComplete () {}
@@ -54,11 +60,14 @@ public class ErrorSimulator extends Controller {
     public void usage() {
         System.out.println("TFTP Error Simulator");
         System.out.println("    Commands:");
-        System.out.println("    help                                          Prints this message");
-        System.out.println("    shutdown                                      Exits the simulator");
-        System.out.println("    change-opcode  <packetNumber> <opCode>        Changes the opcode of a specified packet");
-        System.out.println("    wrong-sender   <packetNumber>                 Changes the sender address of a specified packet");
-        System.out.println("    change-length  <packetNumber> <packetLength>  Changes the length of a specified packet" );
+        System.out.println("    help                                         Prints this message");
+        System.out.println("    shutdown                                     Exits the simulator");
+        System.out.println("    norm                                         Forward packets through without alteration" );
+        System.out.println("    op            <packetNumber> <opCode>        Changes the opcode of a specified packet");
+        System.out.println("    csa           <packetNumber>                 Changes the sender address of a specified packet");
+        System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");
+        System.out.println("    rrs           <packetNumber>                 Removes the Request Seperator. ie Removes 0 Byte after Filename");
+        System.out.println("    rend          <packetNumber>                 Removes the end byte. ie Removes the 0 Byte after Mode");
     }
 
     public static void main(String[] args) {
@@ -85,6 +94,9 @@ public class ErrorSimulator extends Controller {
 	public void handleCommand(Command command) {
 		super.handleCommand(command);
         switch (command.getToken()){
+        case NORMAL_COMMAND:
+        	this.changeLengthSimulation(command.getArguments());
+        	break;
         case OPCODE_COMMAND:
             this.changeOpcodeSimulation(command.getArguments());
             break;
@@ -98,17 +110,55 @@ public class ErrorSimulator extends Controller {
         case LENGTH_COMMAND:
         	this.changeLengthSimulation(command.getArguments());
         	break;
+        case REQUEST_SEPERATOR_COMMAND:
+        	try{
+        		removeRequestSeperatorSimulation(command.getFirstArgument());
+        	}catch (IndexOutOfBoundsException e) {
+        		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
+			}
+        	break;
+        case END_COMMAND:
+        	try{
+        		removeEndByteSimulation(command.getFirstArgument());
+        	}catch (IndexOutOfBoundsException e) {
+        		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
+			}
+        	break;
         }
+        
 	}
 	
-	private void wrongSocketSimulation(String packetNumber) {
+	private void removeEndByteSimulation(String packetNumber) {
+		PacketModifier modifier = new PacketModifier();
+		modifier.setEndByte(false);
 		try {
-			recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER,Integer.parseInt(packetNumber),null);
-			this.cli.message("Running wrong-sender Simulation on next request");
+			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(packetNumber),null);
+			this.cli.message("Now running wrong-sender Simulation on incoming requests");
 		}catch(NumberFormatException e) {
 			this.cli.message("parameter must be a digit");
 		}
 		
+	}
+
+	private void removeRequestSeperatorSimulation(String packetNumber) {
+		PacketModifier modifier = new PacketModifier();
+		modifier.setPostFilenameByte(false);
+		try {
+			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(packetNumber),null);
+			this.cli.message("Now running Change Sender Address Simulation on incoming requests");
+		}catch(NumberFormatException e) {
+			this.cli.message("parameter must be a digit");
+		}
+		
+	}
+
+	private void wrongSocketSimulation(String packetNumber) {
+		try {
+			recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, Integer.parseInt(packetNumber),null);
+			this.cli.message("Now running Change Sender Address Simulation on incoming requests");
+		}catch(NumberFormatException e) {
+			this.cli.message("parameter must be a digit");
+		}	
 	}
 	
 	private void changeLengthSimulation(ArrayList<String> args) {
@@ -117,11 +167,15 @@ public class ErrorSimulator extends Controller {
 			return;
 		}
 		
-		int length = Integer.parseInt(args.get(1));
-		PacketModifier modifier = new PacketModifier();
-		modifier.setLength(length);
-		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-		this.cli.message("Running Change Length Simulation on next request");
+		try {
+			int length = Integer.parseInt(args.get(1));
+			PacketModifier modifier = new PacketModifier();
+			modifier.setLength(length);
+			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
+			this.cli.message("Now running Change Length Simulation on incomming requests");
+		} catch(NumberFormatException e) {
+			this.cli.message("parameter must be a digit");
+		}
 	}
 	
 	private void changeOpcodeSimulation(ArrayList<String> args) {
@@ -144,9 +198,12 @@ public class ErrorSimulator extends Controller {
 		
 		PacketModifier modifier = new PacketModifier();
 		modifier.setOpCode(opCodeBytes);
-		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-		this.cli.message("Running Change Opcode Simulation on next request");
-		
+		try {
+			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
+			this.cli.message("Now running Change Opcode Simulation on incomming requests");	
+		} catch(NumberFormatException e) {
+			this.cli.message("parameter must be a digit");
+		}
 	}
 
 }

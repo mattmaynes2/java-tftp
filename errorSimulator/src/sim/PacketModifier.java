@@ -19,15 +19,19 @@ public class PacketModifier {
 	private static final int DATA_INDEX = 4;
 	private static final int IGNORE = -1;
 	
+	private DatagramPacket packetIn;
+	private Message messageIn;
+	private byte[] inBytes;
+	
 	private byte[] opCode;
 	private byte[] data;
 	private String mode;
 	private String filename;
 	private int blockNum;	
 	private int length;
-	private DatagramPacket packetIn;
-	private Message messageIn;
-	private byte[] inBytes;
+	private boolean postFilenameByte;
+	private boolean endByte;
+
 	
 	public PacketModifier () {
 		opCode = null;
@@ -36,12 +40,14 @@ public class PacketModifier {
 		filename = null;
 		blockNum = IGNORE;	
 		length = IGNORE;
+		postFilenameByte = true;
+		endByte = true;
 	}
 	
-	public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {
-		inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
+	public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {		
 		packetIn = packet;
 		messageIn = MessageFactory.createMessage(inBytes);
+		inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
 		OpCode inOpCode = messageIn.getOpCode();
 		switch(inOpCode) {
 		case READ:
@@ -87,7 +93,9 @@ public class PacketModifier {
 				out.write(inMessage.getFilename().getBytes());
 			}
 			
-			out.write(0);
+			if(postFilenameByte) {
+				out.write(0);
+			}
 			
 			if (this.mode != null) {
 				out.write(this.mode.getBytes());
@@ -95,7 +103,9 @@ public class PacketModifier {
 				out.write(inMessage.getMode().getBytes());
 			}
 			
-			out.write(0);
+			if(endByte) {
+				out.write(0);
+			}
 			
 			return(handleLength(out));
 		} catch(IOException e) {
@@ -172,5 +182,11 @@ public class PacketModifier {
 	}
 	public void setLength(int length) {
 		this.length = length;
+	}
+	public void setPostFilenameByte(boolean postFilenameByte) {
+		this.postFilenameByte = postFilenameByte;
+	}
+	public void setEndByte(boolean endByte) {
+		this.endByte = endByte;
 	}
 }
