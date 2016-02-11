@@ -95,7 +95,7 @@ public abstract class Controller implements CommandHandler, TransferListener {
 
     protected void applyCommandLineOptions(){
     	if (this.commandLineOptions.getOrDefault(QUIET_MODE_FLAG, false)){
-    		Logger.init(Level.OFF);
+    		Logger.init(Level.INFO);
     	}else{
     		Logger.init(Level.ALL);
     	}
