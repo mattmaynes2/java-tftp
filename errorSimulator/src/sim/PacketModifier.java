@@ -46,8 +46,8 @@ public class PacketModifier {
 	
 	public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {		
 		packetIn = packet;
-		messageIn = MessageFactory.createMessage(inBytes);
 		inBytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
+		messageIn = MessageFactory.createMessage(inBytes);
 		OpCode inOpCode = messageIn.getOpCode();
 		switch(inOpCode) {
 		case READ:
