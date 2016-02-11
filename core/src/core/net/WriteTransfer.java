@@ -32,11 +32,6 @@ import java.util.Arrays;
 public class WriteTransfer extends Transfer {
 
     /**
-     * Current data block being transferred
-     */
-    private short currentBlock;
-
-    /**
      * Constructs a new transfer will write data to a socket from
      * the file with the given name
      *
@@ -47,7 +42,6 @@ public class WriteTransfer extends Transfer {
      */
     public WriteTransfer (SocketAddress address, String filename) throws SocketException {
         super(address, filename);
-        this.currentBlock = 0;
     }
 
     /**
@@ -120,16 +114,10 @@ public class WriteTransfer extends Transfer {
 
         msg = this.getSocket().receive();
 
-        this.checkMessage(msg);
+        this.checkErrorMessage(msg);
         this.checkCast(msg, OpCode.ACK);
         ack = (AckMessage) msg;
-
-        if (ack.getBlock() != this.currentBlock) {
-            throw new MessageOrderException(
-                "Ack message out of order." +
-                " Expected " + this.currentBlock +
-                " Received " + ack.getBlock());
-        }
+        this.checkOrder(ack);
 
         return ack;
     }
@@ -155,7 +143,7 @@ public class WriteTransfer extends Transfer {
         byte[] data;
 
         // Increment the block
-        this.currentBlock++;
+        this.incrementBlockNumber();
         data = new byte[DataMessage.BLOCK_SIZE];
         read = in.read(data);
 
@@ -163,10 +151,10 @@ public class WriteTransfer extends Transfer {
         // a data packet with no data. Otherwise we will truncate the
         // data to only use the data read in
         if (read >= 0) {
-            message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
+            message = new DataMessage(this.getBlockNumber(), Arrays.copyOfRange(data, 0, read));
         }
         else {
-            message = new DataMessage(this.currentBlock, new byte[0]);
+            message = new DataMessage(this.getBlockNumber(), new byte[0]);
         }
 
         return message;
