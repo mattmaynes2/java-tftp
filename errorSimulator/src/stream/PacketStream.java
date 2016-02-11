@@ -23,7 +23,7 @@ public class PacketStream implements SimulatorStream{
 	public DatagramPacket receive() throws IOException {
 		DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
 		socket.receive(packet);
-		numReceived++;
+		incNumRecieved(packet);
 		return packet;
 	}
 	
@@ -40,5 +40,8 @@ public class PacketStream implements SimulatorStream{
 		return numReceived;
 	}
 	
-
+	protected void incNumRecieved(DatagramPacket packet) {
+		numReceived++;
+	}
+	
 }
