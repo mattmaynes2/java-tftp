@@ -3,6 +3,7 @@ package core.net;
 import core.req.Message;
 import core.req.WriteRequest;
 import core.req.DataMessage;
+import core.log.Logger;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
@@ -16,6 +17,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 /**
  * Write Transfer
@@ -85,9 +87,9 @@ public class WriteTransfer extends Transfer {
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e) {
-            // TODO Do something
+            // TODO Do something 
         } catch (InvalidMessageException e) {
-            this.handleInvalidMessage(e);
+        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -107,19 +109,23 @@ public class WriteTransfer extends Transfer {
             IOException,
             InvalidMessageException,
             ErrorMessageException,
-            MessageOrderException {
+            MessageOrderException, InvalidMessageException {
 
         Message msg;
         AckMessage ack;
-
-        msg = this.getSocket().receive();
-
-        this.checkErrorMessage(msg);
-        this.checkCast(msg, OpCode.ACK);
-        ack = (AckMessage) msg;
-        this.checkOrder(ack);
-
-        return ack;
+        try {
+	        msg = this.getSocket().receive();
+	
+	        this.checkErrorMessage(msg);
+	        this.checkCast(msg, OpCode.ACK);
+	        ack = (AckMessage) msg;
+	        this.checkOrder(ack);
+	
+	        return ack;
+        } catch (InvalidMessageException e) {
+        	this.handleInvalidMessage(e);
+        	throw e;
+        }
     }
 
     /**

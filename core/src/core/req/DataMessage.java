@@ -33,10 +33,11 @@ public class DataMessage extends AckMessage {
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
-        super.decode(bytes);
         if(bytes.length>=4) {
+            super.decode(Arrays.copyOfRange(bytes, 0, 4));
             this.data=Arrays.copyOfRange(bytes, 4, bytes.length);
         }else {
+            super.decode(bytes);
             this.data=null;
         }
     }
