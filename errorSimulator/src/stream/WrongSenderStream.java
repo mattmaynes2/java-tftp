@@ -4,40 +4,52 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import core.log.Logger;
+
 
 import core.req.InvalidMessageException;
+import core.util.ByteUtils;
 
 public class WrongSenderStream implements SimulatorStream {
 
-	private SimulatorStream stream;
-	private DatagramSocket socket;
+	private SimulatorStream mainStream;
+	private PacketStream wrongStream;
 	private int sendAt;
 	
 	public WrongSenderStream(SimulatorStream stream, int sendAt) throws SocketException {
-		this.stream=stream;
-		this.socket= new DatagramSocket();
+		this.mainStream=stream;
+		this.wrongStream= new PacketStream();
+		this.sendAt=sendAt;
 	}
 	
 	@Override
 	public DatagramPacket receive() throws IOException {
-		return stream.receive();
+		return mainStream.receive();
 	}
 
 	@Override
 	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		if(getNumberPacketsOfPackets()==sendAt) {
 			// send from the wrong socket
-			socket.send(packet);
-			stream.send(packet);
+			Logger.log(Level.INFO,"Sending packet from wrong stream");
+			wrongStream.send(packet);
+			DatagramPacket responsePacket=wrongStream.receive();
+			byte[] bytes = Arrays.copyOfRange(responsePacket.getData(), 0, responsePacket.getLength());
+			Logger.log(Level.INFO,"Received Packet From "+responsePacket.getSocketAddress());
+			Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(bytes));
+			Logger.log(Level.INFO, "Sending original packet from right stream");
+			mainStream.send(packet);
 		}else {
-			stream.send(packet);
+			mainStream.send(packet);
 		}
 
 	}
 
 	@Override
 	public int getNumberPacketsOfPackets() {
-		return stream.getNumberPacketsOfPackets();
+		return mainStream.getNumberPacketsOfPackets();
 	}
 
 }

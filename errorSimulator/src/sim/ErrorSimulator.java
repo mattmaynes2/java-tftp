@@ -18,13 +18,15 @@ public class ErrorSimulator extends Controller {
     /**
      * Command to initialize a menu command
      */
-    public static final String OPCODE_COMMAND = "change-opcode";
+    private static final String OPCODE_COMMAND = "change-opcode";
+    private static final String WRONG_SENDER_COMMAND = "wrong-sender";
     
     private ReceiveWorker recieveListener;
 
     public ErrorSimulator() throws SocketException  {
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
         this.interpreter.addCommand(OPCODE_COMMAND);
+        this.interpreter.addCommand(WRONG_SENDER_COMMAND);
     }
 
     public void handleComplete () {}
@@ -53,6 +55,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    help           Prints this message");
         System.out.println("    shutdown       Exits the simulator");
         System.out.println("    change-opcode  Changes the opcode of a packet");
+        System.out.println("    wrong-sender packetNumber");
     }
 
     public static void main(String[] args) {
@@ -82,7 +85,24 @@ public class ErrorSimulator extends Controller {
         case OPCODE_COMMAND:
             this.changeOpcode(command.getArguments());
             break;
+        case WRONG_SENDER_COMMAND:
+        	try{
+        		wrongSocketSimulation(command.getFirstArgument());
+        	}catch (IndexOutOfBoundsException e) {
+        		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
+			}
+        	break;
         }
+	}
+	
+	private void wrongSocketSimulation(String packetNumber) {
+		try {
+			recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER,Integer.parseInt(packetNumber),null);
+			this.cli.message("Running wrong-sender Simulation on next request");
+		}catch(NumberFormatException e) {
+			this.cli.message("parameter must be a digit");
+		}
+		
 	}
 	
 	public void changeOpcode(ArrayList<String> args) {
@@ -106,7 +126,7 @@ public class ErrorSimulator extends Controller {
 		PacketModifier modifier = new PacketModifier();
 		modifier.setOpCode(opCodeBytes);
 		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-		Logger.log(Level.INFO,"Running change Opcode Simulation on next request");
+		this.cli.message("Running change Opcode Simulation on next request");
 		
 	}
 

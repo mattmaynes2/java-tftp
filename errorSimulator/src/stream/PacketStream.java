@@ -29,6 +29,7 @@ public class PacketStream implements SimulatorStream{
 	
 	
 	public void send(DatagramPacket packet) throws IOException {
+		Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
 		Logger.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
 		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(packet.getData()));
 		socket.send(packet);
