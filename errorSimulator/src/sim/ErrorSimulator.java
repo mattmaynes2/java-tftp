@@ -14,6 +14,7 @@ import core.req.Message;
 public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
+    public static final int REQUEST_PACKET = 1;
     
     /**
      * Command to initialize a menu command
@@ -67,7 +68,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <packetNumber>                 Changes the sender address of a specified packet");
         System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");
         System.out.println("    rrs           <packetNumber>                 Removes the Request Seperator. ie Removes 0 Byte after Filename");
-        System.out.println("    rend          <packetNumber>                 Removes the end byte. ie Removes the 0 Byte after Mode");
+        System.out.println("    rend                                         Removes the end byte. ie Removes the 0 Byte after Mode");
     }
 
     public static void main(String[] args) {
@@ -111,45 +112,25 @@ public class ErrorSimulator extends Controller {
         	this.changeLengthSimulation(command.getArguments());
         	break;
         case REQUEST_SEPERATOR_COMMAND:
-        	try{
-        		removeRequestSeperatorSimulation(command.getFirstArgument());
-        	}catch (IndexOutOfBoundsException e) {
-        		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
-			}
-        	break;
+        	removeRequestSeperatorSimulation();
         case END_COMMAND:
-        	try{
-        		removeEndByteSimulation(command.getFirstArgument());
-        	}catch (IndexOutOfBoundsException e) {
-        		this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
-			}
-        	break;
+        	removeEndByteSimulation();
         }
         
 	}
 	
-	private void removeEndByteSimulation(String packetNumber) {
+	private void removeEndByteSimulation() {
 		PacketModifier modifier = new PacketModifier();
 		modifier.setEndByte(false);
-		try {
-			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(packetNumber),null);
-			this.cli.message("Now running wrong-sender Simulation on incoming requests");
-		}catch(NumberFormatException e) {
-			this.cli.message("parameter must be a digit");
-		}
-		
+		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+		this.cli.message("Now running Remove Simulation on incoming requests");		
 	}
 
-	private void removeRequestSeperatorSimulation(String packetNumber) {
+	private void removeRequestSeperatorSimulation() {
 		PacketModifier modifier = new PacketModifier();
 		modifier.setPostFilenameByte(false);
-		try {
-			recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(packetNumber),null);
-			this.cli.message("Now running Change Sender Address Simulation on incoming requests");
-		}catch(NumberFormatException e) {
-			this.cli.message("parameter must be a digit");
-		}
-		
+		recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+		this.cli.message("Now running Change Sender Address Simulation on incoming requests");		
 	}
 
 	private void wrongSocketSimulation(String packetNumber) {
