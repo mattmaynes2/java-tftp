@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import core.log.Logger;
 import core.req.InvalidMessageException;
+import core.util.ByteUtils;
 
 public class WrongSenderStream implements SimulatorStream {
 
@@ -35,6 +36,7 @@ public class WrongSenderStream implements SimulatorStream {
             DatagramPacket responsePacket=wrongStream.receive();
             byte[] bytes = Arrays.copyOfRange(responsePacket.getData(), 0, responsePacket.getLength());
             Logger.log(Level.INFO,"Received Packet From "+responsePacket.getSocketAddress());
+            Logger.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
             Logger.log(Level.INFO, "Sending original packet from right stream");
             mainStream.send(packet);
         }else {
