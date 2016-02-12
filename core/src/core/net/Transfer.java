@@ -1,5 +1,6 @@
 package core.net;
 
+import core.log.Logger;
 import core.net.NodeSocket;
 import core.net.TransferListener;
 
@@ -14,7 +15,7 @@ import core.req.MessageOrderException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.logging.Level;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
