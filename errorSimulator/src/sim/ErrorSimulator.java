@@ -101,7 +101,7 @@ public class ErrorSimulator extends Controller {
         super.handleCommand(command);
         switch (command.getToken()){
             case NORMAL_COMMAND:
-                this.changeLengthSimulation(command.getArguments());
+                this.passThroughSimulation();
                 break;
             case OPCODE_COMMAND:
                 this.changeOpcodeSimulation(command.getArguments());
@@ -118,20 +118,30 @@ public class ErrorSimulator extends Controller {
                 break;
             case REQUEST_SEPERATOR_COMMAND:
                 removeRequestSeperatorSimulation();
+                break;
             case END_COMMAND:
                 removeEndByteSimulation();
+                break;
         }
 
     }
 
     /**
+     * Set the configuration back to pass through
+     */
+    private void passThroughSimulation() {
+    	recieveListener.setConfiguration(SimulationTypes.PASS_THROUGH, 0, null);
+    	this.cli.message("Incoming requests are now passing through unaltered");		
+	}
+
+	/**
      * Set the configuration to remove the null at the end of a DatagramPacket
      */
     private void removeEndByteSimulation() {
         PacketModifier modifier = new PacketModifier();
         modifier.setEndByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Remove Simulation on incoming requests");
+        this.cli.message("Now running Remove End Byte Simulation on incoming requests");
     }
 
     /**
@@ -141,7 +151,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setPostFilenameByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Change Sender Address Simulation on incoming requests");
+        this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
     }
 
     /**
@@ -228,14 +238,14 @@ public class ErrorSimulator extends Controller {
     public void handleErrorMessage(ErrorMessage err) {}
 
     /**
-     * unused
-     */
-            public void handleComplete () {}
+    * unused
+    */
+    public void handleComplete () {}
 
-            /**
-             * unused
-             */
-            public void handleMessage(Message msg){}
+    /**
+    * unused
+    */
+    public void handleMessage(Message msg){}
 
     /**
      * unused
