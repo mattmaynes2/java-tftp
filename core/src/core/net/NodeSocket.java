@@ -91,6 +91,9 @@ public class NodeSocket {
         this.address = address;
     }
 
+    /**
+     * Resets the socket to its initial state
+     */
     public void reset () {
         this.address = null;
     }
@@ -156,6 +159,11 @@ public class NodeSocket {
         this.socket.close();
     }
 
+    /**
+     * Checks that the given packet is from the correct endpoint
+     *
+     * @param packet - Packet to confirm endpoint
+     */
     private boolean validateEndpoint (DatagramPacket packet) throws IOException {
         if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
             Logger.log(Level.WARNING, "Received message with unknown transfer ID");
