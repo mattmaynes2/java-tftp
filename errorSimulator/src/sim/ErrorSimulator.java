@@ -12,7 +12,7 @@ import core.req.Message;
 public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
-    public static final int REQUEST_PACKET = 1;
+    public static final int REQUEST_PACKET = 0;
 
     /**
      * Declare valid commands as static final
@@ -159,12 +159,11 @@ public class ErrorSimulator extends Controller {
      * @param packetNumber
      */
     private void wrongSocketSimulation(String packetNumber) {
-        try {
-            recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, Integer.parseInt(packetNumber),null);
-            this.cli.message("Now running Change Sender Address Simulation on incoming requests");
-        }catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
-        }
+    	int packetNum = verifyPacketNum(packetNumber, 1);
+    	if(packetNum > 0) {
+    		recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, packetNum,null);
+    		this.cli.message("Now running Change Sender Address on incoming requests");
+    	}
     }
 
     /**
@@ -179,14 +178,13 @@ public class ErrorSimulator extends Controller {
         }
 
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
-        try {
-            int length = Integer.parseInt(args.get(1));
-            PacketModifier modifier = new PacketModifier();
-            modifier.setLength(length);
-            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-            this.cli.message("Now running Change Length Simulation on incomming requests");
-        } catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
+        int length = Integer.parseInt(args.get(1));
+        int packetNum = verifyPacketNum(args.get(0), 1);
+        if(packetNum > 0) {
+	        PacketModifier modifier = new PacketModifier();
+	        modifier.setLength(length);
+	        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+	        this.cli.message("Now running Change Length Simulation on incoming requests");
         }
     }
 
@@ -208,21 +206,35 @@ public class ErrorSimulator extends Controller {
             this.cli.message("Incorrect opcode, two digits required.");
             return;
         }
-
-        //Parse out the opcode into bytes
-        byte[] opCodeBytes = new byte[2];
-        String[] opCodeArray = opCode.split("");
-        opCodeBytes[0] = Byte.parseByte(opCodeArray[0]);
-        opCodeBytes[1] = Byte.parseByte(opCodeArray[1]);
-
-        PacketModifier modifier = new PacketModifier();
-        modifier.setOpCode(opCodeBytes);
-        try {
-            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-            this.cli.message("Now running Change Opcode Simulation on incomming requests");
-        } catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
+        
+        int packetNum = verifyPacketNum(args.get(0), 0);
+        if(packetNum >= 0) {
+	        //Parse out the opcode into bytes
+	        byte[] opCodeBytes = new byte[2];
+	        String[] opCodeArray = opCode.split("");
+	        opCodeBytes[0] = Byte.parseByte(opCodeArray[0]);
+	        opCodeBytes[1] = Byte.parseByte(opCodeArray[1]);
+	
+	        PacketModifier modifier = new PacketModifier();
+	        modifier.setOpCode(opCodeBytes);
+            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+            this.cli.message("Now running Change Opcode Simulation on incoming requests");
         }
+    }
+    
+    private int verifyPacketNum(String packetNum, int min) {
+    	int returnNum = -1;
+    	try { 
+    		returnNum = Integer.parseInt(packetNum);
+    	} catch (NumberFormatException e){
+    		this.cli.message("Packet Number must be a digit"); 
+    		return -1;
+    	}
+		if (returnNum <= min-1) {
+			this.cli.message("Packet Number must be greater than zero.");
+			return -1;
+		}
+		return returnNum;
     }
 
     /**
