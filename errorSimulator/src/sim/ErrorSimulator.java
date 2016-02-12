@@ -80,10 +80,10 @@ public class ErrorSimulator extends Controller {
         System.out.println("    norm                                         Forward packets through without alteration" );
         System.out.println("    rend                                         Removes the end byte. ie Removes the 0 Byte after Mode");
         System.out.println("    rrs                                          Removes the Request Seperator. ie Removes 0 Byte after Filename");
+        System.out.println("    mode          <mode>                         Changes the mode of a request");
         System.out.println("    csa           <packetNumber>                 Changes the sender address of a specified packet");
         System.out.println("    op            <packetNumber> <opCode>        Changes the opcode of a specified packet");
-        System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");
-        System.out.println("    mode          <mode>                         Changes the mode of a request");
+        System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");      
     }
 
     /**
@@ -139,7 +139,6 @@ public class ErrorSimulator extends Controller {
             	}
             	break;
         }
-
     }
 
     /**
