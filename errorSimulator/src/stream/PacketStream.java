@@ -18,7 +18,7 @@ public class PacketStream implements SimulatorStream{
 
     public PacketStream() throws SocketException {
         this.socket= new DatagramSocket();
-        this.numReceived=1;
+        this.numReceived=0;
     }
 
     public DatagramPacket receive() throws IOException {
