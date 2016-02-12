@@ -66,7 +66,7 @@ public class ReadTransfer extends Transfer {
 
         // Starting the transfer
         this.notifyStart();
-        
+
         try {
             // Create a stream to write the file too
             out = new FileOutputStream(this.getFilename());
@@ -90,6 +90,8 @@ public class ReadTransfer extends Transfer {
             out.close();
             this.getSocket().close();
 
+            // Notify that the transfer is complete
+            this.notifyComplete();
         } catch (ErrorMessageException e){
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e){
@@ -97,9 +99,7 @@ public class ReadTransfer extends Transfer {
         } catch (Exception e){
             e.printStackTrace();
         }
-        // Notify that the transfer is complete
-        this.notifyComplete();
-    }
+   }
 
     /**
      * Synchronously receive the next data packet and sends an acknowledgement
