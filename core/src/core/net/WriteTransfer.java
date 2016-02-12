@@ -82,7 +82,7 @@ public class WriteTransfer extends Transfer {
 
         // Starting the transfer
         this.notifyStart();
-        
+
         try {
 
             // Create a new stream to read the file
@@ -99,6 +99,8 @@ public class WriteTransfer extends Transfer {
             in.close();
             this.getSocket().close();
 
+            // Notify that the transfer is complete
+            this.notifyComplete();
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
@@ -106,9 +108,6 @@ public class WriteTransfer extends Transfer {
         } catch (Exception e){
             e.printStackTrace();
         }
-        
-        // Notify that the transfer is complete
-        this.notifyComplete();
     }
 
     /**

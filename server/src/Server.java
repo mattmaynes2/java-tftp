@@ -15,7 +15,7 @@ public class Server extends RequestController {
      * Tracks the number of incomplete transfers
      */
     private int activeTransferCount;
-    
+
     public Server (String[] commandLineArgs) throws SocketException {
         super(SERVER_PORT, commandLineArgs);
         this.activeTransferCount = 0;
@@ -48,7 +48,8 @@ public class Server extends RequestController {
     }
 
     public synchronized void handleErrorMessage (ErrorMessage err){
-        Logger.log(Level.SEVERE, "Received error message: " + err.toString());
+        Logger.log(Level.SEVERE, "Error message: " + err.toString());
+        this.cli.message("\nFinished transfer with errors");
     }
 
     public synchronized void handleStart (){
@@ -56,7 +57,7 @@ public class Server extends RequestController {
         this.cli.prompt();
         this.activeTransferCount++;
     }
-    
+
     @Override
     public synchronized void stop(){
     	if (this.activeTransferCount != 0){
@@ -64,10 +65,10 @@ public class Server extends RequestController {
     	}
     	super.stop();
     }
-    
+
     public static void main (String[] args) {
         Server server;
-        
+
         try {
 
             server = new Server(args);

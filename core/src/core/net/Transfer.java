@@ -64,9 +64,11 @@ public abstract class Transfer implements Runnable {
     }
 
     protected void handleInvalidMessage (InvalidMessageException error) {
+        ErrorMessage msg;
         try {
-            this.socket.send(
-                new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage()));
+            msg = new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage());
+            this.socket.send(msg);
+            this.notifyError(msg);
         } catch (IOException e){
             e.printStackTrace();
             System.exit(1);

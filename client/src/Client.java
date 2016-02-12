@@ -17,18 +17,18 @@ public class Client extends TransferController {
     private static final int SERVER_PORT = 69;
     private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
-    
+
     public Client (SocketAddress address, String[] commandLineArgs){
         super(address, commandLineArgs);
         if (this.commandLineOptions.getOrDefault(TEST_MODE_FLAG, false)){
             try {
-				this.address = new InetSocketAddress(InetAddress.getLocalHost(), ERROR_SIMULATOR_PORT);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
+                this.address = new InetSocketAddress(InetAddress.getLocalHost(), ERROR_SIMULATOR_PORT);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
     }
-    
+
     @Override
     public void usage() {
         System.out.println("TFTP Client");
@@ -55,7 +55,8 @@ public class Client extends TransferController {
     }
 
     public void handleErrorMessage (ErrorMessage err) {
-        Logger.log(Level.SEVERE, "Received error message: " + err.toString());
+        Logger.log(Level.SEVERE, "Error message: " + err.toString());
+        this.cli.message("Finished transfer with errors");
     }
 
     @Override
