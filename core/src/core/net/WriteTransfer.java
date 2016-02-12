@@ -107,7 +107,7 @@ public class WriteTransfer extends Transfer {
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
-        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
+            this.handleInvalidMessage(e);
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);

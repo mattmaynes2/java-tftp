@@ -76,8 +76,6 @@ public abstract class Transfer implements Runnable {
 
     protected void checkErrorMessage (Message msg) throws ErrorMessageException {
         if (msg.getOpCode() == OpCode.ERROR) {
-            // TODO Log Message
-            this.notifyError((ErrorMessage) msg);
             throw new ErrorMessageException((ErrorMessage) msg);
         }
     }
