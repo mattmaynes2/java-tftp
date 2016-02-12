@@ -10,6 +10,14 @@ import sim.PacketModifier;
 
 public class SimulatorStreamFactory {
 
+	/**
+	 * Static method that creates a decorated SimulatorStream based on the input parameters
+	 * @param type
+	 * @param modifier
+	 * @param packetToChange
+	 * @return
+	 * @throws SocketException
+	 */
     public static SimulatorStream createSimulationStream(SimulationTypes type,PacketModifier modifier,int packetToChange) throws SocketException {
         switch(type) {
             case REPLACE_ACK:

@@ -22,3 +22,30 @@ Cameron Blanchard
 - CLI library
 - Core network library
 - Test Plan
+
+This document describes the role of each team member for Iteration 2
+
+Matthew Maynes
+- add support to handle error codes  4 and 5 in client and server
+- Javadoc
+- updating read me
+
+Connor Matthews
+- adding error simulator commands to create error codes 4 and 5
+- Testing
+
+Jeremy Dunsmore
+- Error Simulator Streams and packet handleing
+- UML
+ 
+Peter Mark
+- adding error simulator commands to create error codes 4 and 5
+- Javadoc
+- Test Plan
+
+Cameron Blanchard
+- UCM
+- Timeing diagrams
+- Testing
+
+

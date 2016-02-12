@@ -9,12 +9,20 @@ import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
 
+/**
+ *  Stream that only counts the number of data packets received
+ * @author Jeremy
+ *
+ */
 public class CountDataPacketStream extends PacketStream {
 
 	public CountDataPacketStream() throws SocketException {
 		super();
 	}
 
+	/**
+	 * increment the number of packets received only if the packet is a data packet
+	 */
 	@Override
 	protected void incNumRecieved(DatagramPacket packet) {
 		byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
