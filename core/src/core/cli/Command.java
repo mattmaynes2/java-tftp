@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Defines the layout of a command
- * 
+ *
  */
 public class Command {
 
@@ -22,7 +22,7 @@ public class Command {
     /**
      * Sets the command token and its arguments
      * @param token  the command token
-     * @param arg  the command arguments 
+     * @param arg  the command arguments
      */
     public Command (String token, ArrayList<String> arg){
         this.token = token;
@@ -39,21 +39,21 @@ public class Command {
 
     /**
      * Get the command arguments
-     * @return
+     * @return The arguments from this command
      */
     public ArrayList<String> getArguments () {
         return this.arg;
     }
-    
+
     /**
      * Get the command arguments
      * @throws IndexOutOfBoundsException if there are no arguments
-     * @return
+     * @return The first argument in the argument list
      */
     public String getFirstArgument () throws IndexOutOfBoundsException{
         return this.arg.get(0);
     }
-    
-    
+
+
 
 }

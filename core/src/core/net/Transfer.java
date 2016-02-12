@@ -157,6 +157,8 @@ public abstract class Transfer implements Runnable {
      * Sends the initializing request to start this request
      *
      * @return If the request was accepted
+     *
+     * @throws IOException - If socket is closed or there is no endpoint
      */
     public abstract boolean sendRequest() throws IOException;
 
