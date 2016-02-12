@@ -18,6 +18,7 @@ public class ErrorSimulator extends Controller {
     public static final int REQUEST_PACKET = 0;
     public static final short LOWEST_SHORT = (short) -32727;
     public static final short HIGHEST_SHORT = (short) 32728;
+    public static final short HIGHEST_PACKET = (short) 65535;
 
     /**
      * Declare valid commands as static final
@@ -74,15 +75,15 @@ public class ErrorSimulator extends Controller {
     public void usage() {
         System.out.println("TFTP Error Simulator");
         System.out.println("    Commands:");
-        System.out.println("    help                                         Prints this message");
-        System.out.println("    shutdown                                     Exits the simulator");
-        System.out.println("    norm                                         Forward packets through without alteration" );
-        System.out.println("    rend                                         Removes the end byte. ie Removes the 0 Byte after Mode");
-        System.out.println("    rrs                                          Removes the Request Seperator. ie Removes 0 Byte after Filename");
-        System.out.println("    csa           <packetNumber>                 Changes the sender address of a specified packet");
-        System.out.println("    op            <packetNumber> <opCode>        Changes the opcode of a specified packet");
-        System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");
-        System.out.println("    mode          <mode>                         Changes the mode of a request");
+        System.out.println("    help                                         	Prints this message");
+        System.out.println("    shutdown                                     	Exits the simulator");
+        System.out.println("    norm                                         	Forward packets through without alteration" );
+        System.out.println("    rend                                         	Removes the end byte. ie Removes the 0 Byte after Mode");
+        System.out.println("    rrs                                          	Removes the Request Seperator. ie Removes 0 Byte after Filename");
+        System.out.println("    csa           <packetNum>         				Changes the sender address of a specified packet");
+        System.out.println("    op            <type> <packetNum> <opCode>       Changes the opcode of a specified packet");
+        System.out.println("    cl            <type> <packetNum> <packetLen> 	Changes the length of a specified packet");
+        System.out.println("    mode          <mode>                         	Changes the mode of a request");
     }
 
     /**
@@ -185,49 +186,71 @@ public class ErrorSimulator extends Controller {
      */
     private void wrongSocketSimulation(String packetNumber) {
     	int packetNum = verifyNum(packetNumber, 1);
-    	if(packetNum > 0) {
+    	if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
     		recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, packetNum,null);
     		this.cli.message("Now running Change Sender Address on incoming requests");
     	}
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
+        }
+    	
     }
 
     /**
      * Change the length of a packet
-     * @param args  Will contain the packet number to change, and the length to change it to
+     * @param args  Will contain the packet type to change, its packet number, and the length to change it to
      */
     private void changeLengthSimulation(ArrayList<String> args) {
-        //args must be of size two
-        if(args.size() != 2) {
-            this.cli.message("Incorrect number of parameters for change-length.  Format is change-length packetNumber newLength");
+        //args must be of size three
+        if(args.size() != 3) {
+            this.cli.message("Incorrect number of parameters for cl.  Format is cl <type> <packetNum> <newLen>");
             return;
         }
-
+        
+        //get the simulation type
+        SimulationTypes type = determineSimulationType(args.get(0));
+        
+        if (type == SimulationTypes.PASS_THROUGH) {
+        	return;
+        }
+        
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
-        int length = verifyNum(args.get(1), 0);
-        int packetNum = verifyNum(args.get(0), 1);
-        if(packetNum > 0) {
+        int length = verifyNum(args.get(2), 0);
+        int packetNum = verifyNum(args.get(1), 1);
+        if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	        PacketModifier modifier = new PacketModifier();
 	        modifier.setLength(length);
-	        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+	        recieveListener.setConfiguration(type, packetNum,  modifier);
 	        this.cli.message("Now running Change Length Simulation on incoming requests");
+        }
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
         }
     }
 
     /**
      * Change the op code of a packet
-     * @param args  Will contain the packet number to change, and the opcode to change it to
+     * @param args  Will contain the packet type to change, its packet number, and the opcode to change it to
      */
     private void changeOpcodeSimulation(ArrayList<String> args) {
-        //args must be size of two
-        if(args.size() != 2) {
-            this.cli.message("Incorrect number of parameters for change-code.  Format is change-opcode packetNumber newOpcode");
+        //args must be size of three
+        if(args.size() != 3) {
+            this.cli.message("Incorrect number of parameters for op.  Format is op <packetNum> <opCode> <type>");
             return;
         }
-        //get the opcode
-        String opCode = args.get(1);
         
-        int packetNum = verifyNum(args.get(0), 0);
-        if(packetNum >= 0) {
+        //get the opcode
+        String opCode = args.get(2);
+        
+        //get the simulation type
+        SimulationTypes type = determineSimulationType(args.get(0).toUpperCase());
+        
+        if (type == SimulationTypes.PASS_THROUGH) {
+        	return;
+        }
+        
+        int packetNum = verifyNum(args.get(1), 0);
+        if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
 	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
 	        if(LOWEST_SHORT < opCodeInt && opCodeInt < HIGHEST_SHORT) {    
@@ -244,14 +267,35 @@ public class ErrorSimulator extends Controller {
 		        
 		        PacketModifier modifier = new PacketModifier();
 		        modifier.setOpCode(out.toByteArray());
-	            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+	            recieveListener.setConfiguration(type, packetNum,  modifier);
 	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
 	        }
-	        this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
+	        else {
+	        	this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
+	        }
+        }
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 <= packetNumber < 65535");
         }
     }
     
     /**
+     * Determine the SimulationType from the string argument
+     */
+    private SimulationTypes determineSimulationType(String type) {
+    	if (type.equals("ACK")) {
+        	return SimulationTypes.REPLACE_ACK;
+        } else if (type.equals("DATA")) {
+        	return SimulationTypes.REPLACE_DATA;
+        } else if (type.equals("REQ")){
+        	return SimulationTypes.REPLACE_PACKET;
+        } else {
+        	this.cli.message("Incorrect packet type parameter. Options are ACK, DATA, or REQ");
+        	return SimulationTypes.PASS_THROUGH;
+        }
+	}
+
+	/**
      * Verifies that a packet number meets the requirements
      * @param packetNum  the number to check 
      * @param min  the minimum allowable value
