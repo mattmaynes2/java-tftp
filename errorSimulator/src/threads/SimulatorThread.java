@@ -29,11 +29,12 @@ public  class SimulatorThread extends Thread {
     private DatagramPacket packetIn;
     private SocketAddress sendAddress;
     private SimulatorStream stream;
+    
     /**
      * Creates a new socket and sets the timeout to 1000
      * @param packet  the datagram packet
-     * @throws SocketException
-     * @throws UnknownHostException
+     * @throws SocketException  throws if a new socket cannot be created
+     * @throws UnknownHostException  throws if a local host is unknown
      */
     //TODO change inputs so that there aren't as many and one won't potentially be null
     public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, PacketModifier modifier) throws SocketException, UnknownHostException {
@@ -76,8 +77,8 @@ public  class SimulatorThread extends Thread {
     /**
      * Receives a packet and returns it as a Message
      * @return Message created from received packet
-     * @throws IOException
-     * @throws InvalidMessageException
+     * @throws IOException  throws if invalid input is entered
+     * @throws InvalidMessageException  throws if the message format is invalid
      */
     protected Message receivePacket() throws IOException, InvalidMessageException {
         packetIn=stream.receive();
@@ -88,9 +89,9 @@ public  class SimulatorThread extends Thread {
 
     /**
      * Takes a message and uses it to create and send a packet
-     * @param message
-     * @throws IOException
-     * @throws InvalidMessageException
+     * @param message The message to send
+     * @throws IOException  throws if the stream cannot sent the packet
+     * @throws InvalidMessageException  throws if the message format is invalid
      */
     protected void sendPacket(Message message) throws IOException, InvalidMessageException {
         stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
