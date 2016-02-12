@@ -16,9 +16,7 @@ public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 0;
-    public static final short LOWEST_SHORT = (short) -32727;
-    public static final short HIGHEST_SHORT = (short) 32728;
-    public static final short HIGHEST_PACKET = (short) 65535;
+    public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
 
     /**
      * Declare valid commands as static final
@@ -238,8 +236,8 @@ public class ErrorSimulator extends Controller {
         int packetNum = verifyNum(args.get(0), 0);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
-	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
-	        if(LOWEST_SHORT < opCodeInt && opCodeInt < HIGHEST_SHORT) {    
+	        short opCodeInt = (short)verifyNum(opCode, Short.MIN_VALUE);
+	        if(Short.MIN_VALUE < opCodeInt && opCodeInt < Short.MAX_VALUE) {    
 	            ByteArrayOutputStream out = new ByteArrayOutputStream();
 	            ByteBuffer b = ByteBuffer.allocate(2);
 	    	    b.putShort(opCodeInt);
