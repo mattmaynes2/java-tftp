@@ -118,8 +118,10 @@ public class ErrorSimulator extends Controller {
                 break;
             case REQUEST_SEPERATOR_COMMAND:
                 removeRequestSeperatorSimulation();
+                break;
             case END_COMMAND:
                 removeEndByteSimulation();
+                break;
         }
 
     }
@@ -131,7 +133,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setEndByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Remove Simulation on incoming requests");
+        this.cli.message("Now running Remove End Byte Simulation on incoming requests");
     }
 
     /**
@@ -141,7 +143,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setPostFilenameByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Change Sender Address Simulation on incoming requests");
+        this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
     }
 
     /**
