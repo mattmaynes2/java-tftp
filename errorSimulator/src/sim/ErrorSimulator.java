@@ -1,5 +1,8 @@
 package sim;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -12,7 +15,9 @@ import core.req.Message;
 public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
-    public static final int REQUEST_PACKET = 1;
+    public static final int REQUEST_PACKET = 0;
+    public static final short LOWEST_SHORT = (short) -32727;
+    public static final short HIGHEST_SHORT = (short) 32728;
 
     /**
      * Declare valid commands as static final
@@ -101,7 +106,7 @@ public class ErrorSimulator extends Controller {
         super.handleCommand(command);
         switch (command.getToken()){
             case NORMAL_COMMAND:
-                this.changeLengthSimulation(command.getArguments());
+                this.passThroughSimulation();
                 break;
             case OPCODE_COMMAND:
                 this.changeOpcodeSimulation(command.getArguments());
@@ -118,20 +123,30 @@ public class ErrorSimulator extends Controller {
                 break;
             case REQUEST_SEPERATOR_COMMAND:
                 removeRequestSeperatorSimulation();
+                break;
             case END_COMMAND:
                 removeEndByteSimulation();
+                break;
         }
 
     }
 
     /**
+     * Set the configuration back to pass through
+     */
+    private void passThroughSimulation() {
+    	recieveListener.setConfiguration(SimulationTypes.PASS_THROUGH, 0, null);
+    	this.cli.message("Incoming requests are now passing through unaltered");		
+	}
+
+	/**
      * Set the configuration to remove the null at the end of a DatagramPacket
      */
     private void removeEndByteSimulation() {
         PacketModifier modifier = new PacketModifier();
         modifier.setEndByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Remove Simulation on incoming requests");
+        this.cli.message("Now running Remove End Byte Simulation on incoming requests");
     }
 
     /**
@@ -141,7 +156,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setPostFilenameByte(false);
         recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
-        this.cli.message("Now running Change Sender Address Simulation on incoming requests");
+        this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
     }
 
     /**
@@ -149,12 +164,11 @@ public class ErrorSimulator extends Controller {
      * @param packetNumber
      */
     private void wrongSocketSimulation(String packetNumber) {
-        try {
-            recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, Integer.parseInt(packetNumber),null);
-            this.cli.message("Now running Change Sender Address Simulation on incoming requests");
-        }catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
-        }
+    	int packetNum = verifyNum(packetNumber, 1);
+    	if(packetNum > 0) {
+    		recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, packetNum,null);
+    		this.cli.message("Now running Change Sender Address on incoming requests");
+    	}
     }
 
     /**
@@ -169,14 +183,13 @@ public class ErrorSimulator extends Controller {
         }
 
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
-        try {
-            int length = Integer.parseInt(args.get(1));
-            PacketModifier modifier = new PacketModifier();
-            modifier.setLength(length);
-            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-            this.cli.message("Now running Change Length Simulation on incomming requests");
-        } catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
+        int length = verifyNum(args.get(1), 0);
+        int packetNum = verifyNum(args.get(0), 1);
+        if(packetNum > 0) {
+	        PacketModifier modifier = new PacketModifier();
+	        modifier.setLength(length);
+	        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+	        this.cli.message("Now running Change Length Simulation on incoming requests");
         }
     }
 
@@ -198,21 +211,50 @@ public class ErrorSimulator extends Controller {
             this.cli.message("Incorrect opcode, two digits required.");
             return;
         }
-
-        //Parse out the opcode into bytes
-        byte[] opCodeBytes = new byte[2];
-        String[] opCodeArray = opCode.split("");
-        opCodeBytes[0] = Byte.parseByte(opCodeArray[0]);
-        opCodeBytes[1] = Byte.parseByte(opCodeArray[1]);
-
-        PacketModifier modifier = new PacketModifier();
-        modifier.setOpCode(opCodeBytes);
-        try {
-            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, Integer.parseInt(args.get(0)),  modifier);
-            this.cli.message("Now running Change Opcode Simulation on incomming requests");
-        } catch(NumberFormatException e) {
-            this.cli.message("parameter must be a digit");
+        
+        int packetNum = verifyNum(args.get(0), 0);
+        if(packetNum >= 0) {
+	        //Parse out the opcode into bytes
+	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
+	        if(LOWEST_SHORT < opCodeInt && opCodeInt < HIGHEST_SHORT) {    
+	            ByteArrayOutputStream out = new ByteArrayOutputStream();
+	            ByteBuffer b = ByteBuffer.allocate(2);
+	    	    b.putShort(opCodeInt);
+	    	
+	    	    byte[] result = b.array();
+		        try {
+					out.write(result);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		        
+		        PacketModifier modifier = new PacketModifier();
+		        modifier.setOpCode(out.toByteArray());
+	            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
+	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
+	        }
         }
+    }
+    
+    /**
+     * Verifies that a packet number meets the requirements
+     * @param packetNum  the number to check 
+     * @param min  the minimum allowable value
+     * @return
+     */
+    private int verifyNum(String packetNum, int min) {
+    	int returnNum = -1;
+    	try { 
+    		returnNum = Integer.parseInt(packetNum);
+    	} catch (NumberFormatException e){
+    		this.cli.message("Parameter must be a digit"); 
+    		return -1;
+    	}
+		if (returnNum <= min-1) {
+			this.cli.message("Parameter must be greater than or equal to " + min);
+			return -1;
+		}
+		return returnNum;
     }
 
     /**
@@ -228,14 +270,14 @@ public class ErrorSimulator extends Controller {
     public void handleErrorMessage(ErrorMessage err) {}
 
     /**
-     * unused
-     */
-            public void handleComplete () {}
+    * unused
+    */
+    public void handleComplete () {}
 
-            /**
-             * unused
-             */
-            public void handleMessage(Message msg){}
+    /**
+    * unused
+    */
+    public void handleMessage(Message msg){}
 
     /**
      * unused

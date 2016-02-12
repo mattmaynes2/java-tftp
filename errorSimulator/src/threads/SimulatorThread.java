@@ -14,7 +14,6 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
-import core.util.ByteUtils;
 import sim.PacketModifier;
 import sim.SimulationTypes;
 import stream.SimulatorStream;
@@ -69,6 +68,7 @@ public  class SimulatorThread extends Thread {
         } catch (IOException | InvalidMessageException e) {
             e.printStackTrace();
         }
+        Logger.log(Level.INFO, "Finished Simulation");
     }
 
 
@@ -95,6 +95,5 @@ public  class SimulatorThread extends Thread {
     protected void sendPacket(Message message) throws IOException, InvalidMessageException {
         stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
         sendAddress=packetIn.getSocketAddress();
-        Logger.log(Level.INFO,"Set next address to send "+sendAddress);
     }
 }

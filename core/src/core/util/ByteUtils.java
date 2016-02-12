@@ -41,9 +41,12 @@ public class ByteUtils {
      * @return A hex-formatted string
      */
 	public static String bytesToHexString(byte[] bytes) {
+		if(bytes.length<1) {
+			return "[]";
+		}
 		StringBuilder s= new StringBuilder();
 		for(byte b: bytes) {
-			s.append(Integer.toHexString(b)+", ");
+			s.append(String.format("%02X", b)+", ");
 		}
 		//remove trailing comma and space
 		return "["+s.substring(0, s.length()-2)+"]";

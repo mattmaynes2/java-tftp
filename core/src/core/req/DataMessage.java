@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import core.util.ByteUtils;
+
 /**
  * This class is responsible for data packets that are treated as acknowledgments 
  *
@@ -33,12 +35,13 @@ public class DataMessage extends AckMessage {
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
-        if(bytes.length>=4) {
-            super.decode(Arrays.copyOfRange(bytes, 0, 4));
-            this.data=Arrays.copyOfRange(bytes, 4, bytes.length);
-        }else {
-            super.decode(bytes);
-            this.data=null;
+        if(bytes.length>=4 && bytes.length<=BLOCK_SIZE+ACK_SIZE) {
+            super.decode(Arrays.copyOfRange(bytes, 0, ACK_SIZE));
+            this.data=Arrays.copyOfRange(bytes, ACK_SIZE, bytes.length);
+        } else if (bytes.length < ACK_SIZE) {
+        	throw new InvalidMessageException("Data Message must be at least 4 bytes");
+        } else {
+        	throw new InvalidMessageException("Data Message must be less than 517 bytes");
         }
     }
 
@@ -64,7 +67,7 @@ public class DataMessage extends AckMessage {
      */
     @Override
     public String toString() {
-        return super.toString() + " data: " + Arrays.toString(this.data);
+        return super.toString() + " data: " + ByteUtils.bytesToHexString(data);
     }
 
     /**

@@ -1,23 +1,19 @@
 package core.net;
 
-import core.req.Message;
-import core.req.WriteRequest;
-import core.req.DataMessage;
-import core.log.Logger;
-import core.req.AckMessage;
-import core.req.InvalidMessageException;
-import core.req.ErrorMessageException;
-import core.req.MessageOrderException;
-import core.req.OpCode;
-
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
-
 import java.util.Arrays;
-import java.util.logging.Level;
+
+import core.req.AckMessage;
+import core.req.DataMessage;
+import core.req.ErrorMessageException;
+import core.req.InvalidMessageException;
+import core.req.Message;
+import core.req.MessageOrderException;
+import core.req.OpCode;
+import core.req.WriteRequest;
 
 /**
  * Write Transfer
@@ -86,7 +82,7 @@ public class WriteTransfer extends Transfer {
 
         // Starting the transfer
         this.notifyStart();
-        
+
         try {
 
             // Create a new stream to read the file
@@ -103,6 +99,8 @@ public class WriteTransfer extends Transfer {
             in.close();
             this.getSocket().close();
 
+            // Notify that the transfer is complete
+            this.notifyComplete();
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
@@ -110,9 +108,6 @@ public class WriteTransfer extends Transfer {
         } catch (Exception e){
             e.printStackTrace();
         }
-        
-        // Notify that the transfer is complete
-        this.notifyComplete();
     }
 
     /**

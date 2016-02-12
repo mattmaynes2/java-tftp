@@ -1,5 +1,6 @@
 package core.net;
 
+import core.log.Logger;
 import core.net.NodeSocket;
 import core.net.RequestListener;
 
@@ -11,6 +12,7 @@ import core.req.ErrorMessage;
 import core.util.Worker;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.io.IOException;
 
 import java.net.SocketException;
@@ -54,18 +56,20 @@ public class RequestReceiver extends Worker {
     public void listen () throws IOException, SocketException {
         Request req;
         NodeSocket errorSocket;
+        ErrorMessage err;
 
         try {
             this.socket.reset();
             req = (Request) this.socket.receive();
 
-            for (RequestListener handler : this.listeners){
-                handler.handleRequest(req, socket.getAddress());
-            }
+            this.notifyRequest(req, socket);
         } catch (InvalidMessageException e){
+        	Logger.log(Level.SEVERE, "Invalid message received: " + e.getMessage());
+            err = new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage());
             errorSocket = new NodeSocket(this.socket.getAddress());
-            errorSocket.send(new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage()));
+            errorSocket.send(err);
             errorSocket.close();
+            this.notifyError(err);
         } catch (SocketException ex){
             if (this.isRunning()){
                 throw ex;
@@ -85,6 +89,18 @@ public class RequestReceiver extends Worker {
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private void notifyRequest (Request req, NodeSocket socket) {
+        for (RequestListener handler : this.listeners) {
+            handler.handleRequest(req, socket.getAddress());
+        }
+    }
+
+    private void notifyError (ErrorMessage msg) {
+        for (RequestListener handler : this.listeners) {
+            handler.handleError(msg);
         }
     }
 

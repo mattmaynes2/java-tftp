@@ -11,6 +11,7 @@ import core.net.RequestReceiver;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
 import core.req.Request;
+import core.req.ErrorMessage;
 
 /**
  * Request Controller
@@ -18,12 +19,12 @@ import core.req.Request;
  * Responds to transfer requests and performs operations
  */
 public abstract class RequestController extends Controller implements RequestListener {
-	
+
     /**
      * Handles sockets requests
      */
     private RequestReceiver receiver;
-   
+
     /**
      * Constructs a new request controller for handling transfer requests
      *
@@ -54,6 +55,15 @@ public abstract class RequestController extends Controller implements RequestLis
             default:
             	break;
         }
+    }
+
+    /**
+     * Handles invalid transfer requests
+     *
+     * @param err - Error message
+     */
+    public void handleError (ErrorMessage err) {
+        Logger.log(Level.WARNING, "Invalid request received");
     }
 
     /**

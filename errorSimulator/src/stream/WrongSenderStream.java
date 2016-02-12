@@ -31,13 +31,14 @@ public class WrongSenderStream implements SimulatorStream {
     public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
         if(getNumberPacketsOfPackets()==sendAt) {
             // send from the wrong socket
+            Logger.log(Level.INFO, "Sending original packet from right stream");
+            mainStream.send(packet);
             Logger.log(Level.INFO,"Sending packet from wrong stream");
             wrongStream.send(packet);
             DatagramPacket responsePacket=wrongStream.receive();
             byte[] bytes = Arrays.copyOfRange(responsePacket.getData(), 0, responsePacket.getLength());
             Logger.log(Level.INFO,"Received Packet From "+responsePacket.getSocketAddress());
-            Logger.log(Level.INFO, "Sending original packet from right stream");
-            mainStream.send(packet);
+            Logger.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
         }else {
             mainStream.send(packet);
         }
