@@ -35,14 +35,13 @@ public class DataMessage extends AckMessage {
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
-        if(bytes.length>=4) {
-            super.decode(Arrays.copyOfRange(bytes, 0, 4));
-            this.data=Arrays.copyOfRange(bytes, 4, bytes.length);
-        } else if (bytes.length < 4) {
+        if(bytes.length>=4 && bytes.length<=BLOCK_SIZE+ACK_SIZE) {
+            super.decode(Arrays.copyOfRange(bytes, 0, ACK_SIZE));
+            this.data=Arrays.copyOfRange(bytes, ACK_SIZE, bytes.length);
+        } else if (bytes.length < ACK_SIZE) {
         	throw new InvalidMessageException("Data Message must be at least 4 bytes");
         } else {
-            super.decode(bytes);
-            this.data=null;
+        	throw new InvalidMessageException("Data Message must be less than 517 bytes");
         }
     }
 
