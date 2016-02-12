@@ -36,7 +36,9 @@ public class DataMessage extends AckMessage {
         if(bytes.length>=4) {
             super.decode(Arrays.copyOfRange(bytes, 0, 4));
             this.data=Arrays.copyOfRange(bytes, 4, bytes.length);
-        }else {
+        } else if (bytes.length < 4) {
+        	throw new InvalidMessageException("Data Message must be at least 4 bytes");
+        } else {
             super.decode(bytes);
             this.data=null;
         }
