@@ -22,7 +22,7 @@ public class ReadRequest extends Request {
     /**
      * Specifiec a file to read as a byte list
      * @param data  the encoded filename
-     * @throws InvalidMessageException
+     * @throws InvalidMessageException - If the given message does not form a valid request
      */
     public ReadRequest (byte[] data) throws InvalidMessageException {
         super(data);

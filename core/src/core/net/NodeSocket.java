@@ -54,6 +54,8 @@ public class NodeSocket {
      * that will communicate to the desired address
      *
      * @param address - Address to send messages to
+     *
+     * @throws SocketException - If there are no ports available
      */
     public NodeSocket (SocketAddress address) throws SocketException {
         this.address = address;
