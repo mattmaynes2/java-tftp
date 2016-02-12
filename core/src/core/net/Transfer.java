@@ -1,5 +1,6 @@
 package core.net;
 
+import core.log.Logger;
 import core.net.NodeSocket;
 import core.net.TransferListener;
 
@@ -14,7 +15,7 @@ import core.req.MessageOrderException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.logging.Level;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
@@ -63,23 +64,46 @@ public abstract class Transfer implements Runnable {
         this.currentBlock = 0;
     }
 
+    /**
+     * Handles an invalid message exception by sending an error message on the
+     * socket and notifies listeners of the invalid message
+     *
+     * @param error - Invalid message exception
+     */
     protected void handleInvalidMessage (InvalidMessageException error) {
+        ErrorMessage msg;
         try {
-            this.socket.send(
-                new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage()));
+            msg = new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage());
+            this.socket.send(msg);
+            this.notifyError(msg);
         } catch (IOException e){
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-
+    /**
+     * Checks if the given message is an error message and throws an exception
+     * if there is
+     *
+     * @param msg - Message to check
+     *
+     * @throws ErrorMessageException If the message is an error message
+     */
     protected void checkErrorMessage (Message msg) throws ErrorMessageException {
         if (msg.getOpCode() == OpCode.ERROR) {
             throw new ErrorMessageException((ErrorMessage) msg);
         }
     }
 
+    /**
+     * Checks if the given acknowledge message is in the correct order
+     * and throws an error if not
+     *
+     * @param ack - Acknowledge message
+     *
+     * @throws MessageOrderException - If the acknowledge is out of order
+     */
     protected void checkOrder (AckMessage ack) throws MessageOrderException {
        if (ack.getBlock() != this.getBlockNumber()) {
             throw new MessageOrderException(
@@ -89,6 +113,17 @@ public abstract class Transfer implements Runnable {
         }
     }
 
+    /**
+     * Checks if the given message has the correct op code to cast to the
+     * desired message type.
+     *
+     * @param msg   - Message to check
+     * @param code  - Opcode of message type to cast to
+     *
+     * @return If the cast can be performed
+     *
+     * @throws InvalidMessageException - If the message is not of the correct type
+     */
     protected boolean checkCast (Message msg, OpCode code) throws InvalidMessageException {
         if (msg.getOpCode() == code){
             return true;
@@ -170,6 +205,7 @@ public abstract class Transfer implements Runnable {
 
     /**
      * Notifies all listeners that a message is being sent
+     *
      * @param msg - Message being sent
      */
     protected void notifySendMessage(Message msg){
@@ -178,6 +214,11 @@ public abstract class Transfer implements Runnable {
         }
     }
 
+    /**
+     * Notifies all listeners that an error occurred
+     *
+     * @param msg - Error message that was received
+     */
     protected void notifyError (ErrorMessage msg) {
         for (TransferListener listener : this.listeners) {
             listener.handleErrorMessage(msg);

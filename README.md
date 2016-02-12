@@ -31,25 +31,27 @@ Eclipse should now be configured properly.
 ## Running Instructions
 
 ### Server
-To run the server, run the server project from eclipse.
-To shutdown the server, type `shutdown` in the servers command line interface.
+- To run the server, run the server project from eclipse.
+- To shutdown the server, type `shutdown` in the servers command line interface.
 
 ### Error Simulator
-To run the Error Simulator, run the error simulator from eclipse.
-To shutdown the Error Simulator, type `shutdown` in the error simulators command line interface.
+- To run the Error Simulator, run the error simulator from eclipse.
+- To shutdown the Error Simulator, type `shutdown` in the error simulators command line interface.
 
 ### Client
 By default, client will connect directly to the ser when run through eclipse.  To have the client run through the error simulator, run the client with the -t command line argument.
-To see the usage information, type `help` in the cli.  
-To perform a read operation from the server to the client, type `read` followed by a space and the filename.
-To perform a write operation from the client to the server, type `write` followed by a space and the filename.
+
+- To see the usage information, type `help` in the cli.  
+- To perform a read operation from the server to the client, type `read` followed by a space and the filename.
+- To perform a write operation from the client to the server, type `write` followed by a space and the filename.
 
 #### Command Line Arguments
 To enter a command line argument in eclipse:
--Right click on the client project and select `Run as` -> `Run Configurations`
--Ensure that the client project is selected in the tree view in the left hand side of the popup window
--Select the `Arguments` tab on the right hand side
--In the `Program Arguments` text box, add -t
+
+- Right click on the client project and select `Run as` -> `Run Configurations`
+- Ensure that the client project is selected in the tree view in the left hand side of the popup window
+- Select the `Arguments` tab on the right hand side
+- In the `Program Arguments` text box, add -t
 
 ## Project Structure
 The file TeamResponsibilities.txt describes the responsibilities of each team member for this iteration.  The document is split into a different section for each member, and lists their contributions. 
@@ -64,15 +66,15 @@ errorSimulator - The errorSimulator project contains the code specific to the Er
 Server - The server project contains the code specific to the server application.
 
 
-##UCM Diagrams
+## UCM Diagrams
 
-###Request
+### Request
 This diagram demonstrates the flow of a request from the client to the server and its response.  This is generic, as the same logic is used for a read and a write request.
 
-###Read Transfer
+### Read Transfer
 This shows the steady state transfer when reading from a file on the server to the client.
 
-###Write Transfer
+### Write Transfer
 This shows the steady state transfer when writing to a file on the server from the client.
 
 
