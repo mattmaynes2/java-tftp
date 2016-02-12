@@ -84,9 +84,10 @@ public class WriteTransfer extends Transfer {
         FileInputStream in;
         DataMessage msg;
 
+        // Starting the transfer
+        this.notifyStart();
+        
         try {
-            // Starting the transfer
-            this.notifyStart();
 
             // Create a new stream to read the file
             in = new FileInputStream(this.getFilename());
@@ -102,16 +103,16 @@ public class WriteTransfer extends Transfer {
             in.close();
             this.getSocket().close();
 
-            // Notify that the transfer is complete
-            this.notifyComplete();
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
-        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
+            this.handleInvalidMessage(e);
         } catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
         }
+        
+        // Notify that the transfer is complete
+        this.notifyComplete();
     }
 
     /**
