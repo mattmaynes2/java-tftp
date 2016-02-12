@@ -6,7 +6,10 @@ import core.req.InvalidMessageException;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 
+import core.log.Logger;
+
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import java.io.IOException;
 
@@ -14,6 +17,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
+
 
 /**
  * NodeSocket
@@ -153,8 +157,8 @@ public class NodeSocket {
     }
 
     private boolean validateEndpoint (DatagramPacket packet) throws IOException {
-        // TODO Log this error
         if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
+            Logger.log(Level.WARNING, "Received message with unknown transfer ID");
             this.send(
                 new ErrorMessage(ErrorCode.UNKNOWN_TID, "Unknown transfer ID"),
                 packet.getSocketAddress());
