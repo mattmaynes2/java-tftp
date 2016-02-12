@@ -33,10 +33,10 @@ public enum OpCode {
      * Returns the opcode enum based on the opcode byte
      * @param code  the opcode byte
      * @return the opcode enum
-     * @throws InvalidMessageException 
+     * @throws InvalidMessageException
      */
     public static OpCode convert(byte code) throws InvalidMessageException {
-    	if (code>OpCode.values().length){
+    	if (code < 1 || code > OpCode.values().length){
     		throw new InvalidMessageException("Invalid opcode");
     	}
     	return OpCode.values()[code - 1];

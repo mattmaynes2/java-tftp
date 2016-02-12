@@ -36,8 +36,10 @@ public enum RequestMode {
         switch(mode.toLowerCase()){
             case "netascii":
                 return RequestMode.ASCII;
+            case "octet":
+            	return RequestMode.BINARY;
             default:
-                return RequestMode.BINARY;
+                throw new IllegalArgumentException("Request mode must be either \"netascii\" or \"octet\"");
         }
     }
 
