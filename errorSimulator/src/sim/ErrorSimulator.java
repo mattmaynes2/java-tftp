@@ -18,6 +18,7 @@ public class ErrorSimulator extends Controller {
     public static final int REQUEST_PACKET = 0;
     public static final short LOWEST_SHORT = (short) -32727;
     public static final short HIGHEST_SHORT = (short) 32728;
+    public static final short HIGHEST_PACKET = (short) 65535;
 
     /**
      * Declare valid commands as static final
@@ -185,10 +186,14 @@ public class ErrorSimulator extends Controller {
      */
     private void wrongSocketSimulation(String packetNumber) {
     	int packetNum = verifyNum(packetNumber, 1);
-    	if(packetNum > 0) {
+    	if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
     		recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, packetNum,null);
     		this.cli.message("Now running Change Sender Address on incoming requests");
     	}
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
+        }
+    	
     }
 
     /**
@@ -205,11 +210,14 @@ public class ErrorSimulator extends Controller {
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
         int length = verifyNum(args.get(1), 0);
         int packetNum = verifyNum(args.get(0), 1);
-        if(packetNum > 0) {
+        if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	        PacketModifier modifier = new PacketModifier();
 	        modifier.setLength(length);
 	        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
 	        this.cli.message("Now running Change Length Simulation on incoming requests");
+        }
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
         }
     }
 
@@ -227,7 +235,7 @@ public class ErrorSimulator extends Controller {
         String opCode = args.get(1);
         
         int packetNum = verifyNum(args.get(0), 0);
-        if(packetNum >= 0) {
+        if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
 	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
 	        if(LOWEST_SHORT < opCodeInt && opCodeInt < HIGHEST_SHORT) {    
@@ -247,7 +255,12 @@ public class ErrorSimulator extends Controller {
 	            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
 	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
 	        }
-	        this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
+	        else {
+	        	this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
+	        }
+        }
+        else {
+        	this.cli.message("Packet Number out of bounds:   0 <= packetNumber < 65535");
         }
     }
     
