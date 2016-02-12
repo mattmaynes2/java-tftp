@@ -7,6 +7,10 @@ package core.req;
 public class MessageFactory {
 
     public static Message createMessage(byte[] bytes) throws InvalidMessageException {
+    	if (bytes.length < 2) {
+    		throw new InvalidMessageException("Invalid opCode: requires two bytes");
+    	}
+    	
         if (bytes[0] != 0) {
             throw new InvalidMessageException("Invalid first byte: expected 0x00 got " + bytes[0]);
         }
