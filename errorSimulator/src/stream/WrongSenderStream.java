@@ -8,7 +8,6 @@ import java.util.logging.Level;
 
 import core.log.Logger;
 import core.req.InvalidMessageException;
-import core.util.ByteUtils;
 
 public class WrongSenderStream implements SimulatorStream {
 

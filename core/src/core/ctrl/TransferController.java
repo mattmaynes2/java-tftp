@@ -1,14 +1,11 @@
 package core.ctrl;
 
 import java.net.SocketAddress;
-import java.util.logging.Level;
 
 import core.cli.Command;
-import core.log.Logger;
 import core.net.ReadTransfer;
 import core.net.Transfer;
 import core.net.WriteTransfer;
-import core.req.InvalidMessageException;
 
 /**
  * Transfer Controller

@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import core.log.Logger;
-import core.util.ByteUtils;
 
 
 public class PacketStream implements SimulatorStream{
