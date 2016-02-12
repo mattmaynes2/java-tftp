@@ -2,6 +2,7 @@ package core.net;
 
 import java.net.SocketAddress;
 
+import core.req.ErrorMessage;
 import core.req.Request;
 
 /**
@@ -18,5 +19,12 @@ public interface RequestListener {
      * @param requestAddress - Address of request sender
      */
     public void handleRequest (Request req, SocketAddress requestAddress);
+
+    /**
+     * Invoked when an error occurs on a request
+     *
+     * @param err - Error Message
+     */
+    public void handleError (ErrorMessage err);
 
 }
