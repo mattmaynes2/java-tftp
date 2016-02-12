@@ -8,12 +8,20 @@ import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
 
+/**
+ * Stream that only counts the number of ack packets received
+ * @author Jeremy
+ *
+ */
 public class CountAcksStream extends PacketStream {
 
 	public CountAcksStream() throws SocketException {
 		super();
 	}
 
+	/**
+	 * increments the number of packets received only if the packet is an ack
+	 */
 	@Override
 	protected void incNumRecieved(DatagramPacket packet) {
 		byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
