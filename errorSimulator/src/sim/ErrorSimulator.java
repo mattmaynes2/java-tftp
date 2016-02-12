@@ -227,6 +227,7 @@ public class ErrorSimulator extends Controller {
 	            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
 	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
 	        }
+	        this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
         }
     }
     
