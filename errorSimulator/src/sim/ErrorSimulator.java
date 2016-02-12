@@ -28,6 +28,7 @@ public class ErrorSimulator extends Controller {
     private static final String LENGTH_COMMAND = "cl";
     private static final String REQUEST_SEPERATOR_COMMAND = "rrs";
     private static final String END_COMMAND = "rend";
+    private static final String MODE_COMMAND = "mode";
 
     private ReceiveWorker recieveListener;
 
@@ -44,6 +45,7 @@ public class ErrorSimulator extends Controller {
         this.interpreter.addCommand(LENGTH_COMMAND);
         this.interpreter.addCommand(REQUEST_SEPERATOR_COMMAND);
         this.interpreter.addCommand(END_COMMAND);
+        this.interpreter.addCommand(MODE_COMMAND);
     }
 
     /**
@@ -80,6 +82,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <packetNumber>                 Changes the sender address of a specified packet");
         System.out.println("    op            <packetNumber> <opCode>        Changes the opcode of a specified packet");
         System.out.println("    cl            <packetNumber> <packetLength>  Changes the length of a specified packet");
+        System.out.println("    mode          <mode>                         Changes the mode of a request");
     }
 
     /**
@@ -127,6 +130,13 @@ public class ErrorSimulator extends Controller {
             case END_COMMAND:
                 removeEndByteSimulation();
                 break;
+            case MODE_COMMAND:
+            	try{
+            		this.changeModeSimulation(command.getFirstArgument());
+            	}catch(IndexOutOfBoundsException e){
+            		this.cli.message("Incorrect number of parameters for mode. Format is mode <mode>");
+            	}
+            	break;
         }
 
     }
@@ -139,6 +149,16 @@ public class ErrorSimulator extends Controller {
     	this.cli.message("Incoming requests are now passing through unaltered");		
 	}
 
+    /**
+     * Set the configuration to modify the mode of request packets
+     */
+    private void changeModeSimulation(String mode){
+    	PacketModifier modifier = new PacketModifier();
+    	modifier.setMode(mode);
+    	this.recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+    	this.cli.message("Incoming request packets will have their mode changed to " + mode);
+    }
+    
 	/**
      * Set the configuration to remove the null at the end of a DatagramPacket
      */
