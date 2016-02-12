@@ -14,7 +14,6 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
-import core.util.ByteUtils;
 import sim.PacketModifier;
 import sim.SimulationTypes;
 import stream.SimulatorStream;
