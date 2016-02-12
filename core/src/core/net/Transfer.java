@@ -65,7 +65,6 @@ public abstract class Transfer implements Runnable {
 
     protected void handleInvalidMessage (InvalidMessageException error) {
         try {
-            // TODO Log Error
             this.socket.send(
                 new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage()));
         } catch (IOException e){
@@ -73,6 +72,7 @@ public abstract class Transfer implements Runnable {
             System.exit(1);
         }
     }
+
 
     protected void checkErrorMessage (Message msg) throws ErrorMessageException {
         if (msg.getOpCode() == OpCode.ERROR) {
@@ -127,8 +127,10 @@ public abstract class Transfer implements Runnable {
 
     /**
      * Sends the initializing request to start this request
+     *
+     * @return If the request was accepted
      */
-    public abstract void sendRequest() throws IOException;
+    public abstract boolean sendRequest() throws IOException;
 
     /**
      * Returns the block number that this transfer is currently processing

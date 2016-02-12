@@ -91,11 +91,8 @@ public abstract class TransferController extends Controller {
             runner = new WriteTransfer(this.getAddress(), filename);
             runner.addTransferListener(this);
             runner.sendRequest();
-            runner.getAcknowledge();
 
             performTransfer(runner);
-        } catch (InvalidMessageException e) {
-        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);

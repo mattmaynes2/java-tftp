@@ -45,12 +45,15 @@ public class ReadTransfer extends Transfer {
      * Sends a request to this transfer's endpoint to start the transfer
      *
      * @throws IOException - If the endpoint is not listening or the send fails
+     *
+     * @return If the request was accepted
      */
-    public void sendRequest () throws IOException {
+    public boolean sendRequest () throws IOException {
         ReadRequest request = new ReadRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
         this.getSocket().reset();
+        return true;
     }
 
     /**
@@ -90,7 +93,7 @@ public class ReadTransfer extends Transfer {
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e){
-            // TODO Do something here
+            this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e){
             this.handleInvalidMessage(e);
         } catch (Exception e){
