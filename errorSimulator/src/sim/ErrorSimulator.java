@@ -16,8 +16,8 @@ public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 0;
-    public static final short LOWEST_SHORT = (short) -36727;
-    public static final short HIGHEST_SHORT = (short) 36728;
+    public static final short LOWEST_SHORT = (short) -32727;
+    public static final short HIGHEST_SHORT = (short) 32728;
 
     /**
      * Declare valid commands as static final
@@ -227,7 +227,7 @@ public class ErrorSimulator extends Controller {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-		
+		        
 		        PacketModifier modifier = new PacketModifier();
 		        modifier.setOpCode(out.toByteArray());
 	            recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, packetNum,  modifier);
