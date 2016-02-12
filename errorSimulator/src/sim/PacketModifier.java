@@ -207,27 +207,66 @@ public class PacketModifier {
         return outStream.toByteArray();
     }
 
+    /**
+     * set what the modifier will change the packet's opCode to
+     * @param opCode - byte array that the opCode will be changed to
+     */
     public void setOpCode(byte[] opCode) {
         this.opCode = opCode;
     }
+    
+    /**
+     * set what the modifier will change the packet's data to
+     * @param data - byte array that the data will be changed to
+     */
     public void setData(byte[] data) {
         this.data = data;
     }
+    
+    /**
+     * set what the modifier will change the packet's mode to
+     * @param mode - String that the mode will be changed to
+     */
     public void setMode(String mode) {
         this.mode = mode;
     }
+    
+    /**
+     * set what the modifier will change the packet's filename to
+     * @param filename - String that the filename will be changed to
+     */
     public void setFilename(String filename) {
         this.filename = filename;
     }
+    
+    /**
+     * set what the modifier will change the packet's block number to
+     * @param blockNum - integer that the blockNum will be changed to
+     */
     public void setBlockNum(int blockNum) {
         this.blockNum = blockNum;
     }
+    
+    /**
+     * set what the modifier will change the packet's length to
+     * @param length - integer that the packet length will be changed to
+     */
     public void setLength(int length) {
         this.length = length;
     }
+    
+    /**
+     * set whether the modifier will add the 0 byte to the packet after the filename or not
+     * @param postFilenameByte - boolean that signifies adding the 0 byte or not
+     */
     public void setPostFilenameByte(boolean postFilenameByte) {
         this.postFilenameByte = postFilenameByte;
     }
+    
+    /**
+     * set whether the modifier will add the 0 byte to the packet after the data or not
+     * @param endByte - boolean that signifies adding the 0 byte or not
+     */
     public void setEndByte(boolean endByte) {
         this.endByte = endByte;
     }

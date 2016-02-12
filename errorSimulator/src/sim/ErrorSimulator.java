@@ -151,6 +151,7 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Set the configuration to modify the mode of request packets
+     * @param mode - the value that mode will be modified to
      */
     private void changeModeSimulation(String mode){
     	PacketModifier modifier = new PacketModifier();
@@ -181,7 +182,7 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Set the configuration to set the response for a specified packet number to be from the wrong address
-     * @param packetNumber
+     * @param packetNumber - value that the packet number will be modified to
      */
     private void wrongSocketSimulation(String packetNumber) {
     	int packetNum = verifyNum(packetNumber, 1);
