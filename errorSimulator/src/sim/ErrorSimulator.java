@@ -35,7 +35,8 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Add commands to the interpreter
-     * @throws SocketException
+     * @param commandLineArgs - a String array of arguments from the command line call
+     * @throws SocketException - a socket exception can occur if there are no ports available
      */
     public ErrorSimulator(String[] commandLineArgs) throws SocketException  {
         super(commandLineArgs);
@@ -88,7 +89,7 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Starts a new ErrorSimulator thread
-     * @param args
+     * @param args - String array of arguments received from the Run Configurations
      */
     public static void main(String[] args) {
         ErrorSimulator simulator;

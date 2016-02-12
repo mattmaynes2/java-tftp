@@ -50,8 +50,8 @@ public class PacketModifier {
     /**
      * Determines the message type of a given datagram packet, and calls the appropriate modify method
      * @param packet  the packet received
-     * @return
-     * @throws InvalidMessageException
+     * @return the new DatagramPacket that was modified
+     * @throws InvalidMessageException - an invalid message exception can occur if packet is in an improper format
      */
     public DatagramPacket modifyPacket(DatagramPacket packet) throws InvalidMessageException {
         packetIn = packet;
