@@ -87,9 +87,11 @@ public class CLI extends Worker {
      * Writes the output to the output stream
      * @param output
      */
-    private void write(String output){
+    private synchronized void write(String output){
         try {
-            out.write(output.getBytes());
+        	if (this.isRunning()){
+                out.write(output.getBytes());
+        	}
         } catch (IOException e) {
             e.printStackTrace();
         }
