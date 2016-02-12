@@ -215,8 +215,8 @@ public class ErrorSimulator extends Controller {
         }
         
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
-        int length = verifyNum(args.get(1), 0);
-        int packetNum = verifyNum(args.get(0), 1);
+        int length = verifyNum(args.get(2), 0);
+        int packetNum = verifyNum(args.get(1), 1);
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	        PacketModifier modifier = new PacketModifier();
 	        modifier.setLength(length);
@@ -238,6 +238,7 @@ public class ErrorSimulator extends Controller {
             this.cli.message("Incorrect number of parameters for op.  Format is op <packetNum> <opCode> <type>");
             return;
         }
+        
         //get the opcode
         String opCode = args.get(2);
         
@@ -248,7 +249,7 @@ public class ErrorSimulator extends Controller {
         	return;
         }
         
-        int packetNum = verifyNum(args.get(0), 0);
+        int packetNum = verifyNum(args.get(1), 0);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
 	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
