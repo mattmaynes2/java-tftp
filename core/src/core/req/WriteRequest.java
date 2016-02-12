@@ -13,6 +13,7 @@ public class WriteRequest extends Request {
 
 	/**
 	 * Specifies a file to write as a String
+     *
 	 * @param filename  the file to write
 	 */
     public WriteRequest (String filename) {
@@ -21,8 +22,10 @@ public class WriteRequest extends Request {
 
     /**
      * Specifiec a file to write as a byte list
+     *
      * @param data  the encoded filename
-     * @throws InvalidMessageException
+     *
+     * @throws InvalidMessageException - If the given message does not form a valid request
      */
     public WriteRequest (byte[] data) throws InvalidMessageException {
         super(data);

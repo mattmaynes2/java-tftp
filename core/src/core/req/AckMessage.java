@@ -31,8 +31,8 @@ public class AckMessage extends Message {
     }
 
     /**
-     * 
-     * @return the block number 
+     *
+     * @return the block number
      */
     public short getBlock() {
         return this.block;
@@ -40,7 +40,7 @@ public class AckMessage extends Message {
 
     /**
      * set the block number
-     * @param block
+     * @param block - Block number for this packet
      */
     public void setBlock(short block) {
         this.block = block;
@@ -54,10 +54,11 @@ public class AckMessage extends Message {
         return super.toString()+" block number: "+this.block;
     }
 
-    /** 
-     * Param bytes  a byte list to decode
+    /**
      * The method verifies the byte list is in a valid form for an acknowledgement packet
-     * If verified, it sets the block number to the appropriate value  
+     * If verified, it sets the block number to the appropriate value
+     *
+     * @param bytes - List of bytes to decode
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
@@ -65,10 +66,10 @@ public class AckMessage extends Message {
             throw new InvalidMessageException("Ack Message must be 4 bytes");
         }
         super.decode(bytes);
-        
+
         //stores the block number in a byte buffer to be converted into a short
         ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 2);
-        
+
         this.block= wrapper.getShort();
     }
 
@@ -80,9 +81,9 @@ public class AckMessage extends Message {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteBuffer b = ByteBuffer.allocate(2);
 	    b.putShort(this.block);
-	
+
 	    byte[] result = b.array();
-	    
+
         try {
             out.write(super.toBytes());
             out.write(result);
