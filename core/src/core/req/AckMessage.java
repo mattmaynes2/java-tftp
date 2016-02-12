@@ -60,7 +60,7 @@ public class AckMessage extends Message {
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
-        if (bytes.length<4){
+        if (bytes.length != 4){
             throw new InvalidMessageException("Ack Message must be 4 bytes");
         }
         super.decode(bytes);

@@ -86,6 +86,9 @@ public abstract class Request extends Message {
         this.filename = new String(Arrays.copyOfRange(data, 2, fileIndex));
 
         modeIndex = ByteUtils.indexOf(data, fileIndex + 1, (byte) 0x00);
+        if(modeIndex < 0) {
+        	throw new InvalidMessageException("Missing End 0 Byte.");
+        }
         this.mode = RequestMode.convert(new String(
             Arrays.copyOfRange(data, fileIndex, modeIndex)
             ));

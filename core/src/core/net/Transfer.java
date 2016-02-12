@@ -5,10 +5,12 @@ import core.net.TransferListener;
 
 import core.req.Message;
 import core.req.OpCode;
+import core.req.AckMessage;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
+import core.req.MessageOrderException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +44,11 @@ public abstract class Transfer implements Runnable {
     private String filename;
 
     /**
+     * Current data block being transferred
+     */
+    private short currentBlock;
+
+    /**
      * Constructs a transfer with a socket which will move the specified file
      *
      * @param address - Address to use as the endpoint
@@ -53,11 +60,11 @@ public abstract class Transfer implements Runnable {
         this.filename = filename;
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
+        this.currentBlock = 0;
     }
 
     protected void handleInvalidMessage (InvalidMessageException error) {
         try {
-            // TODO Log Error
             this.socket.send(
                 new ErrorMessage(ErrorCode.ILLEGAL_OP, error.getMessage()));
         } catch (IOException e){
@@ -66,11 +73,21 @@ public abstract class Transfer implements Runnable {
         }
     }
 
-    protected void checkMessage (Message msg) throws ErrorMessageException {
+
+    protected void checkErrorMessage (Message msg) throws ErrorMessageException {
         if (msg.getOpCode() == OpCode.ERROR) {
             // TODO Log Message
             this.notifyError((ErrorMessage) msg);
             throw new ErrorMessageException((ErrorMessage) msg);
+        }
+    }
+
+    protected void checkOrder (AckMessage ack) throws MessageOrderException {
+       if (ack.getBlock() != this.getBlockNumber()) {
+            throw new MessageOrderException(
+                ack.getOpCode() + " Message out of order." +
+                " Expected " + this.getBlockNumber() +
+                " Received " + ack.getBlock());
         }
     }
 
@@ -110,8 +127,28 @@ public abstract class Transfer implements Runnable {
 
     /**
      * Sends the initializing request to start this request
+     *
+     * @return If the request was accepted
      */
-    public abstract void sendRequest() throws IOException;
+    public abstract boolean sendRequest() throws IOException;
+
+    /**
+     * Returns the block number that this transfer is currently processing
+     *
+     * @return Current block number index
+     */
+    public short getBlockNumber() {
+        return this.currentBlock;
+    }
+
+    /**
+     * Increments the current block number and then returns the new value
+     *
+     * @return The next block number
+     */
+    protected short incrementBlockNumber () {
+        return this.currentBlock++;
+    }
 
     /**
      * Notifies all listeners that the transfer has started

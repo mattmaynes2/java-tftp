@@ -3,6 +3,7 @@ package core.net;
 import core.req.Message;
 import core.req.WriteRequest;
 import core.req.DataMessage;
+import core.log.Logger;
 import core.req.AckMessage;
 import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
@@ -16,6 +17,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 /**
  * Write Transfer
@@ -32,11 +34,6 @@ import java.util.Arrays;
 public class WriteTransfer extends Transfer {
 
     /**
-     * Current data block being transferred
-     */
-    private short currentBlock;
-
-    /**
      * Constructs a new transfer will write data to a socket from
      * the file with the given name
      *
@@ -47,19 +44,36 @@ public class WriteTransfer extends Transfer {
      */
     public WriteTransfer (SocketAddress address, String filename) throws SocketException {
         super(address, filename);
-        this.currentBlock = 0;
     }
 
     /**
      * Sends a request to start this transfer
      *
      * @throws IOException - If the endpoint is not listening or the write fails
+     *
+     * @return If the request was accepted
      */
-    public void sendRequest () throws IOException {
-        WriteRequest request = new WriteRequest(this.getFilename());
-        notifySendMessage(request);
-        this.getSocket().send(request);
-        this.getSocket().reset();
+    public boolean sendRequest () throws IOException {
+        WriteRequest request;
+
+        try {
+            request = new WriteRequest(this.getFilename());
+            this.notifySendMessage(request);
+            this.getSocket().send(request);
+            this.getSocket().reset();
+            this.getAcknowledge();
+        } catch (InvalidMessageException e) {
+            this.handleInvalidMessage(e);
+            return false;
+        } catch (ErrorMessageException e) {
+            this.notifyError(e.getErrorMessage());
+            return false;
+        } catch (MessageOrderException e){
+            // This should never happen since it was just a request
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return true;
     }
 
     /**
@@ -91,9 +105,9 @@ public class WriteTransfer extends Transfer {
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e) {
-            // TODO Do something
+            this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
-            this.handleInvalidMessage(e);
+        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -117,19 +131,12 @@ public class WriteTransfer extends Transfer {
 
         Message msg;
         AckMessage ack;
-
         msg = this.getSocket().receive();
 
-        this.checkMessage(msg);
+        this.checkErrorMessage(msg);
         this.checkCast(msg, OpCode.ACK);
         ack = (AckMessage) msg;
-
-        if (ack.getBlock() != this.currentBlock) {
-            throw new MessageOrderException(
-                "Ack message out of order." +
-                " Expected " + this.currentBlock +
-                " Received " + ack.getBlock());
-        }
+        this.checkOrder(ack);
 
         return ack;
     }
@@ -155,7 +162,7 @@ public class WriteTransfer extends Transfer {
         byte[] data;
 
         // Increment the block
-        this.currentBlock++;
+        this.incrementBlockNumber();
         data = new byte[DataMessage.BLOCK_SIZE];
         read = in.read(data);
 
@@ -163,10 +170,10 @@ public class WriteTransfer extends Transfer {
         // a data packet with no data. Otherwise we will truncate the
         // data to only use the data read in
         if (read >= 0) {
-            message = new DataMessage(this.currentBlock, Arrays.copyOfRange(data, 0, read));
+            message = new DataMessage(this.getBlockNumber(), Arrays.copyOfRange(data, 0, read));
         }
         else {
-            message = new DataMessage(this.currentBlock, new byte[0]);
+            message = new DataMessage(this.getBlockNumber(), new byte[0]);
         }
 
         return message;

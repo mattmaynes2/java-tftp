@@ -2,11 +2,12 @@ package core.net;
 
 import core.req.AckMessage;
 import core.req.DataMessage;
-import core.req.ErrorMessageException;
-import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.ReadRequest;
 import core.req.OpCode;
+import core.req.ErrorMessageException;
+import core.req.InvalidMessageException;
+import core.req.MessageOrderException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,12 +45,15 @@ public class ReadTransfer extends Transfer {
      * Sends a request to this transfer's endpoint to start the transfer
      *
      * @throws IOException - If the endpoint is not listening or the send fails
+     *
+     * @return If the request was accepted
      */
-    public void sendRequest () throws IOException {
+    public boolean sendRequest () throws IOException {
         ReadRequest request = new ReadRequest(this.getFilename());
         notifySendMessage(request);
         this.getSocket().send(request);
         this.getSocket().reset();
+        return true;
     }
 
     /**
@@ -89,7 +93,7 @@ public class ReadTransfer extends Transfer {
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e){
-            // TODO Do something here
+            this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e){
             this.handleInvalidMessage(e);
         } catch (Exception e){
@@ -106,21 +110,39 @@ public class ReadTransfer extends Transfer {
      * @throws IOException - If the socket is closed or there is a sending error
      * @throws InvalidMessageException - If there is on error decoding the packet
      */
-    private DataMessage getNext () throws IOException, InvalidMessageException, ErrorMessageException {
+    private DataMessage getNext () throws
+            IOException,
+            InvalidMessageException,
+            ErrorMessageException,
+            MessageOrderException {
+
         Message msg;
         DataMessage data;
         AckMessage ack;
 
+        // Increment the block number before we receive it
+        this.incrementBlockNumber();
         msg = this.getSocket().receive();
-        this.checkMessage(msg);
 
+        // Check that the message is not an error message
+        this.checkErrorMessage(msg);
+
+        // Check that we can cast the message to the type if the
+        // desired OpCode
         this.checkCast(msg, OpCode.DATA);
         data = (DataMessage) msg;
+
+        // Ensure that the packet we got is in the correct
+        // sequence with previous packets we have received
+        this.checkOrder(data);
         ack = new AckMessage(data.getBlock());
 
+        // Notify the listeners that a message we received successfully
+        // and that we are sending the next acknowledgement
         this.notifyMessage(data);
         this.notifySendMessage(ack);
 
+        // Send the ACK
         this.getSocket().send(ack);
         return data;
     }

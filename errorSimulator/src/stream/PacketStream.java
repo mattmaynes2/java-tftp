@@ -12,36 +12,35 @@ import core.util.ByteUtils;
 
 public class PacketStream implements SimulatorStream{
 
-	private DatagramSocket socket;
-	private int numReceived;
-	
-	public PacketStream() throws SocketException {
-		this.socket= new DatagramSocket();
-		this.numReceived=1;
-	}
-	
-	public DatagramPacket receive() throws IOException {
-		DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-		socket.receive(packet);
-		incNumRecieved(packet);
-		return packet;
-	}
-	
-	
-	public void send(DatagramPacket packet) throws IOException {
-		Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
-		Logger.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
-		Logger.log(Level.INFO,"Bytes are: "+ByteUtils.bytesToHexString(packet.getData()));
-		socket.send(packet);
-	}
+    private DatagramSocket socket;
+    private int numReceived;
 
-	@Override
-	public int getNumberPacketsOfPackets() {
-		return numReceived;
-	}
-	
-	protected void incNumRecieved(DatagramPacket packet) {
-		numReceived++;
-	}
-	
+    public PacketStream() throws SocketException {
+        this.socket= new DatagramSocket();
+        this.numReceived=1;
+    }
+
+    public DatagramPacket receive() throws IOException {
+        DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
+        socket.receive(packet);
+        incNumRecieved(packet);
+        return packet;
+    }
+
+
+    public void send(DatagramPacket packet) throws IOException {
+        Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
+        Logger.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
+        socket.send(packet);
+    }
+
+    @Override
+    public int getNumberPacketsOfPackets() {
+        return numReceived;
+    }
+
+    protected void incNumRecieved(DatagramPacket packet) {
+        numReceived++;
+    }
+
 }
