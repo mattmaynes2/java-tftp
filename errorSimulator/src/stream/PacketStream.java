@@ -21,6 +21,9 @@ public class PacketStream implements SimulatorStream{
         this.numReceived=0;
     }
 
+    /**
+     * receives a packet on a DatagramSocket
+     */
     public DatagramPacket receive() throws IOException {
         DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
         socket.receive(packet);
@@ -28,7 +31,9 @@ public class PacketStream implements SimulatorStream{
         return packet;
     }
 
-
+    /**
+     * Sends a packet using a DatagramSocket
+     */
     public void send(DatagramPacket packet) throws IOException {
         Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
         byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
@@ -37,11 +42,17 @@ public class PacketStream implements SimulatorStream{
         socket.send(packet);
     }
 
+    /**
+     * return the number of packets received
+     */
     @Override
     public int getNumberPacketsOfPackets() {
         return numReceived;
     }
-
+    /**
+     * increment the number of packets received whenever a packet is received
+     * @param packet
+     */
     protected void incNumRecieved(DatagramPacket packet) {
         numReceived++;
     }

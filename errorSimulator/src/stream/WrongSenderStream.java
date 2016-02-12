@@ -10,12 +10,24 @@ import core.log.Logger;
 import core.req.InvalidMessageException;
 import core.util.ByteUtils;
 
+/**
+ * Sends a packet on a different socket than the receiver is expecting
+ * used to cause error code 5s 
+ * @author Jeremy
+ *
+ */
 public class WrongSenderStream implements SimulatorStream {
 
     private SimulatorStream mainStream;
     private PacketStream wrongStream;
     private int sendAt;
-
+    
+    /**
+     * 
+     * @param stream the stream that will be used for main communication
+     * @param sendAt packet number in sequence that will trigger a packet to be sent from the wrong stream
+     * @throws SocketException thrown if there are no available ports
+     */
     public WrongSenderStream(SimulatorStream stream, int sendAt) throws SocketException {
         this.mainStream=stream;
         this.wrongStream= new PacketStream();
@@ -27,6 +39,12 @@ public class WrongSenderStream implements SimulatorStream {
         return mainStream.receive();
     }
 
+   /**
+    * If the number of packets received is equal to the packet in the sequence to modify
+    *  Send a packet out from a stream using a different address than the one that had been used
+    *  for previous communication. 
+    *  otherwise send packet from the main stream used for communication
+    */
     @Override
     public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
         if(getNumberPacketsOfPackets()==sendAt) {
@@ -45,6 +63,9 @@ public class WrongSenderStream implements SimulatorStream {
 
     }
 
+    /**
+     * returns the number of packets received by the main stream used for communication
+     */
     @Override
     public int getNumberPacketsOfPackets() {
         return mainStream.getNumberPacketsOfPackets();
