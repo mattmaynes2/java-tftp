@@ -33,6 +33,9 @@ public  class SimulatorThread extends Thread {
     /**
      * Creates a new socket and sets the timeout to 1000
      * @param packet  the datagram packet
+     * @param simulation  the simulation to run from the ErrorSimulator
+     * @param packetToModify  the packet to modify
+     * @param modifier  the packet modifier
      * @throws SocketException  throws if a new socket cannot be created
      * @throws UnknownHostException  throws if a local host is unknown
      */
