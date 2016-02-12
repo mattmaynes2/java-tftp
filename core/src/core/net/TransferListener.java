@@ -31,6 +31,8 @@ public interface TransferListener {
 
     /**
      * Invoked when a message has been received
+     *
+     * @param msg - Message that was received
      */
     public void handleMessage (Message msg);
 
