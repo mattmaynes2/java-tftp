@@ -70,8 +70,9 @@ public abstract class TransferController extends Controller {
             runner = new ReadTransfer(this.getAddress(), filename);
             runner.addTransferListener(this);
 
-            runner.sendRequest();
-            performTransfer(runner);
+            if (runner.sendRequest()){
+                performTransfer(runner);
+            }
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
@@ -90,12 +91,10 @@ public abstract class TransferController extends Controller {
         try {
             runner = new WriteTransfer(this.getAddress(), filename);
             runner.addTransferListener(this);
-            runner.sendRequest();
-            runner.getAcknowledge();
 
-            performTransfer(runner);
-        } catch (InvalidMessageException e) {
-        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
+            if (runner.sendRequest()){
+                performTransfer(runner);
+            }
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);

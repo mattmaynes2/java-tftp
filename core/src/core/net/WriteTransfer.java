@@ -50,12 +50,30 @@ public class WriteTransfer extends Transfer {
      * Sends a request to start this transfer
      *
      * @throws IOException - If the endpoint is not listening or the write fails
+     *
+     * @return If the request was accepted
      */
-    public void sendRequest () throws IOException {
-        WriteRequest request = new WriteRequest(this.getFilename());
-        notifySendMessage(request);
-        this.getSocket().send(request);
-        this.getSocket().reset();
+    public boolean sendRequest () throws IOException {
+        WriteRequest request;
+
+        try {
+            request = new WriteRequest(this.getFilename());
+            this.notifySendMessage(request);
+            this.getSocket().send(request);
+            this.getSocket().reset();
+            this.getAcknowledge();
+        } catch (InvalidMessageException e) {
+            this.handleInvalidMessage(e);
+            return false;
+        } catch (ErrorMessageException e) {
+            this.notifyError(e.getErrorMessage());
+            return false;
+        } catch (MessageOrderException e){
+            // This should never happen since it was just a request
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return true;
     }
 
     /**
@@ -86,9 +104,9 @@ public class WriteTransfer extends Transfer {
             this.getSocket().close();
 
         } catch (ErrorMessageException e) {
-            // TODO Do something 
+            this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
-        	Logger.log(Level.SEVERE, "Transfer terminated: " + e.getMessage());
+            this.handleInvalidMessage(e);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -110,23 +128,18 @@ public class WriteTransfer extends Transfer {
             IOException,
             InvalidMessageException,
             ErrorMessageException,
-            MessageOrderException, InvalidMessageException {
+            MessageOrderException {
 
         Message msg;
         AckMessage ack;
-        try {
-	        msg = this.getSocket().receive();
-	
-	        this.checkErrorMessage(msg);
-	        this.checkCast(msg, OpCode.ACK);
-	        ack = (AckMessage) msg;
-	        this.checkOrder(ack);
-	
-	        return ack;
-        } catch (InvalidMessageException e) {
-        	this.handleInvalidMessage(e);
-        	throw e;
-        }
+        msg = this.getSocket().receive();
+
+        this.checkErrorMessage(msg);
+        this.checkCast(msg, OpCode.ACK);
+        ack = (AckMessage) msg;
+        this.checkOrder(ack);
+
+        return ack;
     }
 
     /**
