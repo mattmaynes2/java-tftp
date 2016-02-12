@@ -29,6 +29,9 @@ public abstract class RequestController extends Controller implements RequestLis
      * Constructs a new request controller for handling transfer requests
      *
      * @param port - Port to listen for requests on
+     * @param commandLineArgs - Arguments input from the command line
+     *
+     * @throws SocketException - If the socket on the desired port is in use
      */
     public RequestController (int port, String[] commandLineArgs) throws SocketException {
         super(commandLineArgs);

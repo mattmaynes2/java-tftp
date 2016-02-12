@@ -12,6 +12,8 @@ public class MessageFactory {
      * @param bytes - An encoded version of a message
      *
      * @throws InvalidMessageException - If the given bytes do not form a valid message
+     *
+     * @return A decoded message object
      */
     public static Message createMessage(byte[] bytes) throws InvalidMessageException {
     	if (bytes.length < 2) {
