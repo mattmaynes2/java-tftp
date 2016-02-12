@@ -205,12 +205,6 @@ public class ErrorSimulator extends Controller {
         }
         //get the opcode
         String opCode = args.get(1);
-
-        //validate the opcode is the correct length
-        if(opCode.length() != 2) {
-            this.cli.message("Incorrect opcode, two digits required.");
-            return;
-        }
         
         int packetNum = verifyNum(args.get(0), 0);
         if(packetNum >= 0) {
