@@ -18,12 +18,12 @@ import core.req.Request;
  * Responds to transfer requests and performs operations
  */
 public abstract class RequestController extends Controller implements RequestListener {
-
+	
     /**
      * Handles sockets requests
      */
     private RequestReceiver receiver;
-
+   
     /**
      * Constructs a new request controller for handling transfer requests
      *
