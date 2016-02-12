@@ -77,6 +77,7 @@ public abstract class Request extends Message {
      * The method verifies the byte list is in a valid form for a request packet
      * If verified, it decodes the filename and transfer mode into Strings that are locally stored
      */
+    @Override
     protected void decode (byte[] data) throws InvalidMessageException {
         int fileIndex, modeIndex;
 
@@ -89,9 +90,13 @@ public abstract class Request extends Message {
         if(modeIndex < 0) {
         	throw new InvalidMessageException("Missing End 0 Byte.");
         }
-        this.mode = RequestMode.convert(new String(
-            Arrays.copyOfRange(data, fileIndex, modeIndex)
-            ));
+    	String tempMode = new String(Arrays.copyOfRange(data, fileIndex+1, modeIndex));
+
+        try{
+        	this.mode = RequestMode.convert(tempMode);
+        }catch(IllegalArgumentException ex){
+        	throw new InvalidMessageException("Invalid mode " + tempMode);
+        }
 
     }
 
