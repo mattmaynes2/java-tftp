@@ -17,16 +17,22 @@ public interface TransferListener {
 
     /**
      * Invoked when a send message is send from a transfer
+     *
+     * @param msg - Message being sent
      */
     public void handleSendMessage (Message msg);
 
     /**
      * Invoked when an error message has been received
+     *
+     * @param err - Error message that was received
      */
     public void handleErrorMessage (ErrorMessage err);
 
     /**
      * Invoked when a message has been received
+     *
+     * @param msg - Message that was received
      */
     public void handleMessage (Message msg);
 

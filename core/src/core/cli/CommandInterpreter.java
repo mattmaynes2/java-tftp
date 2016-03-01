@@ -10,8 +10,14 @@ import java.util.StringTokenizer;
  */
 public class CommandInterpreter {
 
-    private ArrayList<String> commands ;
+    /**
+     * Stores the available commands that can be entered
+     */
+    private ArrayList<String> commands;
 
+    /**
+     * Constructs a new command interpreter
+     */
     public CommandInterpreter () {
         this.commands = new ArrayList<String>();
     }
@@ -26,26 +32,35 @@ public class CommandInterpreter {
 
     /**
      * Takes a string of input and separates it into a command and its arguments
-     * @param input  the input to parse
-     * @return  a Command
-     * @throws CommandInputException
+     * @param input the input to parse
+     * @return a Command
+     * @throws CommandInputException If the command is invalid
      */
-    public Command parseCommand(String input) throws CommandInputException {
+    public Command parseCommand (String input) throws CommandInputException {
         StringTokenizer tokenizer = new StringTokenizer(input);
         String token;
-        
-        try{
+
+        try {
         	token = tokenizer.nextToken().toLowerCase();
-        }catch(NoSuchElementException ex){
+        } catch (NoSuchElementException ex) {
         	throw new CommandInputException("Please enter a command");
         }
         return this.interpretCommand(token, tokenizer);
     }
 
-    private Command interpretCommand(String commandToken, StringTokenizer tokenizer)
+    /**
+     * Given a parsed command, interpret the command and associate the
+     * arguments of the command to the command token
+     *
+     * @param commandToken - Then invoked command (i.e. the command word)
+     * @param tokenizer - The remaining un-interpreted token stream
+     *
+     * @return A compiled command
+     */
+    private Command interpretCommand (String commandToken, StringTokenizer tokenizer)
         throws CommandInputException {
-    	
-    	
+
+
         for(String token : this.commands){
             if(token.equals(commandToken)){
             	if(tokenizer.hasMoreTokens()) {
@@ -55,7 +70,7 @@ public class CommandInterpreter {
             		}
             		return new Command(commandToken, parameters);
             	}
-            	
+
             	else {
             		return new Command(commandToken);
             	}

@@ -118,6 +118,8 @@ public class WriteTransfer extends Transfer {
      *
      * @throws IOException - If the socket is closed
      * @throws InvalidMessageException - If the received message has an invalid encoding
+     * @throws ErrorMessageException - If an error message is received
+     * @throws MessageOrderException - If an acknowledge is received out of order
      */
     public AckMessage getAcknowledge () throws
             IOException,

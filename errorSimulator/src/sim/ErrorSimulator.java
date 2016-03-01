@@ -16,9 +16,7 @@ public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 0;
-    public static final short LOWEST_SHORT = (short) -32727;
-    public static final short HIGHEST_SHORT = (short) 32728;
-    public static final short HIGHEST_PACKET = (short) 65535;
+    public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
 
     /**
      * Declare valid commands as static final
@@ -35,7 +33,8 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Add commands to the interpreter
-     * @throws SocketException
+     * @param commandLineArgs - a String array of arguments from the command line call
+     * @throws SocketException - a socket exception can occur if there are no ports available
      */
     public ErrorSimulator(String[] commandLineArgs) throws SocketException  {
         super(commandLineArgs);
@@ -80,15 +79,15 @@ public class ErrorSimulator extends Controller {
         System.out.println("    norm                                         	Forward packets through without alteration" );
         System.out.println("    rend                                         	Removes the end byte. ie Removes the 0 Byte after Mode");
         System.out.println("    rrs                                          	Removes the Request Seperator. ie Removes 0 Byte after Filename");
+        System.out.println("    mode          <mode>                         	Changes the mode of a request");
         System.out.println("    csa           <packetNum>         				Changes the sender address of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>       Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen> 	Changes the length of a specified packet");
-        System.out.println("    mode          <mode>                         	Changes the mode of a request");
     }
 
     /**
      * Starts a new ErrorSimulator thread
-     * @param args
+     * @param args - String array of arguments received from the Run Configurations
      */
     public static void main(String[] args) {
         ErrorSimulator simulator;
@@ -139,7 +138,6 @@ public class ErrorSimulator extends Controller {
             	}
             	break;
         }
-
     }
 
     /**
@@ -152,6 +150,7 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Set the configuration to modify the mode of request packets
+     * @param mode - the value that mode will be modified to
      */
     private void changeModeSimulation(String mode){
     	PacketModifier modifier = new PacketModifier();
@@ -182,7 +181,7 @@ public class ErrorSimulator extends Controller {
 
     /**
      * Set the configuration to set the response for a specified packet number to be from the wrong address
-     * @param packetNumber
+     * @param packetNumber - value that the packet number will be modified to
      */
     private void wrongSocketSimulation(String packetNumber) {
     	int packetNum = verifyNum(packetNumber, 1);
@@ -252,8 +251,8 @@ public class ErrorSimulator extends Controller {
         int packetNum = verifyNum(args.get(1), 0);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
-	        short opCodeInt = (short)verifyNum(opCode, LOWEST_SHORT);
-	        if(LOWEST_SHORT < opCodeInt && opCodeInt < HIGHEST_SHORT) {    
+	        short opCodeInt = (short)verifyNum(opCode, Short.MIN_VALUE);
+	        if(Short.MIN_VALUE < opCodeInt && opCodeInt < Short.MAX_VALUE) {    
 	            ByteArrayOutputStream out = new ByteArrayOutputStream();
 	            ByteBuffer b = ByteBuffer.allocate(2);
 	    	    b.putShort(opCodeInt);
