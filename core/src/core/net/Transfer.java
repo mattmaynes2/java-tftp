@@ -1,23 +1,18 @@
 package core.net;
 
-import core.log.Logger;
-import core.net.NodeSocket;
-import core.net.TransferListener;
+import java.io.IOException;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.util.ArrayList;
 
-import core.req.Message;
-import core.req.OpCode;
 import core.req.AckMessage;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
-import core.req.InvalidMessageException;
 import core.req.ErrorMessageException;
+import core.req.InvalidMessageException;
+import core.req.Message;
 import core.req.MessageOrderException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.net.SocketAddress;
-import java.net.SocketException;
+import core.req.OpCode;
 
 /**
  * Transfer
@@ -162,6 +157,8 @@ public abstract class Transfer implements Runnable {
      * Sends the initializing request to start this request
      *
      * @return If the request was accepted
+     *
+     * @throws IOException - If socket is closed or there is no endpoint
      */
     public abstract boolean sendRequest() throws IOException;
 

@@ -15,6 +15,7 @@ public enum OpCode {
 
     /**
      * Sets the opcode byte
+     *
      * @param code  the byte to set the opcode
      */
     OpCode (byte code) {
@@ -23,6 +24,7 @@ public enum OpCode {
 
     /**
      * Returns the opcode byte
+     *
      * @return code  the opcode byte
      */
     public byte getCode(){
@@ -31,9 +33,12 @@ public enum OpCode {
 
     /**
      * Returns the opcode enum based on the opcode byte
-     * @param code  the opcode byte
+     *
+     * @param code - The opcode byte
+     *
      * @return the opcode enum
-     * @throws InvalidMessageException
+     *
+     * @throws InvalidMessageException - If the given byte is not a valid op code
      */
     public static OpCode convert(byte code) throws InvalidMessageException {
     	if (code < 1 || code > OpCode.values().length){

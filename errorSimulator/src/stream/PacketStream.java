@@ -23,6 +23,7 @@ public class PacketStream implements SimulatorStream{
 
     /**
      * receives a packet on a DatagramSocket
+     * @throws IOException if stream closes during transfer
      */
     public DatagramPacket receive() throws IOException {
         DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
@@ -33,6 +34,8 @@ public class PacketStream implements SimulatorStream{
 
     /**
      * Sends a packet using a DatagramSocket
+     * @param packet {@link DatagramPacket} to send
+     * @throws IOException if the socket is closed during transfer
      */
     public void send(DatagramPacket packet) throws IOException {
         Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
@@ -43,7 +46,7 @@ public class PacketStream implements SimulatorStream{
     }
 
     /**
-     * return the number of packets received
+     * @return the number of packets received
      */
     @Override
     public int getNumberPacketsOfPackets() {
@@ -51,7 +54,7 @@ public class PacketStream implements SimulatorStream{
     }
     /**
      * increment the number of packets received whenever a packet is received
-     * @param packet
+     * @param packet the {@link DatagramPacket} that needs to be checked before incrementing the number of packets received
      */
     protected void incNumRecieved(DatagramPacket packet) {
         numReceived++;

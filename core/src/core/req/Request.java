@@ -17,13 +17,22 @@ import java.io.ByteArrayOutputStream;
  */
 public abstract class Request extends Message {
 
+    /**
+     * Mode to run transfer in (either "OCTET" or "NETASCII")
+     */
     private RequestMode mode;
+
+    /**
+     * Name of file to transfer
+     */
     private String filename;
 
     /**
      * Sets the request information
-     * @param code  the opcode
-     * @param filename  the file name
+     *
+     * @param code - The opcode
+     *
+     * @param filename - The file name
      */
     public Request (OpCode code, String filename) {
         super(code);
@@ -33,8 +42,10 @@ public abstract class Request extends Message {
 
     /**
      * Sets the request information passed in as a byte array
-     * @param data  the byte array
-     * @throws InvalidMessageException
+     *
+     * @param data - The byte array
+     *
+     * @throws InvalidMessageException - If the given byte data does not form a valid request
      */
     public Request (byte[] data) throws InvalidMessageException {
         super(data);
@@ -42,7 +53,8 @@ public abstract class Request extends Message {
 
     /**
      * Sets the transfer mode
-     * @param mode  the transfer mode
+     *
+     * @param mode - The transfer mode
      */
     public void setMode (RequestMode mode){
         this.mode = mode;
@@ -50,7 +62,8 @@ public abstract class Request extends Message {
 
     /**
      * Gets the transfer mode
-     * @return  the transfer mode
+     *
+     * @return The transfer mode
      */
     public RequestMode getMode () {
         return this.mode;
@@ -58,7 +71,8 @@ public abstract class Request extends Message {
 
     /**
      * Sets the filename
-     * @param filename
+     *
+     * @param filename - Path and name of file to transfer
      */
     public void setFilename (String filename){
         this.filename = filename;
@@ -66,16 +80,18 @@ public abstract class Request extends Message {
 
     /**
      * Gets the filename
-     * @return
+     *
+     * @return Path and name of file to transfer
      */
     public String getFilename () {
         return this.filename;
     }
 
     /**
-     * @param bytes  a byte list to decode
      * The method verifies the byte list is in a valid form for a request packet
      * If verified, it decodes the filename and transfer mode into Strings that are locally stored
+     *
+     * @param data - A byte list to decode
      */
     @Override
     protected void decode (byte[] data) throws InvalidMessageException {
@@ -102,6 +118,8 @@ public abstract class Request extends Message {
 
     /**
      * Writes the data to a byte stream and returns it as a byte array
+     *
+     * @return An encoded version of this request
      */
     public byte[] toBytes () {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
