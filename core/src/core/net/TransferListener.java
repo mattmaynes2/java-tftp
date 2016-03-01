@@ -40,5 +40,13 @@ public interface TransferListener {
      * Invoked when a transfer has been completed
      */
     public void handleComplete ();
+    
+    /**
+     * Invoked when a timeout occurs while waiting to receive a message
+     * @param attemptsLeft - the number of times to attempt to receive message
+     */
+	public void handleTimeout(int attemptsLeft);
+
+	public void handleException(Exception e);
 
 }

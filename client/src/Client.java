@@ -77,4 +77,15 @@ public class Client extends TransferController {
             e.printStackTrace();
         }
     }
+
+	@Override
+	public void handleTimeout(int attemptsLeft) {
+		Logger.log(Level.WARNING, "Timed-out while waiting for Message from server will try "+ attemptsLeft+" more times");
+	}
+
+	@Override
+	public void handleException(Exception e) {
+		Logger.log(Level.SEVERE,e.getMessage());
+		this.cli.message("Finished transfer with errors");
+	}
 }

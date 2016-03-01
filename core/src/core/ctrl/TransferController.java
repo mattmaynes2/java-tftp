@@ -84,7 +84,7 @@ public abstract class TransferController extends Controller {
      * @param filename - Name of file to transfer
      */
     public void write (String filename){
-        WriteTransfer runner;
+        Transfer runner;
 
         try {
             runner = new WriteTransfer(this.getAddress(), filename);

@@ -231,4 +231,17 @@ public abstract class Transfer implements Runnable {
         }
     }
 
+	protected void notifyTimeout(int attempsLeft) {
+		for (TransferListener listener : this.listeners) {
+            listener.handleTimeout(attempsLeft);
+        }
+		
+	}
+
+	protected void notifyException(Exception e) {
+		for (TransferListener listener : this.listeners) {
+            listener.handleException(e);
+        }
+	}
+
 }
