@@ -1,5 +1,4 @@
-#TFTP Iteration One
-
+# TFTP Iteration Two
 
 ## Setup Instructions
 Set your eclipse workspace to the top level, which is the project 
@@ -58,6 +57,29 @@ TFTP Error Simulator
     cl            <packetNumber> <packetLength>  Changes the length of a specified packet
 ```
 
+#### Command Structure
+Packet numbers will start at index 0 which represents the request packet. 
+Since there are no retries in this iteration, odd packet numbers will represent
+packets being set to the client. Even packet numbers will represent packets
+being sent to the server.
+
+```
+Example Using a Read Request:
+	csa 1 	// Modifies the first data packet
+	csa 2 	// Modifies the first acknowledge packet
+	...
+	csa 6 	// Modifies the third acknowledge packet
+	
+```
+
+```
+Example Using a Write Request:
+	csa 1 	// Modifies the first acknowledge packet
+	csa 2 	// Modifies the first data packet
+	...
+	csa 6 	// Modifies the third data packet
+	
+```
 
 
 ### Client
@@ -122,6 +144,10 @@ to the client.
 This shows the steady state transfer when writing to a file on the server
 from the client.
 
+
+## Timing Diagrams
+Contains all of the timing diagrams for this iteration that represent
+the transfers during error scenarios.
 
 ## Source Code Structure
 
