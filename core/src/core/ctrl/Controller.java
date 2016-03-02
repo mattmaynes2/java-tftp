@@ -22,7 +22,7 @@ import java.util.logging.Level;
  *
  * Handles requests from a command line interface and spawns transfers
  */
-public abstract class Controller implements CommandHandler, TransferListener {
+public abstract class Controller implements CommandHandler{
 
     /**
      * Command line option to turn on quiet mode logging
@@ -165,30 +165,5 @@ public abstract class Controller implements CommandHandler, TransferListener {
                     break;
             }
         }
-
-        /**
-         * Invoked when a transfer is started
-         */
-        public abstract void handleStart ();
-
-    /**
-     * Invoked when a transfer receives a message from the endpoint
-     *
-     * @param msg - The message received
-     */
-        public abstract void handleMessage (Message msg);
-
-    /**
-     * Invoked when an error is received during a transfer
-     *
-     * @param err - The error received
-     */
-    public abstract void handleErrorMessage (ErrorMessage err);
-
-    /**
-     * Invoked when the transfer is complete
-     */
-    public abstract void handleComplete ();
-
 
 }

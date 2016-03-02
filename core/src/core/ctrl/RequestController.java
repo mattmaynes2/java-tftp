@@ -9,6 +9,7 @@ import core.net.ReadTransfer;
 import core.net.RequestListener;
 import core.net.RequestReceiver;
 import core.net.Transfer;
+import core.net.TransferListener;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
 import core.req.Request;
@@ -19,7 +20,7 @@ import core.req.ErrorMessage;
  *
  * Responds to transfer requests and performs operations
  */
-public abstract class RequestController extends Controller implements RequestListener {
+public abstract class RequestController extends Controller implements RequestListener, TransferListener  {
 
     /**
      * Handles sockets requests

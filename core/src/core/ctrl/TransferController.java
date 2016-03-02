@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import core.cli.Command;
 import core.net.ReadTransfer;
 import core.net.Transfer;
+import core.net.TransferListener;
 import core.net.WriteTransfer;
 
 /**
@@ -12,7 +13,7 @@ import core.net.WriteTransfer;
  *
  * Spawns transfers when user enters CLI commands
  */
-public abstract class TransferController extends Controller {
+public abstract class TransferController extends Controller implements TransferListener  {
 
     /**
      * Command to initialize a read command
