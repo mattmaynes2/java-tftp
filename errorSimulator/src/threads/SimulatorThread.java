@@ -14,10 +14,7 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
-import sim.PacketModifier;
-import sim.SimulationTypes;
 import stream.SimulatorStream;
-import stream.SimulatorStreamFactory;
 
 /**
  * Performs the communication between a client and a server once communication has been started
@@ -40,10 +37,10 @@ public  class SimulatorThread extends Thread {
      * @throws UnknownHostException  throws if a local host is unknown
      */
     //TODO change inputs so that there aren't as many and one won't potentially be null
-    public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, PacketModifier modifier) throws SocketException, UnknownHostException {
+    public SimulatorThread(DatagramPacket packet, SimulatorStream stream) throws SocketException, UnknownHostException {
         this.packetIn=packet;
         this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
-        this.stream=SimulatorStreamFactory.createSimulationStream(simulation, modifier, packetToModify);
+        this.stream = stream;
     }
 
     /**

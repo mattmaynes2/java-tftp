@@ -11,12 +11,15 @@ import core.ctrl.Controller;
 import core.log.Logger;
 import core.req.ErrorMessage;
 import core.req.Message;
+import stream.SimulatorStream;
+import stream.SimulatorStreamFactory;
 
 public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 0;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
+    public static final int TIMEOUT_MILLISECONDS = 2400;
 
     /**
      * Declare valid commands as static final
@@ -28,6 +31,7 @@ public class ErrorSimulator extends Controller {
     private static final String REQUEST_SEPERATOR_COMMAND = "rrs";
     private static final String END_COMMAND = "rend";
     private static final String MODE_COMMAND = "mode";
+    private static final String DELAY_COMMAND = "delay";
 
     private ReceiveWorker recieveListener;
 
@@ -46,6 +50,7 @@ public class ErrorSimulator extends Controller {
         this.interpreter.addCommand(REQUEST_SEPERATOR_COMMAND);
         this.interpreter.addCommand(END_COMMAND);
         this.interpreter.addCommand(MODE_COMMAND);
+        this.interpreter.addCommand(DELAY_COMMAND);
     }
 
     /**
@@ -83,7 +88,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <packetNum>                    	Changes the sender address of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
-        }
+        System.out.println("    delay <packetType> <packetNumber> <timeouts> Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
+    }
 
     /**
      * Starts a new ErrorSimulator thread
@@ -137,14 +143,43 @@ public class ErrorSimulator extends Controller {
             		this.cli.message("Incorrect number of parameters for mode. Format is mode <mode>");
             	}
             	break;
+            case DELAY_COMMAND:
+            	this.delayPacketSimulation(command.getArguments());
+            	break;
         }
     }
 
     /**
+     * Sets the simulator configuration to delay a packet
+     * @param arguments
+     */
+    private void delayPacketSimulation(ArrayList<String> arguments) {
+		if (arguments.size() < 3){
+			throw new IllegalArgumentException("Delay simulation requires 3 arguments");
+		}
+	    int packetNum = verifyNum(arguments.get(1), 1);
+		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
+    	try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
+	    	recieveListener.setConfiguration(stream);
+	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be delayed by " + timeout + "ms");
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch(IllegalArgumentException e){
+			this.cli.message(e.getMessage());
+		}
+	}
+
+	/**
      * Set the configuration back to pass through
      */
     private void passThroughSimulation() {
-    	recieveListener.setConfiguration(SimulationTypes.PASS_THROUGH, 0, null);
+		try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.PASS_THROUGH);
+	    	recieveListener.setConfiguration(stream);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
     	this.cli.message("Incoming requests are now passing through unaltered");		
 	}
 
@@ -155,7 +190,12 @@ public class ErrorSimulator extends Controller {
     private void changeModeSimulation(String mode){
     	PacketModifier modifier = new PacketModifier();
     	modifier.setMode(mode);
-    	this.recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+		try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+	    	recieveListener.setConfiguration(stream);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
     	this.cli.message("Incoming request packets will have their mode changed to " + mode);
     }
     
@@ -165,7 +205,12 @@ public class ErrorSimulator extends Controller {
     private void removeEndByteSimulation() {
         PacketModifier modifier = new PacketModifier();
         modifier.setEndByte(false);
-        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+		try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+	    	recieveListener.setConfiguration(stream);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
         this.cli.message("Now running Remove End Byte Simulation on incoming requests");
     }
 
@@ -175,7 +220,12 @@ public class ErrorSimulator extends Controller {
     private void removeRequestSeperatorSimulation() {
         PacketModifier modifier = new PacketModifier();
         modifier.setPostFilenameByte(false);
-        recieveListener.setConfiguration(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+		try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+	    	recieveListener.setConfiguration(stream);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
         this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
     }
 
@@ -186,7 +236,12 @@ public class ErrorSimulator extends Controller {
     private void wrongSocketSimulation(String packetNumber) {
     	int packetNum = verifyNum(packetNumber, 1);
     	if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
-    		recieveListener.setConfiguration(SimulationTypes.CHANGE_SENDER, packetNum,null);
+    		try {
+    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.CHANGE_SENDER, packetNum);
+    	    	recieveListener.setConfiguration(stream);
+    		} catch (SocketException e) {
+    			e.printStackTrace();
+    		}
     		this.cli.message("Now running Change Sender Address on incoming requests");
     	}
         else {
@@ -219,7 +274,12 @@ public class ErrorSimulator extends Controller {
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	        PacketModifier modifier = new PacketModifier();
 	        modifier.setLength(length);
-	        recieveListener.setConfiguration(type, packetNum,  modifier);
+    		try {
+    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(type, args.get(0), packetNum,  modifier);
+    	    	recieveListener.setConfiguration(stream);
+    		} catch (SocketException e) {
+    			e.printStackTrace();
+    		}
 	        this.cli.message("Now running Change Length Simulation on incoming requests");
         }
         else {
@@ -266,7 +326,12 @@ public class ErrorSimulator extends Controller {
 		        
 		        PacketModifier modifier = new PacketModifier();
 		        modifier.setOpCode(out.toByteArray());
-	            recieveListener.setConfiguration(type, packetNum,  modifier);
+		 		try {
+	    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(type, packetNum,  modifier);
+	    	    	recieveListener.setConfiguration(stream);
+	    		} catch (SocketException e) {
+	    			e.printStackTrace();
+	    		}
 	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
 	        }
 	        else {

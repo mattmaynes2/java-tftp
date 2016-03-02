@@ -7,20 +7,16 @@ import java.net.SocketException;
 import sim.SimulationTypes;
 import core.util.Worker;
 import threads.SimulatorThread;
-
+import stream.SimulatorStream;
 
 public class ReceiveWorker extends Worker {
 
 	private DatagramSocket requestSocket;
-	private SimulationTypes type;
-	private int packetNumber;
-	private PacketModifier modifier;
+	private SimulatorStream stream;
 	
 	public ReceiveWorker(int port) throws SocketException {
 		requestSocket = new DatagramSocket(port);
-		type = SimulationTypes.PASS_THROUGH;
-		packetNumber = 0;
-		modifier = null;
+		stream = null;
 	}
 	
 	@Override
@@ -28,7 +24,7 @@ public class ReceiveWorker extends Worker {
          DatagramPacket receivePacket = new DatagramPacket(new byte[1024], 1024);
          try {
 			requestSocket.receive(receivePacket);
-			(new SimulatorThread(receivePacket, type, packetNumber, this.modifier)).start();
+			(new SimulatorThread(receivePacket, stream)).start();
 		} catch (SocketException e) {
 			// Ignore socket exception if not currently running
 			if(this.isRunning()) {
@@ -48,12 +44,8 @@ public class ReceiveWorker extends Worker {
 		requestSocket.close();
 	}
 	
-	public void setConfiguration(SimulationTypes type, int packetNumber, PacketModifier modifier) {
-		
-		this.type = type;
-		this.packetNumber = packetNumber;
-		this.modifier = modifier;
-		
+	public void setConfiguration(SimulatorStream stream) {
+		this.stream = stream;
 	}
 
 }

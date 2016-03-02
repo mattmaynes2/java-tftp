@@ -10,6 +10,9 @@ import sim.PacketModifier;
 
 public class SimulatorStreamFactory {
 
+	private final static String DATA_STREAM_OPTION = "data";
+	private final static String ACK_STREAM_OPTION = "ack";
+	
 	/**
 	 * Static method that creates a decorated SimulatorStream based on the input parameters
 	 * @param type type of SimulatorStream to create
@@ -18,18 +21,36 @@ public class SimulatorStreamFactory {
 	 * @return a decorated SimulatorStream
 	 * @throws SocketException if no more sockets are available when creating a stream
 	 */
-    public static SimulatorStream createSimulationStream(SimulationTypes type,PacketModifier modifier,int packetToChange) throws SocketException {
+    public static SimulatorStream createSimulationStream(SimulationTypes type, Object...streamArgs) throws SocketException {
         switch(type) {
             case REPLACE_ACK:
-                return new InjectPacketStream(new CountAcksStream(), modifier, packetToChange);
+                return new InjectPacketStream(new CountAcksStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
             case REPLACE_DATA:
-                return new InjectPacketStream(new CountDataPacketStream(), modifier, packetToChange);
+                return new InjectPacketStream(new CountDataPacketStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
             case REPLACE_PACKET:
-                return new InjectPacketStream(new PacketStream(), modifier, packetToChange);
+                return new InjectPacketStream(new PacketStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
             case CHANGE_SENDER:
-                return new WrongSenderStream(new PacketStream(), packetToChange);
+                return new WrongSenderStream(new PacketStream(), (int)streamArgs[1]);
+            case DELAY_PACKET:
+            	return new DelayedPacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
             default:
                 return  new PacketStream();
         }
+    }
+    
+    /**
+     * 
+     * @param dataOrAck Either "data" or "ack", specifies the stream type to create
+     * @throws IllegalArgumentException if dataOrAck is not "data" or "ack"
+     * @return The stream that is appropriate based on dataOrAck
+     */
+    private static PacketStream createAckOrDataStream(String dataOrAck) throws SocketException{
+    	if (dataOrAck.toLowerCase().equals(DATA_STREAM_OPTION)){
+    		return new CountDataPacketStream();
+    	}else if (dataOrAck.toLowerCase().equals(ACK_STREAM_OPTION)){
+    		return new CountAcksStream();
+    	}else{
+    		throw new IllegalArgumentException("Type of packet to count must be either 'data' or 'ack'");
+    	}
     }
 }
