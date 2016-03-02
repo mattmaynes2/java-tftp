@@ -33,6 +33,8 @@ public class SimulatorStreamFactory {
                 return new WrongSenderStream(new PacketStream(), (int)streamArgs[1]);
             case DELAY_PACKET:
             	return new DelayedPacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
+            case DUPLICATE_PACKET:
+            	return new DuplicatePacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1]);
             default:
                 return  new PacketStream();
         }
