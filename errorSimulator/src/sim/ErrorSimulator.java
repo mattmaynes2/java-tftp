@@ -379,32 +379,4 @@ public class ErrorSimulator extends Controller {
 		}
 		return returnNum;
     }
-
-    /**
-     * unused
-     */
-    @Override
-    public void handleSendMessage(Message msg) {}
-
-    /**
-     * unused
-     */
-    @Override
-    public void handleErrorMessage(ErrorMessage err) {}
-
-    /**
-    * unused
-    */
-    public void handleComplete () {}
-
-    /**
-    * unused
-    */
-    public void handleMessage(Message msg){}
-
-    /**
-     * unused
-     */
-    public void handleStart () {}
-
 }

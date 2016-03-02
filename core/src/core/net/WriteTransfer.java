@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 import core.req.AckMessage;
@@ -90,9 +91,24 @@ public class WriteTransfer extends Transfer {
 
             // Continue to send data until all of the data has been sent
             do {
-                msg = createMessage(in);
-                this.sendDataMessage(msg);
-                this.notifyMessage(this.getAcknowledge());
+            	msg = createMessage(in);
+            	int sendAttemps=0;
+            	AckMessage ack=null;
+            	while(ack == null ) {
+	            	try {
+	                	this.sendDataMessage(msg);
+	                	ack=this.getAcknowledge();
+	            	}catch(SocketTimeoutException e){
+	            		sendAttemps++;
+	            		if(sendAttemps == MAX_ATTEMPTS) {
+	            			throw new UnreachableHostException("No response from host tried 5 times");
+	            		}
+	            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+	            	}catch(MessageOrderException e) {
+	            		this.notifyInfo(e.getMessage()+"\nIgnoring Messge");
+	            	}
+            	}
+                this.notifyMessage(ack);
             } while(msg.getData().length == 512);
 
             // Close the input stream and socket
@@ -105,6 +121,8 @@ public class WriteTransfer extends Transfer {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
+        } catch(UnreachableHostException e) {
+        	this.notifyException(e);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -120,12 +138,13 @@ public class WriteTransfer extends Transfer {
      * @throws InvalidMessageException - If the received message has an invalid encoding
      * @throws ErrorMessageException - If an error message is received
      * @throws MessageOrderException - If an acknowledge is received out of order
+     * @throws SocketTimeoutException - If an acknowledge packet isn't received within TIMEOUT_TIME
      */
     public AckMessage getAcknowledge () throws
             IOException,
             InvalidMessageException,
             ErrorMessageException,
-            MessageOrderException {
+            MessageOrderException, SocketTimeoutException{
 
         Message msg;
         AckMessage ack;
