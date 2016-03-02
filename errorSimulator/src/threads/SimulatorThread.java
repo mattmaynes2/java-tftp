@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.spec.MGF1ParameterSpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -25,6 +26,8 @@ public  class SimulatorThread extends Thread {
 
     private DatagramPacket packetIn;
     private SocketAddress sendAddress;
+    private SocketAddress clientAddress;
+    private SocketAddress serverAddress;
     private SimulatorStream stream;
     
     /**
@@ -41,6 +44,7 @@ public  class SimulatorThread extends Thread {
         this.packetIn=packet;
         this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
         this.stream = stream;
+        this.clientAddress = packet.getSocketAddress(); //save address of client from initial request
     }
 
     /**
@@ -53,13 +57,17 @@ public  class SimulatorThread extends Thread {
         try {
             Message msg=MessageFactory.createMessage(bytes);
             System.out.println(msg);
-            sendPacket(msg);
-            while(!MessageFactory.isLastMessage(msg)) {
+            sendPacket(msg, sendAddress);
+            msg = receivePacket();
+            serverAddress = packetIn.getSocketAddress(); //Server address must come from the first response to initial request
+            while(!MessageFactory.isLastMessage(msg)){
 
-                msg=receivePacket();
                 Logger.log(Level.INFO,"Message is "+msg);
                 sendPacket(msg);
+                msg=receivePacket();
             }
+            sendPacket(msg); //forward last packet
+            
             if(!OpCode.ERROR.equals(msg.getOpCode())) {
                 //Receives the last packet if not an error
                 msg=receivePacket();
@@ -94,7 +102,16 @@ public  class SimulatorThread extends Thread {
      * @throws InvalidMessageException  throws if the message format is invalid
      */
     protected void sendPacket(Message message) throws IOException, InvalidMessageException {
-        stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
-        sendAddress=packetIn.getSocketAddress();
+    	//Ensure packets are not send back to the sender in case of retransmitted/duplicated packets
+    	if (packetIn.getSocketAddress().equals(serverAddress)){
+    		sendAddress = clientAddress;
+    	}else if(packetIn.getSocketAddress().equals(clientAddress)){
+    		sendAddress = serverAddress;
+    	}
+    	sendPacket(message, sendAddress);
+    }
+    
+    protected void sendPacket(Message message, SocketAddress address) throws IOException, InvalidMessageException{
+		stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
     }
 }
