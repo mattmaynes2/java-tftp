@@ -33,6 +33,7 @@ public class ErrorSimulator extends Controller {
     private static final String MODE_COMMAND = "mode";
     private static final String DELAY_COMMAND = "delay";
     private static final String DUPLICATE_COMMAND = "duplicate";
+    private static final String DROP_COMMAND = "drop";
 
     private ReceiveWorker recieveListener;
 
@@ -53,6 +54,7 @@ public class ErrorSimulator extends Controller {
         this.interpreter.addCommand(MODE_COMMAND);
         this.interpreter.addCommand(DELAY_COMMAND);
         this.interpreter.addCommand(DUPLICATE_COMMAND);
+        this.interpreter.addCommand(DROP_COMMAND);
     }
 
     /**
@@ -93,6 +95,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNumber> <timeout>	Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
         System.out.println("    duplicate     <type> <packetNumber>				Duplicates the specified packet");
+        System.out.println("    drop          <type> <packetNumber>				Drops the specified packet");
     }
 
     /**
@@ -153,6 +156,8 @@ public class ErrorSimulator extends Controller {
             case DUPLICATE_COMMAND:
             	this.duplicatePacketSimulation(command.getArguments());
             	break;
+            case DROP_COMMAND:
+            	this.dropPacketSimulation(command.getArguments());
         }
     }
 
@@ -170,6 +175,27 @@ public class ErrorSimulator extends Controller {
 			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
 	    	recieveListener.setConfiguration(stream);
 	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be delayed by " + timeout + "ms");
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch(IllegalArgumentException e){
+			this.cli.message(e.getMessage());
+		}
+	}
+    
+    /**
+     * Sets the simulator configuration to delay a packet
+     * @param arguments
+     */
+    private void dropPacketSimulation(ArrayList<String> arguments) {
+		if (arguments.size() < 2){
+			throw new IllegalArgumentException("Drop simulation requires 2 arguments");
+		}
+	    int packetNum = verifyNum(arguments.get(1), 1);
+
+    	try {
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DROP_PACKET, arguments.get(0), packetNum);
+	    	recieveListener.setConfiguration(stream);
+	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be dropped");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch(IllegalArgumentException e){

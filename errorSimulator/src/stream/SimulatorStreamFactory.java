@@ -35,6 +35,8 @@ public class SimulatorStreamFactory {
             	return new DelayedPacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
             case DUPLICATE_PACKET:
             	return new DuplicatePacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1]);
+            case DROP_PACKET:
+            	return new DropPacketStream(createAckOrDataStream((String)streamArgs[0]), (int)streamArgs[1]);
             default:
                 return  new PacketStream();
         }
