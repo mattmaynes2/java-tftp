@@ -24,9 +24,9 @@ public class SimulatorStreamFactory {
     public static SimulatorStream createSimulationStream(SimulationTypes type, Object...streamArgs) throws SocketException {
         switch(type) {
             case REPLACE_ACK:
-                return new InjectPacketStream(new CountAcksStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
+                return new InjectPacketStream(new CountAcksStream(), (PacketModifier)streamArgs[1], (int) streamArgs[0]);
             case REPLACE_DATA:
-                return new InjectPacketStream(new CountDataPacketStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
+                return new InjectPacketStream(new CountDataPacketStream(), (PacketModifier)streamArgs[1], (int) streamArgs[0]);
             case REPLACE_PACKET:
                 return new InjectPacketStream(new PacketStream(), (PacketModifier)streamArgs[0], (int) streamArgs[1]);
             case CHANGE_SENDER:
