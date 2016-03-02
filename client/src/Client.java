@@ -2,6 +2,7 @@ import core.req.Message;
 import core.req.ErrorMessage;
 
 import core.log.Logger;
+import core.ctrl.Controller;
 import core.ctrl.TransferController;
 
 
@@ -65,7 +66,7 @@ public class Client extends TransferController {
     }
 
     public static void main(String[] args){
-        Client client;
+        Controller client;
 
         try {
             InetSocketAddress address =
@@ -79,13 +80,19 @@ public class Client extends TransferController {
     }
 
 	@Override
-	public void handleTimeout(int attemptsLeft) {
-		Logger.log(Level.WARNING, "Timed-out while waiting for Message from server will try "+ attemptsLeft+" more times");
-	}
-
-	@Override
 	public void handleException(Exception e) {
 		Logger.log(Level.SEVERE,e.getMessage());
 		this.cli.message("Finished transfer with errors");
+	}
+	
+	@Override
+	public void handleTimeout(int attemptsLeft) {
+		Logger.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
+	}
+
+	@Override
+	public void handleInfo(String info) {
+		Logger.log(Level.INFO,info);
+		
 	}
 }

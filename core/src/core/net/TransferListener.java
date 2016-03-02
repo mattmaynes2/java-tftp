@@ -47,6 +47,16 @@ public interface TransferListener {
      */
 	public void handleTimeout(int attemptsLeft);
 
+	/**
+	 * Invoked when an exception occurred during transfer 
+	 * @param e the exception that was thrown
+	 */
 	public void handleException(Exception e);
+
+	/**
+	 * Invoked when there is a message to display to the user
+	 * @param info message to display
+	 */
+	public void handleInfo(String info);
 
 }

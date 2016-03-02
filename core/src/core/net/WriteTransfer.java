@@ -30,9 +30,7 @@ import core.req.WriteRequest;
  */
 public class WriteTransfer extends Transfer {
 
-    private static final int MAX_ATTEMPTS = 5;
-
-	/**
+    /**
      * Constructs a new transfer will write data to a socket from
      * the file with the given name
      *
@@ -96,7 +94,7 @@ public class WriteTransfer extends Transfer {
             	msg = createMessage(in);
             	int sendAttemps=0;
             	AckMessage ack=null;
-            	while(ack == null && sendAttemps < MAX_ATTEMPTS) {
+            	while(ack == null ) {
 	            	try {
 	                	this.sendDataMessage(msg);
 	                	ack=this.getAcknowledge();
@@ -106,6 +104,8 @@ public class WriteTransfer extends Transfer {
 	            			throw new UnreachableHostException("No response from host tried 5 times");
 	            		}
 	            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+	            	}catch(MessageOrderException e) {
+	            		this.notifyInfo(e.getMessage()+"\nIgnoring Messge");
 	            	}
             	}
                 this.notifyMessage(ack);
