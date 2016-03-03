@@ -65,16 +65,16 @@ public  class SimulatorThread extends Thread {
                 sendPacket(msg);
                 msg=receivePacket();
             }
-            while (!sendPacket(msg)){
-            	msg = receivePacket();
-            }
-            
+            sendPacket(msg);
             if(!OpCode.ERROR.equals(msg.getOpCode())) {
                 //Receives the last packet if not an error
                 msg=receivePacket();
                 Logger.log(Level.INFO,"Message is "+msg);
-                sendPacket(msg);
             }
+            while (!sendPacket(msg)){
+            	msg = receivePacket();
+            }
+            
         } catch (SocketException ex){
         	//socket closed
         }  catch (IOException | InvalidMessageException e) {
