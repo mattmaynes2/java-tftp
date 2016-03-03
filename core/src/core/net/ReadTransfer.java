@@ -8,7 +8,7 @@ import core.req.OpCode;
 import core.req.ErrorMessageException;
 import core.req.InvalidMessageException;
 import core.req.MessageOrderException;
-
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -62,7 +62,7 @@ public class ReadTransfer extends Transfer {
      * writing them to the output file
      */
     public void run () {
-        FileOutputStream out;
+        FileOutputStream out = null;
         DataMessage msg;
 
         // Starting the transfer
@@ -95,14 +95,34 @@ public class ReadTransfer extends Transfer {
             this.notifyComplete();
         } catch (ErrorMessageException e){
             this.notifyError(e.getErrorMessage());
+            removeFile(out);
         } catch (InvalidMessageException e){
             this.handleInvalidMessage(e);
+            removeFile(out);
         }catch(UnreachableHostException e) {
         	this.notifyException(e);
+        	removeFile(out);
         }catch (Exception e){
             e.printStackTrace();
         }
    }
+
+	private void removeFile(FileOutputStream out) {
+		if(out!=null) {
+			try {
+				
+				out.close();
+				File f = new File(this.getFilename());
+				if(f.delete()) {
+					this.notifyInfo("Deleted "+getFilename());
+				}else {
+					this.notifyInfo("Unable to deleted "+getFilename());
+				}
+			} catch (IOException e1) {
+				this.notifyInfo("Error closing output stream");
+			}
+		}
+	}
 
     /**
      * Synchronously receive the next data packet and sends an acknowledgement
