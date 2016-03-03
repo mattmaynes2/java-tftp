@@ -399,11 +399,11 @@ public class ErrorSimulator extends Controller {
      * Determine the SimulationType from the string argument
      */
     private SimulationTypes determineSimulationType(String type) {
-    	if (type.equals("ACK")) {
+    	if (type.toUpperCase().equals("ACK")) {
         	return SimulationTypes.REPLACE_ACK;
-        } else if (type.equals("DATA")) {
+        } else if (type.toUpperCase().equals("DATA")) {
         	return SimulationTypes.REPLACE_DATA;
-        } else if (type.equals("REQ")){
+        } else if (type.toUpperCase().equals("REQ")){
         	return SimulationTypes.REPLACE_PACKET;
         } else {
         	this.cli.message("Incorrect packet type parameter. Options are ACK, DATA, or REQ");
