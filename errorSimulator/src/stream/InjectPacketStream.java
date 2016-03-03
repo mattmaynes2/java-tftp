@@ -13,6 +13,7 @@ public class InjectPacketStream implements SimulatorStream {
     private PacketStream stream;
     private PacketModifier modifier;
     private int injectAt;
+    private boolean hasInjected;
 
 /**
  * 
@@ -24,6 +25,7 @@ public class InjectPacketStream implements SimulatorStream {
         this.stream=stream;
         this.modifier=modifier;
         this.injectAt=injectAt;
+        this.hasInjected = false;
     }
 
 
@@ -37,7 +39,8 @@ public class InjectPacketStream implements SimulatorStream {
      */
     @Override
     public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
-        if(getNumberPacketsOfPackets()==injectAt) {
+        if(!hasInjected && getNumberPacketsOfPackets()==injectAt) {
+        	hasInjected = true;
             Logger.log(Level.INFO, "About to Send Modifyied Packet");
         	stream.send(modifier.modifyPacket(packet));
         }else {

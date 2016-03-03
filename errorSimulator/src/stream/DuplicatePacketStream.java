@@ -9,10 +9,12 @@ public class DuplicatePacketStream implements SimulatorStream {
 
 	private PacketStream stream;
 	int duplicatedPacketNumber;
+	private boolean hasDuplicated;
 	
 	public DuplicatePacketStream(PacketStream stream, int duplicatedPacketNumber){
 		this.duplicatedPacketNumber = duplicatedPacketNumber;
 		this.stream = stream;
+		this.hasDuplicated = false;
 	}
 
 	@Override
@@ -23,7 +25,8 @@ public class DuplicatePacketStream implements SimulatorStream {
 	@Override
 	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		this.stream.send(packet);
-		if (this.stream.getNumberPacketsOfPackets() == this.duplicatedPacketNumber){
+		if (!hasDuplicated && this.stream.getNumberPacketsOfPackets() == this.duplicatedPacketNumber){
+			hasDuplicated = true;
 			this.stream.send(packet);
 		}
 	}

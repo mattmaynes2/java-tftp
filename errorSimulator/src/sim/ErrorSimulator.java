@@ -222,7 +222,7 @@ public class ErrorSimulator extends Controller {
      */
     private void duplicatePacketSimulation(ArrayList<String> arguments) {
 		if (arguments.size() < 2){
-			throw new IllegalArgumentException("Delay simulation requires 2 arguments");
+			throw new IllegalArgumentException("Duplicate simulation requires 2 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
 	    

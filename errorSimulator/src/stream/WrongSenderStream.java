@@ -21,6 +21,7 @@ public class WrongSenderStream implements SimulatorStream {
     private SimulatorStream mainStream;
     private PacketStream wrongStream;
     private int sendAt;
+    private boolean hasSentFromWrongStream;
     
     /**
      * 
@@ -32,6 +33,7 @@ public class WrongSenderStream implements SimulatorStream {
         this.mainStream=stream;
         this.wrongStream= new PacketStream();
         this.sendAt=sendAt;
+        this.hasSentFromWrongStream = false;
     }
 
     @Override
@@ -47,8 +49,9 @@ public class WrongSenderStream implements SimulatorStream {
     */
     @Override
     public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
-        if(getNumberPacketsOfPackets()==sendAt) {
+        if(!hasSentFromWrongStream && getNumberPacketsOfPackets()==sendAt) {
             // send from the wrong socket
+        	hasSentFromWrongStream = true;
             Logger.log(Level.INFO, "Sending original packet from right stream");
             mainStream.send(packet);
             Logger.log(Level.INFO,"Sending packet from wrong stream");
