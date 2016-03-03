@@ -93,7 +93,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <packetNum>                    	Changes the sender address of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
-        System.out.println("    delay         <type> <packetNum> <timeout>	Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
+        System.out.println("    delay         <type> <packetNum> <timeout>		Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
         System.out.println("    duplicate     <type> <packetNum>			Duplicates the specified packet");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
