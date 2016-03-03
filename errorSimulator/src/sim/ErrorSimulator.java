@@ -14,7 +14,7 @@ import stream.SimulatorStreamFactory;
 
 public class ErrorSimulator extends Controller {
 
-    public static final int SIMULATOR_PORT = 680;
+    public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 0;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
