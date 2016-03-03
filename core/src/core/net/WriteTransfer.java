@@ -7,6 +7,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
+import com.sun.xml.internal.ws.handler.HandlerException;
+
 import core.req.AckMessage;
 import core.req.DataMessage;
 import core.req.ErrorMessageException;
@@ -49,6 +51,7 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the endpoint is not listening or the write fails
      *
      * @return If the request was accepted
+     * @throws UnreachableHostException 
      */
     public boolean sendRequest () throws IOException {
         WriteRequest request;
@@ -58,7 +61,20 @@ public class WriteTransfer extends Transfer {
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
-            this.getAcknowledge();
+            AckMessage ack =null;
+            int sendAttemps=0;
+            while(ack == null) {
+            	try {
+            		ack=this.getAcknowledge();
+            	}catch(SocketTimeoutException e) {
+            		sendAttemps++;
+            		if(sendAttemps == MAX_ATTEMPTS) {
+            			throw new UnreachableHostException("No response from host tried 5 times");
+            		}
+            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+            	}
+            }
+            
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
             return false;
@@ -67,8 +83,11 @@ public class WriteTransfer extends Transfer {
             return false;
         } catch (MessageOrderException e){
             // This should never happen since it was just a request
-            e.printStackTrace();
-            System.exit(1);
+            this.notifyException(e);
+            return false;
+        }catch(UnreachableHostException e) {
+        	this.notifyException(e);
+            return false;
         }
         return true;
     }

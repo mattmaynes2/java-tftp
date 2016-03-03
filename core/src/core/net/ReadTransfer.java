@@ -123,7 +123,7 @@ public class ReadTransfer extends Transfer {
         DataMessage data = null;
         AckMessage ack;
         int sendAttemps=0;
-      while(msg == null && data == null) {
+      while(msg == null) {
       		try {
       			msg = this.getSocket().receive();
       	}catch(SocketTimeoutException e){
@@ -131,34 +131,38 @@ public class ReadTransfer extends Transfer {
       		if(sendAttemps == MAX_ATTEMPTS) {
       			throw new UnreachableHostException("No response from host tried 5 times");
       		}
-      		//re-send last ack
-      		ack = new AckMessage(this.getBlockNumber());
-      		this.getSocket().send(ack);
+      		//don't try and send ack after missing response after request
+      		if(Short.toUnsignedInt(getBlockNumber())>0) {
+      			//re-send last ack
+      			ack = new AckMessage(this.getBlockNumber());
+      			this.getSocket().send(ack);
+      		}
       		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
       		}
-  		
-	        // Check that the message is not an error message
-	        this.checkErrorMessage(msg);
-	
-	        // Increment the block number
-	        this.incrementBlockNumber();
-	        // Check that we can cast the message to the type if the
-	        // desired OpCode
-	        this.checkCast(msg, OpCode.DATA);
-	        data = (DataMessage) msg;
-	
-	        // Ensure that the packet we got is in the correct
-	        // sequence with previous packets we have received
-	        try {
-	        	this.checkOrder(data);
-	        }catch(MessageOrderException e) {
-	        	
-	        	this.notifyInfo(e.getMessage()+"\nIgnoring Message");
-	        	//reset block number to ignore message
-	        	this.decrementBlockNumber();
-	        	//reset data
-	        	data=null;
-	        }
+      		if(msg!=null) {
+		        // Check that the message is not an error message
+		        this.checkErrorMessage(msg);
+		
+		        // Increment the block number
+		        this.incrementBlockNumber();
+		        // Check that we can cast the message to the type if the
+		        // desired OpCode
+		        this.checkCast(msg, OpCode.DATA);
+		        data = (DataMessage) msg;
+		
+		        // Ensure that the packet we got is in the correct
+		        // sequence with previous packets we have received
+		        try {
+		        	this.checkOrder(data);
+		        }catch(MessageOrderException e) {
+		        	
+		        	this.notifyInfo(e.getMessage()+"\nIgnoring Message");
+		        	//reset block number to ignore message
+		        	this.decrementBlockNumber();
+		        	//reset data
+		        	msg=null;
+		        }
+      		}
       }
         ack = new AckMessage(data.getBlock());
 
