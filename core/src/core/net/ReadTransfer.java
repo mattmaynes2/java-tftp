@@ -126,12 +126,12 @@ public class ReadTransfer extends Transfer {
       while(msg == null) {
       		try {
       			msg = this.getSocket().receive();
-      	}catch(SocketTimeoutException e){
-      		sendAttemps++;
-      		if(sendAttemps == MAX_ATTEMPTS) {
-      			throw new UnreachableHostException("No response from host tried 5 times");
-      		}
-      			this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);   		
+      		}catch(SocketTimeoutException e){
+      			sendAttemps++;
+      			if(sendAttemps == MAX_ATTEMPTS) {
+      				throw new UnreachableHostException("No response from host tried 5 times");
+      			}
+      				this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);   		
       		}
       		if(msg!=null) {
 		        // Check that the message is not an error message
@@ -159,7 +159,7 @@ public class ReadTransfer extends Transfer {
 		      			this.notifySendMessage(ack);
 		      			this.getSocket().send(ack);
 		      		}
-		        	//reset data
+		        	//reset msg
 		        	msg=null;
 		        }
       		}
