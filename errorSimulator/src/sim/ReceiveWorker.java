@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import core.util.Worker;
+import stream.PacketStream;
 import stream.SimulatorStream;
 import threads.SimulatorThread;
 
@@ -25,6 +26,7 @@ public class ReceiveWorker extends Worker {
          try {
 			requestSocket.receive(receivePacket);
 			(new SimulatorThread(receivePacket, stream)).start();
+			stream = new PacketStream();
 		} catch (SocketException e) {
 			// Ignore socket exception if not currently running
 			if(this.isRunning()) {
