@@ -112,9 +112,9 @@ public class WriteTransfer extends Transfer {
             	msg = createMessage(in);
             	int sendAttemps=0;
             	AckMessage ack=null;
+            	this.sendDataMessage(msg);
             	while(ack == null ) {
 	            	try {
-	                	this.sendDataMessage(msg);
 	                	ack=this.getAcknowledge();
 	            	}catch(SocketTimeoutException e){
 	            		sendAttemps++;
@@ -122,6 +122,8 @@ public class WriteTransfer extends Transfer {
 	            			throw new UnreachableHostException("No response from host tried 5 times");
 	            		}
 	            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+	            		//resend message
+	            		this.sendDataMessage(msg);
 	            	}catch(MessageOrderException e) {
 	            		this.notifyInfo(e.getMessage()+"\nIgnoring Messge");
 	            	}
