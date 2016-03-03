@@ -37,12 +37,13 @@ public class PacketStream implements SimulatorStream{
      * @param packet {@link DatagramPacket} to send
      * @throws IOException if the socket is closed during transfer
      */
-    public void send(DatagramPacket packet) throws IOException {
+    public boolean send(DatagramPacket packet) throws IOException {
         Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
         byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
         Logger.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
         Logger.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
         socket.send(packet);
+        return true;
     }
 
     /**

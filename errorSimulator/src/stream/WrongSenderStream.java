@@ -48,7 +48,7 @@ public class WrongSenderStream implements SimulatorStream {
     *  otherwise send packet from the main stream used for communication
     */
     @Override
-    public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
+    public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
         if(!hasSentFromWrongStream && getNumberPacketsOfPackets()==sendAt) {
             // send from the wrong socket
         	hasSentFromWrongStream = true;
@@ -63,7 +63,7 @@ public class WrongSenderStream implements SimulatorStream {
         }else {
             mainStream.send(packet);
         }
-
+        return true;
     }
 
     /**

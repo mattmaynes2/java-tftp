@@ -38,7 +38,7 @@ public class InjectPacketStream implements SimulatorStream {
      * Replaces the packet at the specified point in the sequence with the modified packet
      */
     @Override
-    public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
+    public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
         if(!hasInjected && getNumberPacketsOfPackets()==injectAt) {
         	hasInjected = true;
             Logger.log(Level.INFO, "About to Send Modifyied Packet");
@@ -46,7 +46,7 @@ public class InjectPacketStream implements SimulatorStream {
         }else {
             stream.send(packet);
         }
-
+        return true;
     }
 
     @Override

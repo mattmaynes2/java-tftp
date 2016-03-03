@@ -32,7 +32,7 @@ public class DelayedPacketStream implements SimulatorStream{
 	}
 
 	@Override
-	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
+	public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		if ((stream.getNumberPacketsOfPackets() == delayedPacketNumber) && !alreadyDelayed){
 			try {
 				Thread.sleep(this.delayTime);
@@ -42,6 +42,7 @@ public class DelayedPacketStream implements SimulatorStream{
 			}
 		}
 		this.stream.send(packet);
+		return true;
 	}
 
 	@Override

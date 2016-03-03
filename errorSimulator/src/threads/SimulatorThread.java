@@ -65,7 +65,9 @@ public  class SimulatorThread extends Thread {
                 sendPacket(msg);
                 msg=receivePacket();
             }
-            sendPacket(msg); //forward last packet
+            while (!sendPacket(msg)){
+            	msg = receivePacket();
+            }
             
             if(!OpCode.ERROR.equals(msg.getOpCode())) {
                 //Receives the last packet if not an error
@@ -102,17 +104,17 @@ public  class SimulatorThread extends Thread {
      * @throws IOException  throws if the stream cannot sent the packet
      * @throws InvalidMessageException  throws if the message format is invalid
      */
-    protected void sendPacket(Message message) throws IOException, InvalidMessageException {
+    protected boolean sendPacket(Message message) throws IOException, InvalidMessageException {
     	//Ensure packets are not send back to the sender in case of retransmitted/duplicated packets
     	if (packetIn.getSocketAddress().equals(serverAddress)){
     		sendAddress = clientAddress;
     	}else if(packetIn.getSocketAddress().equals(clientAddress)){
     		sendAddress = serverAddress;
     	}
-    	sendPacket(message, sendAddress);
+    	return sendPacket(message, sendAddress);
     }
     
-    protected void sendPacket(Message message, SocketAddress address) throws IOException, InvalidMessageException{
-		stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
+    protected boolean sendPacket(Message message, SocketAddress address) throws IOException, InvalidMessageException{
+		return stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
     }
 }

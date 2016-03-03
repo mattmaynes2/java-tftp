@@ -28,14 +28,16 @@ public class DropPacketStream implements SimulatorStream {
 	}
 
 	@Override
-	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
-
+	public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
+		boolean dropped = false;
 		if (hasDropped || this.stream.getNumberPacketsOfPackets() != this.dropPacketNumber){
 			this.stream.send(packet);
 		}else{
 			hasDropped = true;
+			dropped = true;
 			Logger.log(Level.INFO, "dropped packet: " + Arrays.toString(packet.getData()));
 		}
+		return !dropped;
 	}
 
 	@Override
