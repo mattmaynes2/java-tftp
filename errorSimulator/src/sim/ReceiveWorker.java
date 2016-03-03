@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import sim.SimulationTypes;
+
 import core.util.Worker;
-import threads.SimulatorThread;
 import stream.SimulatorStream;
+import threads.SimulatorThread;
 
 public class ReceiveWorker extends Worker {
 
