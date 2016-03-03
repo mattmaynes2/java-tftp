@@ -124,9 +124,10 @@ public abstract class RequestController extends Controller implements RequestLis
             runner = new ReadTransfer(address, filename);
 
             runner.addTransferListener(this);
+            AckMessage ack = new AckMessage((short)0);
+            this.handleSendMessage(ack);
             // Send the initial Ack
-            runner.getSocket().send(new AckMessage((short)0));
-
+            runner.getSocket().send(ack);
             (new Thread(runner)).start();
         } catch (Exception e){
             e.printStackTrace();
