@@ -81,19 +81,22 @@ public class ErrorSimulator extends Controller {
     @Override
     public void usage() {
         System.out.println("TFTP Error Simulator");
+        System.out.println("<type> must be either 'ack','data', or 'req'");
+        System.out.println("<packetNum> starts counting at 1 (The first data packet is data 1)");
+        System.out.println("Each simulation runs for a single transfer. The mode reset to norm after each transfer\n");
         System.out.println("    Commands:");
         System.out.println("    help                                         	Prints this message");
         System.out.println("    shutdown                                     	Exits the simulator");
         System.out.println("    norm                                         	Forward packets through without alteration" );
-        System.out.println("    rend                                         	Removes the end byte. ie Removes the 0 Byte after Mode");
-        System.out.println("    rrs                                          	Removes the Request Seperator. ie Removes 0 Byte after Filename");
-        System.out.println("    mode          <mode>                         	Changes the mode of a request");
-        System.out.println("    csa           <packetNum>                    	Changes the sender address of a specified packet");
+        System.out.println("    rend                                         	Removes the end byte of the next request packet. ie Removes the 0 Byte after Mode");
+        System.out.println("    rrs                                          	Removes the Request Seperator of the next request packet. ie Removes 0 Byte after Filename");
+        System.out.println("    mode          <mode>                         	Changes the mode of the next request packet");
+        System.out.println("    csa           <packetNum>                    	Changes the sender TID of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
-        System.out.println("    delay         <type> <packetNumber> <timeout>	Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
-        System.out.println("    duplicate     <type> <packetNumber>				Duplicates the specified packet");
-        System.out.println("    drop          <type> <packetNumber>				Drops the specified packet");
+        System.out.println("    delay         <type> <packetNum> <timeout>		Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
+        System.out.println("    duplicate     <type> <packetNum>			Duplicates the specified packet");
+        System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
     /**
@@ -118,44 +121,48 @@ public class ErrorSimulator extends Controller {
     @Override
     public void handleCommand(Command command) {
         super.handleCommand(command);
-        switch (command.getToken()){
-            case NORMAL_COMMAND:
-                this.passThroughSimulation();
-                break;
-            case OPCODE_COMMAND:
-                this.changeOpcodeSimulation(command.getArguments());
-                break;
-            case WRONG_SENDER_COMMAND:
-                try{
-                    wrongSocketSimulation(command.getFirstArgument());
-                }catch (IndexOutOfBoundsException e) {
-                    this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
-                }
-                break;
-            case LENGTH_COMMAND:
-                this.changeLengthSimulation(command.getArguments());
-                break;
-            case REQUEST_SEPERATOR_COMMAND:
-                removeRequestSeperatorSimulation();
-                break;
-            case END_COMMAND:
-                removeEndByteSimulation();
-                break;
-            case MODE_COMMAND:
-            	try{
-            		this.changeModeSimulation(command.getFirstArgument());
-            	}catch(IndexOutOfBoundsException e){
-            		this.cli.message("Incorrect number of parameters for mode. Format is mode <mode>");
-            	}
-            	break;
-            case DELAY_COMMAND:
-            	this.delayPacketSimulation(command.getArguments());
-            	break;
-            case DUPLICATE_COMMAND:
-            	this.duplicatePacketSimulation(command.getArguments());
-            	break;
-            case DROP_COMMAND:
-            	this.dropPacketSimulation(command.getArguments());
+        try{
+	        switch (command.getToken()){
+	            case NORMAL_COMMAND:
+	                this.passThroughSimulation();
+	                break;
+	            case OPCODE_COMMAND:
+	                this.changeOpcodeSimulation(command.getArguments());
+	                break;
+	            case WRONG_SENDER_COMMAND:
+	                try{
+	                    wrongSocketSimulation(command.getFirstArgument());
+	                }catch (IndexOutOfBoundsException e) {
+	                    this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
+	                }
+	                break;
+	            case LENGTH_COMMAND:
+	                this.changeLengthSimulation(command.getArguments());
+	                break;
+	            case REQUEST_SEPERATOR_COMMAND:
+	                removeRequestSeperatorSimulation();
+	                break;
+	            case END_COMMAND:
+	                removeEndByteSimulation();
+	                break;
+	            case MODE_COMMAND:
+	            	try{
+	            		this.changeModeSimulation(command.getFirstArgument());
+	            	}catch(IndexOutOfBoundsException e){
+	            		this.cli.message("Incorrect number of parameters for mode. Format is mode <mode>");
+	            	}
+	            	break;
+	            case DELAY_COMMAND:
+	            	this.delayPacketSimulation(command.getArguments());
+	            	break;
+	            case DUPLICATE_COMMAND:
+	            	this.duplicatePacketSimulation(command.getArguments());
+	            	break;
+	            case DROP_COMMAND:
+	            	this.dropPacketSimulation(command.getArguments());
+	        }
+        } catch (IllegalArgumentException ex){
+        	this.cli.message(ex.getMessage());
         }
     }
 
@@ -313,13 +320,6 @@ public class ErrorSimulator extends Controller {
             return;
         }
         
-        //get the simulation type
-        SimulationTypes type = determineSimulationType(args.get(0));
-        
-        if (type == SimulationTypes.PASS_THROUGH) {
-        	return;
-        }
-        
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
         int length = verifyNum(args.get(2), 0);
         int packetNum = verifyNum(args.get(1), 1);
@@ -327,7 +327,7 @@ public class ErrorSimulator extends Controller {
 	        PacketModifier modifier = new PacketModifier();
 	        modifier.setLength(length);
     		try {
-    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(type, packetNum,  modifier);
+    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, args.get(0), packetNum,  modifier);
     	    	recieveListener.setConfiguration(stream);
     		} catch (SocketException e) {
     			e.printStackTrace();
@@ -353,13 +353,6 @@ public class ErrorSimulator extends Controller {
         //get the opcode
         String opCode = args.get(2);
         
-        //get the simulation type
-        SimulationTypes type = determineSimulationType(args.get(0).toUpperCase());
-        
-        if (type == SimulationTypes.PASS_THROUGH) {
-        	return;
-        }
-        
         int packetNum = verifyNum(args.get(1), 0);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
@@ -379,7 +372,7 @@ public class ErrorSimulator extends Controller {
 		        PacketModifier modifier = new PacketModifier();
 		        modifier.setOpCode(out.toByteArray());
 		 		try {
-	    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(type, packetNum,  modifier);
+	    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, args.get(0), packetNum,  modifier);
 	    	    	recieveListener.setConfiguration(stream);
 	    		} catch (SocketException e) {
 	    			e.printStackTrace();
@@ -394,22 +387,7 @@ public class ErrorSimulator extends Controller {
         	this.cli.message("Packet Number out of bounds:   0 <= packetNumber < 65535");
         }
     }
-    
-    /**
-     * Determine the SimulationType from the string argument
-     */
-    private SimulationTypes determineSimulationType(String type) {
-    	if (type.equals("ACK")) {
-        	return SimulationTypes.REPLACE_ACK;
-        } else if (type.equals("DATA")) {
-        	return SimulationTypes.REPLACE_DATA;
-        } else if (type.equals("REQ")){
-        	return SimulationTypes.REPLACE_PACKET;
-        } else {
-        	this.cli.message("Incorrect packet type parameter. Options are ACK, DATA, or REQ");
-        	return SimulationTypes.PASS_THROUGH;
-        }
-	}
+
 
 	/**
      * Verifies that a packet number meets the requirements
