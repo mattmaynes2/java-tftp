@@ -223,12 +223,22 @@ public class ReadTransfer extends Transfer {
     	int sendAttempts = 0;
     	// Only try to re-send 5 times, then exit with an error
     	while (sendAttempts < MAX_ATTEMPTS) {
-    		try {
-				msg = this.getSocket().receive();
-			} catch (SocketTimeoutException e) {
-				// Never received the data packet again, so safe to end transfer
-				return;
-			}
+    		int timeoutCount = 0;
+    		// Two time outs are needed to ensure that no data packet has been dropped
+    		while (timeoutCount < 2) {
+	    		try {
+					msg = this.getSocket().receive();
+					this.notifyMessage(msg);
+					timeoutCount = 2; // Break the loop since a message was received
+				} catch (SocketTimeoutException e) {
+					if (timeoutCount > 0) {
+						// Never received the data packet, so safe to end transfer
+						return;
+					}
+					// Increment timeoutCounter
+					timeoutCount++;
+				}
+    		}
     		if (msg != null) {
     			// Increment the send counter
     			sendAttempts++;
