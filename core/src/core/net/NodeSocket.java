@@ -31,7 +31,7 @@ import java.net.DatagramPacket;
  */
 public class NodeSocket {
 
-    private static final int TIMEOUT_TIME = 2000; 
+    private static final int TIMEOUT_TIME = 2400; 
 
 	/**
      * Address of the socket that this socket is communicating with.
@@ -65,7 +65,8 @@ public class NodeSocket {
     public NodeSocket (SocketAddress address) throws SocketException {
         this.address = address;
         this.socket = new DatagramSocket();
-
+     // set timeout
+        socket.setSoTimeout(TIMEOUT_TIME);
     }
 
     /**
