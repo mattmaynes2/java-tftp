@@ -6,7 +6,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.security.spec.MGF1ParameterSpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 
