@@ -31,7 +31,7 @@ public class SimulatorStreamFactory {
             case DELAY_PACKET:
             	return new DelayedPacketStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
             case DUPLICATE_PACKET:
-            	return new DuplicatePacketStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[1]);
+            	return new DuplicatePacketStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
             case DROP_PACKET:
             	return new DropPacketStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[1]);
             default:

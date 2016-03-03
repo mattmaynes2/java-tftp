@@ -83,7 +83,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("TFTP Error Simulator");
         System.out.println("<type> must be either 'ack','data', or 'req'");
         System.out.println("<packetNum> starts counting at 1 (The first data packet is data 1)");
-        System.out.println("Each simulation runs for a single transfer. The mode reset to norm after each transfer\n");
+        System.out.println("Each simulation runs for a single transfer. The mode reset to norm after each transfer");
+        System.out.println("The server and client timeout is " + TIMEOUT_MILLISECONDS  + "ms\n");
         System.out.println("    Commands:");
         System.out.println("    help                                         	Prints this message");
         System.out.println("    shutdown                                     	Exits the simulator");
@@ -94,8 +95,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <type> <packetNum>                    Changes the sender TID of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
-        System.out.println("    delay         <type> <packetNum> <timeout>		Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
-        System.out.println("    duplicate     <type> <packetNum>			Duplicates the specified packet");
+        System.out.println("    delay         <type> <packetNum> <numTimeouts>	Delays the specified packet by a number of timeouts");
+        System.out.println("    duplicate     <type> <packetNum> <numTimeouts>	Sends a duplicate of the specified packet <numeTimeouts> timeout periods after it is received");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
@@ -221,16 +222,17 @@ public class ErrorSimulator extends Controller {
      * @param arguments
      */
     private void duplicatePacketSimulation(ArrayList<String> arguments) {
-		if (arguments.size() < 2){
-			throw new IllegalArgumentException("Duplicate simulation requires 2 arguments");
+		if (arguments.size() < 3){
+			throw new IllegalArgumentException("Duplicate simulation requires 3 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
-	    
+		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
+		
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
-				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum, timeout);
 		    	recieveListener.setConfiguration(stream);
-		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated");
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated after " + timeout + "ms");
 			} catch (SocketException e) {
 				e.printStackTrace();
 			} catch(IllegalArgumentException e){
