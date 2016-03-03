@@ -129,7 +129,7 @@ public class WriteTransfer extends Transfer {
 	            	}
             	}
                 this.notifyMessage(ack);
-            } while(msg.getData().length == 512);
+            } while(msg.getData().length == DataMessage.BLOCK_SIZE);
 
             // Close the input stream and socket
             in.close();

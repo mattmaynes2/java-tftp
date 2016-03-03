@@ -79,7 +79,7 @@ public class ReadTransfer extends Transfer {
 
                 // Forward the data to the output file
                 out.write(msg.getData());
-
+                
                 // Get the next message
                 msg = this.getNext();
             }
@@ -87,6 +87,9 @@ public class ReadTransfer extends Transfer {
             // Write the last data message to the file
             out.write(msg.getData());
 
+            // Wait until we are certain the last ack message was received by the server
+            waitAfterLastAck();
+            
             // Close the output stream and the socket
             out.close();
             this.getSocket().close();
@@ -107,6 +110,11 @@ public class ReadTransfer extends Transfer {
         }
    }
 
+    /**
+     * Delete the file if a problem occurs during transfer
+     * 
+     * @param out - the outputstream for the file that needs to be deleted
+     */
 	private void removeFile(FileOutputStream out) {
 		if(out!=null) {
 			try {
@@ -132,6 +140,7 @@ public class ReadTransfer extends Transfer {
      * @throws IOException - If the socket is closed or there is a sending error
      * @throws InvalidMessageException - If there is on error decoding the packet
      * @throws UnreachableHostException - If the max number of attempts is reached when receiving a packet
+     * @throws ErrorMessageException - If an error message is received
      */
     private DataMessage getNext () throws
             IOException,
@@ -196,4 +205,48 @@ public class ReadTransfer extends Transfer {
         return data;
     }
 
+    /**
+     * There is the possibility that the last ack sent gets dropped,
+     * so the transfer should not end until the server receives it
+     * 
+     * @throws IOException - If the socket is closed or there is a sending error
+     * @throws InvalidMessageException - If there is on error decoding the packet
+     * @throws UnreachableHostException - If the max number of attempts is reached when sending the last ack packet
+     * @throws ErrorMessageException - If an error message is received
+     */
+    private void waitAfterLastAck() throws 
+    		IOException, 
+    		InvalidMessageException, 
+    		ErrorMessageException, 
+    		UnreachableHostException {
+    	Message msg = null;
+    	int sendAttempts = 0;
+    	// Only try to re-send 5 times, then exit with an error
+    	while (sendAttempts < MAX_ATTEMPTS) {
+    		try {
+				msg = this.getSocket().receive();
+			} catch (SocketTimeoutException e) {
+				// Never received the data packet again, so safe to end transfer
+				return;
+			}
+    		if (msg != null) {
+    			// Increment the send counter
+    			sendAttempts++;
+    			
+    			// Check that the message is not an error message
+		        this.checkErrorMessage(msg);
+		        
+		        // Notify the listeners that we are re-sending the ack message
+		        this.notifyInfo("Received data packet again, resending ack");
+		        
+		        // Re-send ack message 
+		        AckMessage ack = new AckMessage(this.getBlockNumber());
+		        this.notifySendMessage(ack);
+		        this.getSocket().send(ack);
+    		}
+    	}
+    	
+    	// There is a problem with reaching the server, so throw an error
+    	throw new UnreachableHostException("Tried re-sending ack message 5 times");
+    }
 }
