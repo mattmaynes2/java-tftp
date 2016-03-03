@@ -176,15 +176,20 @@ public class ErrorSimulator extends Controller {
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
 		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
-    	try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
-	    	recieveListener.setConfiguration(stream);
-	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be delayed by " + timeout + "ms");
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch(IllegalArgumentException e){
-			this.cli.message(e.getMessage());
-		}
+        if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
+	    	try {
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
+		    	recieveListener.setConfiguration(stream);
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be delayed by " + timeout + "ms");
+			} catch (SocketException e) {
+				e.printStackTrace();
+			} catch(IllegalArgumentException e){
+				this.cli.message(e.getMessage());
+			}
+        } else {
+        	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
+        }
+	    	
 	}
     
     /**
@@ -196,16 +201,19 @@ public class ErrorSimulator extends Controller {
 			throw new IllegalArgumentException("Drop simulation requires 2 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
-
-    	try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DROP_PACKET, arguments.get(0), packetNum);
-	    	recieveListener.setConfiguration(stream);
-	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be dropped");
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch(IllegalArgumentException e){
-			this.cli.message(e.getMessage());
-		}
+        if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
+	    	try {
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DROP_PACKET, arguments.get(0), packetNum);
+		    	recieveListener.setConfiguration(stream);
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be dropped");
+			} catch (SocketException e) {
+				e.printStackTrace();
+			} catch(IllegalArgumentException e){
+				this.cli.message(e.getMessage());
+			}
+        } else {
+        	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
+        }
 	}
     
     /**
@@ -217,16 +225,20 @@ public class ErrorSimulator extends Controller {
 			throw new IllegalArgumentException("Delay simulation requires 2 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
-
-    	try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
-	    	recieveListener.setConfiguration(stream);
-	    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated");
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch(IllegalArgumentException e){
-			this.cli.message(e.getMessage());
-		}
+	    
+        if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
+	    	try {
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
+		    	recieveListener.setConfiguration(stream);
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated");
+			} catch (SocketException e) {
+				e.printStackTrace();
+			} catch(IllegalArgumentException e){
+				this.cli.message(e.getMessage());
+			}	   
+        } else {
+        	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
+        }
 	}
 
 	/**
@@ -304,7 +316,7 @@ public class ErrorSimulator extends Controller {
     		this.cli.message("Now running Change Sender Address on incoming requests");
     	}
         else {
-        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
+        	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
     	
     }
@@ -321,7 +333,7 @@ public class ErrorSimulator extends Controller {
         }
         
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
-        int length = verifyNum(args.get(2), 0);
+        int length = verifyNum(args.get(2), 1);
         int packetNum = verifyNum(args.get(1), 1);
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	        PacketModifier modifier = new PacketModifier();
@@ -335,7 +347,7 @@ public class ErrorSimulator extends Controller {
 	        this.cli.message("Now running Change Length Simulation on incoming requests");
         }
         else {
-        	this.cli.message("Packet Number out of bounds:   0 < packetNumber < 65535");
+        	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
     }
 
@@ -353,7 +365,7 @@ public class ErrorSimulator extends Controller {
         //get the opcode
         String opCode = args.get(2);
         
-        int packetNum = verifyNum(args.get(1), 0);
+        int packetNum = verifyNum(args.get(1), 1);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
 	        short opCodeInt = (short)verifyNum(opCode, Short.MIN_VALUE);
@@ -384,7 +396,7 @@ public class ErrorSimulator extends Controller {
 	        }
         }
         else {
-        	this.cli.message("Packet Number out of bounds:   0 <= packetNumber < 65535");
+        	this.cli.message("Packet Number out of bounds:   1 <= packetNumber < 65535");
         }
     }
 
@@ -404,7 +416,6 @@ public class ErrorSimulator extends Controller {
     		return -1;
     	}
 		if (returnNum <= min-1) {
-			this.cli.message("Parameter must be greater than or equal to " + min);
 			return -1;
 		}
 		return returnNum;

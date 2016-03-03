@@ -7,7 +7,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
-import com.sun.xml.internal.ws.handler.HandlerException;
 
 import core.req.AckMessage;
 import core.req.DataMessage;
