@@ -71,4 +71,12 @@ public class WrongSenderStream implements SimulatorStream {
         return mainStream.getNumberPacketsOfPackets();
     }
 
+    /**
+     * close the stream
+     */
+	@Override
+	public void close() {
+		mainStream.close();
+	}
+
 }

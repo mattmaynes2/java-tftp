@@ -42,6 +42,7 @@ public class ReceiveWorker extends Worker {
 	@Override
 	public void teardown() {
 		requestSocket.close();
+		stream.close();
 	}
 	
 	public void setConfiguration(SimulatorStream stream) {

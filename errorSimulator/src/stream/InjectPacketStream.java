@@ -51,4 +51,10 @@ public class InjectPacketStream implements SimulatorStream {
         return stream.getNumberPacketsOfPackets();
     }
 
+
+	@Override
+	public void close() {
+		stream.close();
+	}
+
 }

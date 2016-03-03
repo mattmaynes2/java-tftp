@@ -73,7 +73,9 @@ public  class SimulatorThread extends Thread {
                 Logger.log(Level.INFO,"Message is "+msg);
                 sendPacket(msg);
             }
-        } catch (IOException | InvalidMessageException e) {
+        } catch (SocketException ex){
+        	//socket closed
+        }  catch (IOException | InvalidMessageException e) {
             e.printStackTrace();
         }
         Logger.log(Level.INFO, "Finished Simulation");

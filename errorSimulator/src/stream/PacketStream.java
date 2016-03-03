@@ -60,4 +60,9 @@ public class PacketStream implements SimulatorStream{
         numReceived++;
     }
 
+	@Override
+	public void close() {
+		socket.close();
+	}
+
 }

@@ -32,6 +32,11 @@ public class DuplicatePacketStream implements SimulatorStream {
 	public int getNumberPacketsOfPackets() {
 		return this.stream.getNumberPacketsOfPackets();
 	}
+
+	@Override
+	public void close() {
+		this.stream.close();
+	}
 	
 
 }

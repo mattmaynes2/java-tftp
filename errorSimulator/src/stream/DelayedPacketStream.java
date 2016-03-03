@@ -48,5 +48,10 @@ public class DelayedPacketStream implements SimulatorStream{
 	public int getNumberPacketsOfPackets() {
 		return stream.getNumberPacketsOfPackets();
 	}
+
+	@Override
+	public void close() {
+		stream.close();
+	}
 		
 }

@@ -31,4 +31,9 @@ public interface SimulatorStream {
 	 * @return The number of packets received
 	 */
 	public int  getNumberPacketsOfPackets();
+	
+	/**
+	 * Close the stream
+	 */
+	public void close();
 }
