@@ -71,7 +71,7 @@ public  class SimulatorThread extends Thread {
                 msg=receivePacket();
                 Logger.log(Level.INFO,"Message is "+msg);
             }
-            while (!sendPacket(msg)){
+            while (!sendPacket(msg) || (!msg.getOpCode().equals(OpCode.ACK) && !OpCode.ERROR.equals(msg.getOpCode()))){
             	msg = receivePacket();
             }
             
