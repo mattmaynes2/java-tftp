@@ -27,7 +27,7 @@ public class SimulatorStreamFactory {
             case REPLACE_PACKET:
                 return new InjectPacketStream(createCountingStream((String)streamArgs[0]), (PacketModifier)streamArgs[2], (int) streamArgs[1]);
             case CHANGE_SENDER:
-                return new WrongSenderStream(new PacketStream(), (int)streamArgs[0]);
+                return new WrongSenderStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[0]);
             case DELAY_PACKET:
             	return new DelayedPacketStream(createCountingStream((String)streamArgs[0]), (int)streamArgs[1], (int)streamArgs[2]);
             case DUPLICATE_PACKET:

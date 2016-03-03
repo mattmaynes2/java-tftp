@@ -15,7 +15,7 @@ import stream.SimulatorStreamFactory;
 public class ErrorSimulator extends Controller {
 
     public static final int SIMULATOR_PORT = 68;
-    public static final int REQUEST_PACKET = 0;
+    public static final int REQUEST_PACKET = 1;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
 
@@ -91,7 +91,7 @@ public class ErrorSimulator extends Controller {
         System.out.println("    rend                                         	Removes the end byte of the next request packet. ie Removes the 0 Byte after Mode");
         System.out.println("    rrs                                          	Removes the Request Seperator of the next request packet. ie Removes 0 Byte after Filename");
         System.out.println("    mode          <mode>                         	Changes the mode of the next request packet");
-        System.out.println("    csa           <packetNum>                    	Changes the sender TID of a specified packet");
+        System.out.println("    csa           <type> <packetNum>                    Changes the sender TID of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNum> <timeout>		Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
@@ -131,7 +131,7 @@ public class ErrorSimulator extends Controller {
 	                break;
 	            case WRONG_SENDER_COMMAND:
 	                try{
-	                    wrongSocketSimulation(command.getFirstArgument());
+	                    wrongSocketSimulation(command.getArguments());
 	                }catch (IndexOutOfBoundsException e) {
 	                    this.cli.message("Incorrect number of parameters for wrong-sender.  Format is wrong-sender packetNumber");
 	                }
@@ -250,7 +250,7 @@ public class ErrorSimulator extends Controller {
     	PacketModifier modifier = new PacketModifier();
     	modifier.setMode(mode);
 		try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, "req", REQUEST_PACKET, modifier);
 	    	recieveListener.setConfiguration(stream);
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -265,7 +265,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setEndByte(false);
 		try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, "req", REQUEST_PACKET, modifier);
 	    	recieveListener.setConfiguration(stream);
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -280,7 +280,7 @@ public class ErrorSimulator extends Controller {
         PacketModifier modifier = new PacketModifier();
         modifier.setPostFilenameByte(false);
 		try {
-			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, REQUEST_PACKET, modifier);
+			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.REPLACE_PACKET, "req", REQUEST_PACKET, modifier);
 	    	recieveListener.setConfiguration(stream);
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -292,11 +292,11 @@ public class ErrorSimulator extends Controller {
      * Set the configuration to set the response for a specified packet number to be from the wrong address
      * @param packetNumber - value that the packet number will be modified to
      */
-    private void wrongSocketSimulation(String packetNumber) {
-    	int packetNum = verifyNum(packetNumber, 1);
+    private void wrongSocketSimulation(ArrayList<String> args) {
+    	int packetNum = verifyNum(args.get(1), 1);
     	if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
     		try {
-    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.CHANGE_SENDER, packetNum);
+    			SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.CHANGE_SENDER, args.get(0), packetNum);
     	    	recieveListener.setConfiguration(stream);
     		} catch (SocketException e) {
     			e.printStackTrace();
