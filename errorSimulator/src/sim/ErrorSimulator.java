@@ -92,8 +92,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNumber> <timeout>	Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
-        System.out.println("    duplicate     <type> <packetNumber>				Duplicates the specified packet");
-        System.out.println("    drop          <type> <packetNumber>				Drops the specified packet");
+        System.out.println("    duplicate     <type> <packetNumber>			Duplicates the specified packet");
+        System.out.println("    drop          <type> <packetNumber>			Drops the specified packet");
     }
 
     /**
