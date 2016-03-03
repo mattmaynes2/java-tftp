@@ -131,13 +131,15 @@ public class ReadTransfer extends Transfer {
       		if(sendAttemps == MAX_ATTEMPTS) {
       			throw new UnreachableHostException("No response from host tried 5 times");
       		}
+      		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
       		//don't try and send ack after missing response after request
       		if(Short.toUnsignedInt(getBlockNumber())>0) {
       			//re-send last ack
       			ack = new AckMessage(this.getBlockNumber());
+      			this.notifySendMessage(ack);
       			this.getSocket().send(ack);
       		}
-      		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+      		
       		}
       		if(msg!=null) {
 		        // Check that the message is not an error message
