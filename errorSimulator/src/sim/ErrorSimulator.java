@@ -184,6 +184,10 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
 		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
+		if (timeout < 0){
+			this.cli.message("Timeout must be a positive number");
+			return;
+		}
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
 				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
@@ -234,7 +238,10 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
 		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
-		
+		if (timeout < 0){
+			this.cli.message("Timeout must be a positive number");
+			return;
+		}
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
 				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum, timeout);
