@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
  * Read Transfer
@@ -70,8 +71,8 @@ public class ReadTransfer extends Transfer {
         try {
             // Create a stream to write the file too
             out = new FileOutputStream(this.getFilename());
+            
             msg = this.getNext();
-
             // We should continue to read until we get a block
             // that is less than the standard data block size
             while (msg.getData().length == DataMessage.BLOCK_SIZE){
@@ -96,7 +97,9 @@ public class ReadTransfer extends Transfer {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e){
             this.handleInvalidMessage(e);
-        } catch (Exception e){
+        }catch(UnreachableHostException e) {
+        	this.notifyException(e);
+        }catch (Exception e){
             e.printStackTrace();
         }
    }
@@ -108,32 +111,61 @@ public class ReadTransfer extends Transfer {
      *
      * @throws IOException - If the socket is closed or there is a sending error
      * @throws InvalidMessageException - If there is on error decoding the packet
+     * @throws UnreachableHostException - If the max number of attempts is reached when receiving a packet
      */
     private DataMessage getNext () throws
             IOException,
             InvalidMessageException,
             ErrorMessageException,
-            MessageOrderException {
+            UnreachableHostException {
 
-        Message msg;
-        DataMessage data;
+        Message msg=null;
+        DataMessage data = null;
         AckMessage ack;
-
-        // Increment the block number before we receive it
-        this.incrementBlockNumber();
-        msg = this.getSocket().receive();
-
-        // Check that the message is not an error message
-        this.checkErrorMessage(msg);
-
-        // Check that we can cast the message to the type if the
-        // desired OpCode
-        this.checkCast(msg, OpCode.DATA);
-        data = (DataMessage) msg;
-
-        // Ensure that the packet we got is in the correct
-        // sequence with previous packets we have received
-        this.checkOrder(data);
+        int sendAttemps=0;
+      while(msg == null) {
+      		try {
+      			msg = this.getSocket().receive();
+      	}catch(SocketTimeoutException e){
+      		sendAttemps++;
+      		if(sendAttemps == MAX_ATTEMPTS) {
+      			throw new UnreachableHostException("No response from host tried 5 times");
+      		}
+      		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+      		//don't try and send ack after missing response after request
+      		if(Short.toUnsignedInt(getBlockNumber())>0) {
+      			//re-send last ack
+      			ack = new AckMessage(this.getBlockNumber());
+      			this.notifySendMessage(ack);
+      			this.getSocket().send(ack);
+      		}
+      		
+      		}
+      		if(msg!=null) {
+		        // Check that the message is not an error message
+		        this.checkErrorMessage(msg);
+		
+		        // Increment the block number
+		        this.incrementBlockNumber();
+		        // Check that we can cast the message to the type if the
+		        // desired OpCode
+		        this.checkCast(msg, OpCode.DATA);
+		        data = (DataMessage) msg;
+		
+		        // Ensure that the packet we got is in the correct
+		        // sequence with previous packets we have received
+		        try {
+		        	this.checkOrder(data);
+		        }catch(MessageOrderException e) {
+		        	
+		        	this.notifyInfo(e.getMessage()+"\nIgnoring Message");
+		        	//reset block number to ignore message
+		        	this.decrementBlockNumber();
+		        	//reset data
+		        	msg=null;
+		        }
+      		}
+      }
         ack = new AckMessage(data.getBlock());
 
         // Notify the listeners that a message we received successfully

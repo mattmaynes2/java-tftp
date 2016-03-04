@@ -80,4 +80,22 @@ public class Server extends RequestController {
             System.out.println("Ensure that you have sufficient privileges to bind to this port");
         }
     }
+
+	@Override
+	public void handleException(Exception e) {
+		Logger.log(Level.SEVERE,e.getMessage());
+		this.cli.message("Finished transfer with errors");
+		this.activeTransferCount--;
+	}
+
+	@Override
+	public void handleTimeout(int attemptsLeft) {
+		Logger.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
+	}
+
+	@Override
+	public void handleInfo(String info) {
+		Logger.log(Level.INFO,info);
+		
+	}
 }

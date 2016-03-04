@@ -14,10 +14,7 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
-import sim.PacketModifier;
-import sim.SimulationTypes;
 import stream.SimulatorStream;
-import stream.SimulatorStreamFactory;
 
 /**
  * Performs the communication between a client and a server once communication has been started
@@ -28,6 +25,8 @@ public  class SimulatorThread extends Thread {
 
     private DatagramPacket packetIn;
     private SocketAddress sendAddress;
+    private SocketAddress clientAddress;
+    private SocketAddress serverAddress;
     private SimulatorStream stream;
     
     /**
@@ -40,10 +39,11 @@ public  class SimulatorThread extends Thread {
      * @throws UnknownHostException  throws if a local host is unknown
      */
     //TODO change inputs so that there aren't as many and one won't potentially be null
-    public SimulatorThread(DatagramPacket packet, SimulationTypes simulation,int packetToModify, PacketModifier modifier) throws SocketException, UnknownHostException {
+    public SimulatorThread(DatagramPacket packet, SimulatorStream stream) throws SocketException, UnknownHostException {
         this.packetIn=packet;
         this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
-        this.stream=SimulatorStreamFactory.createSimulationStream(simulation, modifier, packetToModify);
+        this.stream = stream;
+        this.clientAddress = packet.getSocketAddress(); //save address of client from initial request
     }
 
     /**
@@ -56,20 +56,26 @@ public  class SimulatorThread extends Thread {
         try {
             Message msg=MessageFactory.createMessage(bytes);
             System.out.println(msg);
-            sendPacket(msg);
-            while(!MessageFactory.isLastMessage(msg)) {
+            sendPacket(msg, sendAddress);
+            msg = receivePacket();
+            serverAddress = packetIn.getSocketAddress(); //Server address must come from the first response to initial request
+            while(!MessageFactory.isLastMessage(msg)){
 
-                msg=receivePacket();
                 Logger.log(Level.INFO,"Message is "+msg);
                 sendPacket(msg);
+                msg=receivePacket();
             }
+            sendPacket(msg); //forward last packet
+            
             if(!OpCode.ERROR.equals(msg.getOpCode())) {
                 //Receives the last packet if not an error
                 msg=receivePacket();
                 Logger.log(Level.INFO,"Message is "+msg);
                 sendPacket(msg);
             }
-        } catch (IOException | InvalidMessageException e) {
+        } catch (SocketException ex){
+        	//socket closed
+        }  catch (IOException | InvalidMessageException e) {
             e.printStackTrace();
         }
         Logger.log(Level.INFO, "Finished Simulation");
@@ -97,7 +103,16 @@ public  class SimulatorThread extends Thread {
      * @throws InvalidMessageException  throws if the message format is invalid
      */
     protected void sendPacket(Message message) throws IOException, InvalidMessageException {
-        stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
-        sendAddress=packetIn.getSocketAddress();
+    	//Ensure packets are not send back to the sender in case of retransmitted/duplicated packets
+    	if (packetIn.getSocketAddress().equals(serverAddress)){
+    		sendAddress = clientAddress;
+    	}else if(packetIn.getSocketAddress().equals(clientAddress)){
+    		sendAddress = serverAddress;
+    	}
+    	sendPacket(message, sendAddress);
+    }
+    
+    protected void sendPacket(Message message, SocketAddress address) throws IOException, InvalidMessageException{
+		stream.send(new DatagramPacket(message.toBytes(), message.toBytes().length,sendAddress));
     }
 }

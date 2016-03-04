@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 
@@ -30,7 +31,9 @@ import java.net.DatagramPacket;
  */
 public class NodeSocket {
 
-    /**
+    private static final int TIMEOUT_TIME = 2400; 
+
+	/**
      * Address of the socket that this socket is communicating with.
      */
     private SocketAddress address;
@@ -47,6 +50,8 @@ public class NodeSocket {
      */
     public NodeSocket () throws SocketException {
         this.socket = new DatagramSocket();
+        // set timeout
+        socket.setSoTimeout(TIMEOUT_TIME);
     }
 
     /**
@@ -60,7 +65,8 @@ public class NodeSocket {
     public NodeSocket (SocketAddress address) throws SocketException {
         this.address = address;
         this.socket = new DatagramSocket();
-
+     // set timeout
+        socket.setSoTimeout(TIMEOUT_TIME);
     }
 
     /**
@@ -133,8 +139,9 @@ public class NodeSocket {
      *
      * @throws IOException - If the transmission fails
      * @throws InvalidMessageException - If the message received is not valid
+     * @throws SocketTimeoutException -If a packet isn't received within TIMEOUT_TIME
      */
-    public Message receive() throws IOException, InvalidMessageException {
+    public Message receive() throws IOException, InvalidMessageException,SocketTimeoutException {
         // Create a packet to buffer the data received
         DatagramPacket packet;
 

@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
+
 
 import core.req.AckMessage;
 import core.req.DataMessage;
@@ -48,6 +50,7 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the endpoint is not listening or the write fails
      *
      * @return If the request was accepted
+     * @throws UnreachableHostException 
      */
     public boolean sendRequest () throws IOException {
         WriteRequest request;
@@ -57,7 +60,20 @@ public class WriteTransfer extends Transfer {
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
-            this.getAcknowledge();
+            AckMessage ack =null;
+            int sendAttemps=0;
+            while(ack == null) {
+            	try {
+            		ack=this.getAcknowledge();
+            	}catch(SocketTimeoutException e) {
+            		sendAttemps++;
+            		if(sendAttemps == MAX_ATTEMPTS) {
+            			throw new UnreachableHostException("No response from host tried 5 times");
+            		}
+            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+            	}
+            }
+            
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
             return false;
@@ -66,8 +82,11 @@ public class WriteTransfer extends Transfer {
             return false;
         } catch (MessageOrderException e){
             // This should never happen since it was just a request
-            e.printStackTrace();
-            System.exit(1);
+            this.notifyException(e);
+            return false;
+        }catch(UnreachableHostException e) {
+        	this.notifyException(e);
+            return false;
         }
         return true;
     }
@@ -90,9 +109,26 @@ public class WriteTransfer extends Transfer {
 
             // Continue to send data until all of the data has been sent
             do {
-                msg = createMessage(in);
-                this.sendDataMessage(msg);
-                this.notifyMessage(this.getAcknowledge());
+            	msg = createMessage(in);
+            	int sendAttemps=0;
+            	AckMessage ack=null;
+            	this.sendDataMessage(msg);
+            	while(ack == null ) {
+	            	try {
+	                	ack=this.getAcknowledge();
+	            	}catch(SocketTimeoutException e){
+	            		sendAttemps++;
+	            		if(sendAttemps == MAX_ATTEMPTS) {
+	            			throw new UnreachableHostException("No response from host tried 5 times");
+	            		}
+	            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
+	            		//resend message
+	            		this.sendDataMessage(msg);
+	            	}catch(MessageOrderException e) {
+	            		this.notifyInfo(e.getMessage()+"\nIgnoring Messge");
+	            	}
+            	}
+                this.notifyMessage(ack);
             } while(msg.getData().length == 512);
 
             // Close the input stream and socket
@@ -105,6 +141,8 @@ public class WriteTransfer extends Transfer {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
+        } catch(UnreachableHostException e) {
+        	this.notifyException(e);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -120,12 +158,13 @@ public class WriteTransfer extends Transfer {
      * @throws InvalidMessageException - If the received message has an invalid encoding
      * @throws ErrorMessageException - If an error message is received
      * @throws MessageOrderException - If an acknowledge is received out of order
+     * @throws SocketTimeoutException - If an acknowledge packet isn't received within TIMEOUT_TIME
      */
     public AckMessage getAcknowledge () throws
             IOException,
             InvalidMessageException,
             ErrorMessageException,
-            MessageOrderException {
+            MessageOrderException, SocketTimeoutException{
 
         Message msg;
         AckMessage ack;
