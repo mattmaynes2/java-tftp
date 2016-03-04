@@ -13,14 +13,12 @@ public class DuplicatePacketStream implements SimulatorStream {
 
 	private PacketStream stream;
 	int duplicatedPacketNumber;
-	int timeout;
 	private boolean hasDuplicated;
 	
-	public DuplicatePacketStream(PacketStream stream, int duplicatedPacketNumber, int timeout){
+	public DuplicatePacketStream(PacketStream stream, int duplicatedPacketNumber){
 		this.duplicatedPacketNumber = duplicatedPacketNumber;
 		this.stream = stream;
 		this.hasDuplicated = false;
-		this.timeout = timeout;
 	}
 
 	@Override
@@ -32,12 +30,6 @@ public class DuplicatePacketStream implements SimulatorStream {
 	public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
 		this.stream.send(packet);
 		if (!hasDuplicated && (this.stream.getNumberPacketsOfPackets() == this.duplicatedPacketNumber)){
-			try {
-				Logger.log(Level.INFO, "Duplicating a packet after " + timeout + "seconds");
-				Thread.sleep(timeout);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			Logger.log(Level.INFO, "Duplicating packet: " + Arrays.toString(packet.getData()));
 			hasDuplicated = true;
 			this.stream.send(packet);

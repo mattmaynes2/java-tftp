@@ -103,7 +103,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNum> <numTimeouts>	Delays the specified packet by a number of timeouts");
-        System.out.println("    duplicate     <type> <packetNum> <numTimeouts>	Sends a duplicate of the specified packet <numeTimeouts> timeout periods after it is received");
+        System.out.println("    duplicate     <type> <packetNum>			Sends a duplicate of the specified packet <numeTimeouts> timeout periods after it is received");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
@@ -233,20 +233,16 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
      * @param arguments
      */
     private void duplicatePacketSimulation(ArrayList<String> arguments) {
-		if (arguments.size() < 3){
+		if (arguments.size() < 2){
 			throw new IllegalArgumentException("Duplicate simulation requires 3 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
-		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
-		if (timeout < 0){
-			this.cli.message("Timeout must be a positive number");
-			return;
-		}
+
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
-				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum, timeout);
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
 		    	recieveListener.setConfiguration(stream);
-		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated after " + timeout + "ms");
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated");
 			} catch (SocketException e) {
 				e.printStackTrace();
 			} catch(IllegalArgumentException e){
