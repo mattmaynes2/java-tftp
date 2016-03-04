@@ -261,7 +261,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-    	this.cli.message("Incoming requests are now passing through unaltered");		
+    	this.cli.message("Next request will now pass through unaltered");		
 	}
 
     /**
@@ -277,7 +277,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-    	this.cli.message("Incoming request packets will have their mode changed to " + mode);
+    	this.cli.message("Next request will have its mode changed to " + mode);
     }
     
 	/**
@@ -292,7 +292,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-        this.cli.message("Now running Remove End Byte Simulation on incoming requests");
+        this.cli.message("Next request will have its End of Message 0 byte removed");
     }
 
     /**
@@ -307,7 +307,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-        this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
+        this.cli.message("Next request will have its 0 byte seperator removed");
     }
 
     /**
@@ -323,7 +323,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-    		this.cli.message("Now running Change Sender Address on incoming requests");
+    		this.cli.message("Packet " + packetNum + "will now have be sent from the wrong sender");
     	}
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -354,7 +354,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-	        this.cli.message("Now running Change Length Simulation on incoming requests");
+	        this.cli.message("Packet " + packetNum + "will now have its length changed to " + length);
         }
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -399,7 +399,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 	    		} catch (SocketException e) {
 	    			e.printStackTrace();
 	    		}
-	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
+	            this.cli.message("Packet " + packetNum + "will now have its opcode changed to " + opCodeInt);
 	        }
 	        else {
 	        	this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
