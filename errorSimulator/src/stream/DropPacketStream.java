@@ -1,17 +1,16 @@
 package stream;
 
 import java.io.IOException;
-import core.log.Logger;
-
 import java.util.Arrays;
 import java.util.logging.Level;
-
+import java.util.logging.Logger;
 import java.net.DatagramPacket;
 
 import core.req.InvalidMessageException;
 
 public class DropPacketStream implements SimulatorStream {
 
+	private static final Logger LOGGER = Logger.getGlobal();
 	private PacketStream stream;
 	private int dropPacketNumber;
 	private boolean hasDropped;
@@ -35,7 +34,7 @@ public class DropPacketStream implements SimulatorStream {
 		}else{
 			hasDropped = true;
 			dropped = true;
-			Logger.log(Level.INFO, "dropped packet: " + Arrays.toString(packet.getData()));
+			LOGGER.log(Level.INFO, "dropped packet: " + Arrays.toString(packet.getData()));
 		}
 		return !dropped;
 	}

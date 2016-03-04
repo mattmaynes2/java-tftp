@@ -5,8 +5,7 @@ import java.net.DatagramPacket;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.logging.Level;
-
-import core.log.Logger;
+import java.util.logging.Logger;
 import core.req.InvalidMessageException;
 import core.util.ByteUtils;
 
@@ -18,6 +17,7 @@ import core.util.ByteUtils;
  */
 public class WrongSenderStream implements SimulatorStream {
 
+	private static final Logger LOGGER = Logger.getGlobal();
     private SimulatorStream mainStream;
     private PacketStream wrongStream;
     private int sendAt;
@@ -52,14 +52,14 @@ public class WrongSenderStream implements SimulatorStream {
         if(!hasSentFromWrongStream && getNumberPacketsOfPackets()==sendAt) {
             // send from the wrong socket
         	hasSentFromWrongStream = true;
-            Logger.log(Level.INFO, "Sending original packet from right stream");
+            LOGGER.log(Level.INFO, "Sending original packet from right stream");
             mainStream.send(packet);
-            Logger.log(Level.INFO,"Sending packet from wrong stream");
+            LOGGER.log(Level.INFO,"Sending packet from wrong stream");
             wrongStream.send(packet);
             DatagramPacket responsePacket=wrongStream.receive();
             byte[] bytes = Arrays.copyOfRange(responsePacket.getData(), 0, responsePacket.getLength());
-            Logger.log(Level.INFO,"Received Packet From "+responsePacket.getSocketAddress());
-            Logger.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
+            LOGGER.log(Level.INFO,"Received Packet From "+responsePacket.getSocketAddress());
+            LOGGER.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
         }else {
             mainStream.send(packet);
         }

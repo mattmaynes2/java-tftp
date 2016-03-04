@@ -8,8 +8,9 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import core.log.Logger;
+import core.log.ConsoleLogger;
 import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
@@ -22,7 +23,7 @@ import stream.SimulatorStream;
  */
 public  class SimulatorThread extends Thread {
 
-
+	private static final Logger LOGGER = Logger.getGlobal();
     private DatagramPacket packetIn;
     private SocketAddress sendAddress;
     private SocketAddress clientAddress;
@@ -39,7 +40,6 @@ public  class SimulatorThread extends Thread {
      * @throws SocketException  throws if a new socket cannot be created
      * @throws UnknownHostException  throws if a local host is unknown
      */
-    //TODO change inputs so that there aren't as many and one won't potentially be null
     public SimulatorThread(DatagramPacket packet, SimulatorStream stream) throws SocketException, UnknownHostException {
         this.packetIn=packet;
         this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
@@ -53,7 +53,7 @@ public  class SimulatorThread extends Thread {
     @Override
     public void run() {
         byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-        Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
+        LOGGER.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
         if (eventListener != null){
         	eventListener.simulationStarted();
         }
@@ -65,7 +65,7 @@ public  class SimulatorThread extends Thread {
             serverAddress = packetIn.getSocketAddress(); //Server address must come from the first response to initial request
             while(!MessageFactory.isLastMessage(msg)){
 
-                Logger.log(Level.INFO,"Message is "+msg);
+                LOGGER.log(Level.INFO,"Message is "+msg);
                 sendPacket(msg);
                 msg=receivePacket();
             }
@@ -73,7 +73,7 @@ public  class SimulatorThread extends Thread {
             if(!OpCode.ERROR.equals(msg.getOpCode())) {
                 //Receives the last packet if not an error
                 msg=receivePacket();
-                Logger.log(Level.INFO,"Message is "+msg);
+                LOGGER.log(Level.INFO,"Message is "+msg);
             }
             while (!sendPacket(msg) || (!msg.getOpCode().equals(OpCode.ACK) && !OpCode.ERROR.equals(msg.getOpCode()))){
             	msg = receivePacket();
@@ -84,7 +84,7 @@ public  class SimulatorThread extends Thread {
         }  catch (IOException | InvalidMessageException e) {
             e.printStackTrace();
         }
-        Logger.log(Level.INFO, "Finished Simulation");
+        LOGGER.log(Level.INFO, "Finished Simulation");
         if (eventListener != null){
         	eventListener.simulationComplete();
         }
@@ -104,7 +104,7 @@ public  class SimulatorThread extends Thread {
     protected Message receivePacket() throws IOException, InvalidMessageException {
         packetIn=stream.receive();
         byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
-        Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
+        LOGGER.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
         return MessageFactory.createMessage(bytes);
     }
 

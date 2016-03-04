@@ -3,13 +3,13 @@ package stream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.logging.Level;
-
-import core.log.Logger;
+import java.util.logging.Logger;
 import core.req.InvalidMessageException;
 import sim.PacketModifier;
 
 public class InjectPacketStream implements SimulatorStream {
-
+	
+	private static final Logger LOGGER = Logger.getGlobal();
     private PacketStream stream;
     private PacketModifier modifier;
     private int injectAt;
@@ -41,7 +41,7 @@ public class InjectPacketStream implements SimulatorStream {
     public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
         if(!hasInjected && getNumberPacketsOfPackets()==injectAt) {
         	hasInjected = true;
-            Logger.log(Level.INFO, "About to Send Modifyied Packet");
+        	LOGGER.log(Level.INFO, "About to Send Modifyied Packet");
         	stream.send(modifier.modifyPacket(packet));
         }else {
             stream.send(packet);

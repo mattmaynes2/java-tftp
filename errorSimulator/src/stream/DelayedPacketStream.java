@@ -2,10 +2,10 @@ package stream;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import core.log.Logger;
-
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import core.req.InvalidMessageException;
 
 /**
@@ -14,10 +14,11 @@ import core.req.InvalidMessageException;
  */
 public class DelayedPacketStream implements SimulatorStream{
 	
-	PacketStream stream;
-	int delayedPacketNumber;
-	int delayTime;
-	boolean alreadyDelayed = false;
+	private static final Logger LOGGER = Logger.getGlobal();
+	private PacketStream stream;
+	private int delayedPacketNumber;
+	private int delayTime;
+	private boolean alreadyDelayed = false;
 	
 	/**
 	 * 
@@ -40,7 +41,7 @@ public class DelayedPacketStream implements SimulatorStream{
 			Thread t = new Thread(new Runnable(){
 				public void run(){
 					try {
-						Logger.log(Level.INFO, "Delaying packet by " + delayTime + "ms : " + Arrays.toString(packet.getData()));
+						LOGGER.log(Level.INFO, "Delaying packet by " + delayTime + "ms : " + Arrays.toString(packet.getData()));
 						Thread.sleep(delayTime);
 						stream.send(packet);
 					} catch (IOException | InterruptedException e) {

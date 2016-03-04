@@ -1,6 +1,5 @@
 package core.net;
 
-import core.log.Logger;
 import core.net.NodeSocket;
 import core.net.RequestListener;
 
@@ -64,7 +63,7 @@ public class RequestReceiver extends Worker {
 
             this.notifyRequest(req, socket);
         } catch (InvalidMessageException e){
-        	Logger.log(Level.SEVERE, "Invalid message received: " + e.getMessage());
+        	//ConsoleLogger.log(Level.SEVERE, "Invalid message received: " + e.getMessage());
             err = new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage());
             errorSocket = new NodeSocket(this.socket.getAddress());
             errorSocket.send(err);

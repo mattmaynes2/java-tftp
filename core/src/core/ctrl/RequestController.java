@@ -3,8 +3,6 @@ package core.ctrl;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
-
-import core.log.Logger;
 import core.net.ReadTransfer;
 import core.net.RequestListener;
 import core.net.RequestReceiver;
@@ -48,7 +46,7 @@ public abstract class RequestController extends Controller implements RequestLis
      * @param address - Sender's address
      */
     public void handleRequest (Request req, SocketAddress address){
-    	Logger.log(Level.FINE, "Received request from client " + req.toString());
+    	LOGGER.log(Level.FINE, "Received request from client " + req.toString());
 
         switch(req.getOpCode()){
             case READ:
@@ -68,7 +66,7 @@ public abstract class RequestController extends Controller implements RequestLis
      * @param err - Error message
      */
     public void handleError (ErrorMessage err) {
-        Logger.log(Level.WARNING, "Invalid request received");
+        LOGGER.log(Level.WARNING, "Invalid request received:"+err.getMessage());
     }
 
     /**

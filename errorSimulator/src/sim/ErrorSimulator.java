@@ -5,10 +5,8 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.logging.Level;
-
 import core.cli.Command;
 import core.ctrl.Controller;
-import core.log.Logger;
 import stream.SimulatorStream;
 import stream.SimulatorStreamFactory;
 import threads.SimulationEventListener;
@@ -117,7 +115,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
             simulator= new ErrorSimulator(args);
             simulator.start();
         } catch (SocketException e) {
-            Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
+           LOGGER.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
         } 
     }
 

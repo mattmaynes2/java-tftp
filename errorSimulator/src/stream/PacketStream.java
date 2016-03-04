@@ -6,13 +6,13 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.logging.Level;
-
-import core.log.Logger;
+import java.util.logging.Logger;
 import core.util.ByteUtils;
 
 
 public class PacketStream implements SimulatorStream{
 
+	private static final Logger LOGGER = Logger.getGlobal();
     private DatagramSocket socket;
     private int numReceived;
 
@@ -38,10 +38,10 @@ public class PacketStream implements SimulatorStream{
      * @throws IOException if the socket is closed during transfer
      */
     public boolean send(DatagramPacket packet) throws IOException {
-        Logger.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
+    	LOGGER.log(Level.INFO, "Sending from "+socket.getLocalSocketAddress());
         byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
-        Logger.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
-        Logger.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
+        LOGGER.log(Level.INFO, "Bytes are: "+ByteUtils.bytesToHexString(bytes));
+        LOGGER.log(Level.INFO,"Sending message to: "+packet.getSocketAddress());
         socket.send(packet);
         return true;
     }
