@@ -28,6 +28,7 @@ public  class SimulatorThread extends Thread {
     private SocketAddress clientAddress;
     private SocketAddress serverAddress;
     private SimulatorStream stream;
+    private SimulationEventListener eventListener;
     
     /**
      * Creates a new socket and sets the timeout to 1000
@@ -53,6 +54,7 @@ public  class SimulatorThread extends Thread {
     public void run() {
         byte[] bytes = Arrays.copyOfRange(packetIn.getData(), 0, packetIn.getLength());
         Logger.log(Level.INFO,"Received Packet From "+packetIn.getSocketAddress());
+        eventListener.simulationStarted();
         try {
             Message msg=MessageFactory.createMessage(bytes);
             System.out.println(msg);
@@ -81,8 +83,12 @@ public  class SimulatorThread extends Thread {
             e.printStackTrace();
         }
         Logger.log(Level.INFO, "Finished Simulation");
+        eventListener.simulationComplete();
     }
 
+    public void subscribeSimulationEvents(SimulationEventListener listener){
+    	eventListener = listener;
+    }
 
 
     /**

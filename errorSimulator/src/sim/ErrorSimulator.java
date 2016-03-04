@@ -11,14 +11,15 @@ import core.ctrl.Controller;
 import core.log.Logger;
 import stream.SimulatorStream;
 import stream.SimulatorStreamFactory;
+import threads.SimulationEventListener;
 
-public class ErrorSimulator extends Controller {
+public class ErrorSimulator extends Controller implements SimulationEventListener{
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 1;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
-
+    
     /**
      * Declare valid commands as static final
      */
@@ -32,9 +33,11 @@ public class ErrorSimulator extends Controller {
     private static final String DELAY_COMMAND = "delay";
     private static final String DUPLICATE_COMMAND = "duplicate";
     private static final String DROP_COMMAND = "drop";
+   
 
     private ReceiveWorker recieveListener;
-
+    private int simulationsInProgress = 0;
+    
     /**
      * Add commands to the interpreter
      * @param commandLineArgs - a String array of arguments from the command line call
@@ -43,6 +46,7 @@ public class ErrorSimulator extends Controller {
     public ErrorSimulator(String[] commandLineArgs) throws SocketException  {
         super(commandLineArgs);
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
+        recieveListener.subscribeSimulationEvents(this);
         this.interpreter.addCommand(NORMAL_COMMAND);
         this.interpreter.addCommand(OPCODE_COMMAND);
         this.interpreter.addCommand(WRONG_SENDER_COMMAND);
@@ -70,6 +74,9 @@ public class ErrorSimulator extends Controller {
      */
     @Override
     public void stop() {
+        if (simulationsInProgress != 0){
+        	this.cli.message("There are currently " + simulationsInProgress + " simulations in progress. The simulator will automatically shut down when they have completed");
+        }
         super.stop();
         recieveListener.stop();
         recieveListener.teardown();
@@ -111,7 +118,7 @@ public class ErrorSimulator extends Controller {
             simulator.start();
         } catch (SocketException e) {
             Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
-        }
+        } 
     }
 
     /**
@@ -422,4 +429,15 @@ public class ErrorSimulator extends Controller {
 		}
 		return returnNum;
     }
+
+	@Override
+	public synchronized void simulationStarted() {
+		this.simulationsInProgress += 1;
+	}
+    
+	@Override
+	public synchronized void simulationComplete() {
+		this.simulationsInProgress -= 1;
+		
+	}
 }
