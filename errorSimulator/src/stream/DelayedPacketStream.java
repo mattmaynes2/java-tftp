@@ -13,23 +13,25 @@ import core.req.InvalidMessageException;
  * Will delay a specific packet send on an underlying stream
  */
 public class DelayedPacketStream implements SimulatorStream{
-	
+
 	private static final Logger LOGGER = Logger.getGlobal();
 	private PacketStream stream;
 	private int delayedPacketNumber;
 	private int delayTime;
 	private boolean alreadyDelayed = false;
-	
+
 	/**
-	 * 
+	 *
 	 * @param stream A PacketStream to delay packets for
+     * @param delayedPacketNumber Index of the delayed packet
+     * @param timeoutMilliseconds Number of milliseconds to wait before timing out
 	 */
 	public DelayedPacketStream(PacketStream stream, int delayedPacketNumber, int timeoutMilliseconds){
 		this.stream = stream;
 		this.delayedPacketNumber = delayedPacketNumber;
 		this.delayTime = timeoutMilliseconds;
 	}
-	
+
 	@Override
 	public DatagramPacket receive() throws IOException {
 		return this.stream.receive();
@@ -66,5 +68,5 @@ public class DelayedPacketStream implements SimulatorStream{
 	public void close() {
 		stream.close();
 	}
-		
+
 }

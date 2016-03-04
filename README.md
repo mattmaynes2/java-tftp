@@ -1,4 +1,4 @@
-# TFTP Iteration Two
+# TFTP Iteration Three
 
 ## Setup Instructions
 Set your eclipse workspace to the top level, which is the project 
@@ -34,6 +34,10 @@ Eclipse should now be configured properly.
 
 ## Running Instructions
 
+**Note** All transfers take place from the present working directory
+of the respective project. For example a write operation from the client
+will write from `project-root/client/`  
+
 ### Server
 - To run the server, run the server project from eclipse.
 - To shutdown the server, type `shutdown` in the servers command line interface.
@@ -45,41 +49,31 @@ Eclipse should now be configured properly.
 #### Simulation Commands
 ```
 TFTP Error Simulator
+<type> must be either 'ack','data', or 'req'
+<packetNum> starts counting at 1 (The first data packet is data 1). 
+Each simulation runs for a single transfer. The mode reset to norm after each transfer
+The server and client timeout is 2400ms
+
     Commands:
-    help                                         Prints this message
-    shutdown                                     Exits the simulator
-    norm                                         Forward packets through without alteration
-    rend                                         Removes the end byte
-    rrs                                          Removes the Request Seperator
-    mode          <mode>                         Changes the mode of a request
-    csa           <packetNumber>                 Changes the sender address of a specified packet
-    op            <packetNumber> <opCode>        Changes the opcode of a specified packet
-    cl            <packetNumber> <packetLength>  Changes the length of a specified packet
+    help                                       Prints this message
+    shutdown                                   Exits the simulator
+    norm                                       Forward packets through without alteration
+    rend                                       Removes the end byte of the next request packet.
+    			     						      ie Removes the 0 Byte after Mode
+    rrs                                        Removes the Request Seperator of the next request
+    										      packet. ie Removes 0 Byte after Filename
+    mode      <mode>                           Changes the mode of the next request packet
+    csa       <type> <packetNum>               Changes the sender TID of a specified packet
+    op        <type> <packetNum> <opCode>      Changes the opcode of a specified packet
+    cl        <type> <packetNum> <packetLen>   Changes the length of a specified packet
+    delay     <type> <packetNum> <numTimeouts> Delays the specified packet by a number of
+    											  timeouts
+    duplicate <type> <packetNum>               Sends a duplicate of the specified packet
+    drop      <type> <packetNum>               Drops the specified packet
 ```
 
-#### Command Structure
-Packet numbers will start at index 0 which represents the request packet. 
-Since there are no retries in this iteration, odd packet numbers will represent
-packets being set to the client. Even packet numbers will represent packets
-being sent to the server.
-
-```
-Example Using a Read Request:
-	csa 1 	// Modifies the first data packet
-	csa 2 	// Modifies the first acknowledge packet
-	...
-	csa 6 	// Modifies the third acknowledge packet
-	
-```
-
-```
-Example Using a Write Request:
-	csa 1 	// Modifies the first acknowledge packet
-	csa 2 	// Modifies the first data packet
-	...
-	csa 6 	// Modifies the third data packet
-	
-```
+##### Notes
+- If the type parameter is equal to `req` then the packet number must be `1` for desired functionality
 
 
 ### Client
@@ -111,7 +105,8 @@ The javadoc for each project is located in that projects doc folder.
 
 There is a top level folder called ucms where the ucm diagrams are located.
 
-The source code for this deliverable is split up into four main projects: core, client, errorSimulator, and server.  
+The source code for this deliverable is split up into four main projects: core, 
+client, errorSimulator, and server.  
 
 #### Core
 The core project contains all of the common core functionality shared between
@@ -144,10 +139,6 @@ to the client.
 This shows the steady state transfer when writing to a file on the server
 from the client.
 
-
-## Timing Diagrams
-Contains all of the timing diagrams for this iteration that represent
-the transfers during error scenarios.
 
 ## Source Code Structure
 
@@ -217,5 +208,10 @@ This is an abstract base class for long running asynchronous jobs.
 
 For further details on any specific class from a core package, refer to the
 provided javadoc.  
+
+
+## Known Issues
+- Due to the error simulator only running one thread per request, a duplicate request is not throwing an error 5. This is due to the fact that the error simualtor and client communicate on a single port and therefore it never has a mismatched transfer id. Instead the second response is just ignored by the client.
+
 
 

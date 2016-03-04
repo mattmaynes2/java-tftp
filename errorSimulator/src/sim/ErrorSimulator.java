@@ -17,7 +17,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     public static final int REQUEST_PACKET = 1;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
-    
+
     /**
      * Declare valid commands as static final
      */
@@ -31,11 +31,11 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     private static final String DELAY_COMMAND = "delay";
     private static final String DUPLICATE_COMMAND = "duplicate";
     private static final String DROP_COMMAND = "drop";
-   
+
 
     private ReceiveWorker recieveListener;
     private int simulationsInProgress = 0;
-    
+
     /**
      * Add commands to the interpreter
      * @param commandLineArgs - a String array of arguments from the command line call
@@ -101,7 +101,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNum> <numTimeouts>	Delays the specified packet by a number of timeouts");
-        System.out.println("    duplicate     <type> <packetNum>			Sends a duplicate of the specified packet <numeTimeouts> timeout periods after it is received");
+        System.out.println("    duplicate     <type> <packetNum>			Sends a duplicate of the specified packet");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
@@ -116,7 +116,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
             simulator.start();
         } catch (SocketException e) {
            LOGGER.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
-        } 
+        }
     }
 
     /**
@@ -199,9 +199,9 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         } else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
-	    	
+
 	}
-    
+
     /**
      * Sets the simulator configuration to delay a packet
      * @param arguments
@@ -225,7 +225,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
 	}
-    
+
     /**
      * Sets the simulator configuration to delay a packet
      * @param arguments
@@ -245,7 +245,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 				e.printStackTrace();
 			} catch(IllegalArgumentException e){
 				this.cli.message(e.getMessage());
-			}	   
+			}
         } else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
@@ -261,7 +261,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-    	this.cli.message("Next request will now pass through unaltered");		
+    	this.cli.message("Next request will now pass through unaltered");
 	}
 
     /**
@@ -279,7 +279,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 		}
     	this.cli.message("Next request will have its mode changed to " + mode);
     }
-    
+
 	/**
      * Set the configuration to remove the null at the end of a DatagramPacket
      */
@@ -328,7 +328,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
-    	
+
     }
 
     /**
@@ -341,7 +341,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
             this.cli.message("Incorrect number of parameters for cl.  Format is cl <type> <packetNum> <newLen>");
             return;
         }
-        
+
         // Try to get the packet number from the string, then form the packet modifier, setting the new length
         int length = verifyNum(args.get(2), 1);
         int packetNum = verifyNum(args.get(1), 1);
@@ -371,26 +371,26 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
             this.cli.message("Incorrect number of parameters for op.  Format is op <packetNum> <opCode> <type>");
             return;
         }
-        
+
         //get the opcode
         String opCode = args.get(2);
-        
+
         int packetNum = verifyNum(args.get(1), 1);
         if(packetNum >= 0 && packetNum < HIGHEST_PACKET) {
 	        //Parse out the opcode into bytes
 	        short opCodeInt = (short)verifyNum(opCode, Short.MIN_VALUE);
-	        if(Short.MIN_VALUE < opCodeInt && opCodeInt < Short.MAX_VALUE) {    
+	        if(Short.MIN_VALUE < opCodeInt && opCodeInt < Short.MAX_VALUE) {
 	            ByteArrayOutputStream out = new ByteArrayOutputStream();
 	            ByteBuffer b = ByteBuffer.allocate(2);
 	    	    b.putShort(opCodeInt);
-	    	
+
 	    	    byte[] result = b.array();
 		        try {
 					out.write(result);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-		        
+
 		        PacketModifier modifier = new PacketModifier();
 		        modifier.setOpCode(out.toByteArray());
 		 		try {
@@ -413,16 +413,16 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 
 	/**
      * Verifies that a packet number meets the requirements
-     * @param packetNum  the number to check 
+     * @param packetNum  the number to check
      * @param min  the minimum allowable value
      * @return
      */
     private int verifyNum(String packetNum, int min) {
     	int returnNum = -1;
-    	try { 
+    	try {
     		returnNum = Integer.parseInt(packetNum);
     	} catch (NumberFormatException e){
-    		this.cli.message("Parameter must be a digit"); 
+    		this.cli.message("Parameter must be a digit");
     		return -1;
     	}
 		if (returnNum <= min-1) {
@@ -435,10 +435,10 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 	public synchronized void simulationStarted() {
 		this.simulationsInProgress += 1;
 	}
-    
+
 	@Override
 	public synchronized void simulationComplete() {
 		this.simulationsInProgress -= 1;
-		
+
 	}
 }

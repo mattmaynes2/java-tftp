@@ -50,7 +50,6 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the endpoint is not listening or the write fails
      *
      * @return If the request was accepted
-     * @throws UnreachableHostException 
      */
     public boolean sendRequest () throws IOException {
         WriteRequest request;
@@ -73,7 +72,7 @@ public class WriteTransfer extends Transfer {
             		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
             	}
             }
-            
+
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
             return false;
