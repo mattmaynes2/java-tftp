@@ -17,8 +17,7 @@ public class SimulatorStreamFactory {
 	/**
 	 * Static method that creates a decorated SimulatorStream based on the input parameters
 	 * @param type type of SimulatorStream to create
-	 * @param modifier used to modify the packet
-	 * @param packetToChange the number of the packet in the sequence that is going to be modified
+	 * @param streamArgs Arguments required for this type of simulation
 	 * @return a decorated SimulatorStream
 	 * @throws SocketException if no more sockets are available when creating a stream
 	 */
