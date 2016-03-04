@@ -12,6 +12,7 @@ import core.util.Worker;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.IOException;
 
 import java.net.SocketException;
@@ -34,6 +35,11 @@ public class RequestReceiver extends Worker {
      */
     private ArrayList<RequestListener> listeners;
 
+    /**
+     * Logger used to log information
+     */
+	private static final Logger LOGGER = Logger.getGlobal();
+	
     /**
      * Constructs a new request receiver to listen for requests on
      * the given port
@@ -63,7 +69,7 @@ public class RequestReceiver extends Worker {
 
             this.notifyRequest(req, socket);
         } catch (InvalidMessageException e){
-        	//ConsoleLogger.log(Level.SEVERE, "Invalid message received: " + e.getMessage());
+        	LOGGER.log(Level.SEVERE, "Invalid message received: " + e.getMessage());
             err = new ErrorMessage(ErrorCode.ILLEGAL_OP, e.getMessage());
             errorSocket = new NodeSocket(this.socket.getAddress());
             errorSocket.send(err);
