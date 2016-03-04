@@ -5,20 +5,19 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.logging.Level;
-
 import core.cli.Command;
 import core.ctrl.Controller;
-import core.log.Logger;
 import stream.SimulatorStream;
 import stream.SimulatorStreamFactory;
+import threads.SimulationEventListener;
 
-public class ErrorSimulator extends Controller {
+public class ErrorSimulator extends Controller implements SimulationEventListener{
 
     public static final int SIMULATOR_PORT = 68;
     public static final int REQUEST_PACKET = 1;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
-
+    
     /**
      * Declare valid commands as static final
      */
@@ -32,9 +31,11 @@ public class ErrorSimulator extends Controller {
     private static final String DELAY_COMMAND = "delay";
     private static final String DUPLICATE_COMMAND = "duplicate";
     private static final String DROP_COMMAND = "drop";
+   
 
     private ReceiveWorker recieveListener;
-
+    private int simulationsInProgress = 0;
+    
     /**
      * Add commands to the interpreter
      * @param commandLineArgs - a String array of arguments from the command line call
@@ -43,6 +44,7 @@ public class ErrorSimulator extends Controller {
     public ErrorSimulator(String[] commandLineArgs) throws SocketException  {
         super(commandLineArgs);
         recieveListener = new ReceiveWorker(SIMULATOR_PORT);
+        recieveListener.subscribeSimulationEvents(this);
         this.interpreter.addCommand(NORMAL_COMMAND);
         this.interpreter.addCommand(OPCODE_COMMAND);
         this.interpreter.addCommand(WRONG_SENDER_COMMAND);
@@ -70,6 +72,9 @@ public class ErrorSimulator extends Controller {
      */
     @Override
     public void stop() {
+        if (simulationsInProgress != 0){
+        	this.cli.message("There are currently " + simulationsInProgress + " simulations in progress. The simulator will automatically shut down when they have completed");
+        }
         super.stop();
         recieveListener.stop();
         recieveListener.teardown();
@@ -83,7 +88,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("TFTP Error Simulator");
         System.out.println("<type> must be either 'ack','data', or 'req'");
         System.out.println("<packetNum> starts counting at 1 (The first data packet is data 1)");
-        System.out.println("Each simulation runs for a single transfer. The mode reset to norm after each transfer\n");
+        System.out.println("Each simulation runs for a single transfer. The mode reset to norm after each transfer");
+        System.out.println("The server and client timeout is " + TIMEOUT_MILLISECONDS  + "ms\n");
         System.out.println("    Commands:");
         System.out.println("    help                                         	Prints this message");
         System.out.println("    shutdown                                     	Exits the simulator");
@@ -94,8 +100,8 @@ public class ErrorSimulator extends Controller {
         System.out.println("    csa           <type> <packetNum>                    Changes the sender TID of a specified packet");
         System.out.println("    op            <type> <packetNum> <opCode>		Changes the opcode of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
-        System.out.println("    delay         <type> <packetNum> <timeout>		Delays the specified packet by a number of timeouts. Timeout is " + TIMEOUT_MILLISECONDS  + "ms");
-        System.out.println("    duplicate     <type> <packetNum>			Duplicates the specified packet");
+        System.out.println("    delay         <type> <packetNum> <numTimeouts>	Delays the specified packet by a number of timeouts");
+        System.out.println("    duplicate     <type> <packetNum>			Sends a duplicate of the specified packet <numeTimeouts> timeout periods after it is received");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
@@ -109,8 +115,8 @@ public class ErrorSimulator extends Controller {
             simulator= new ErrorSimulator(args);
             simulator.start();
         } catch (SocketException e) {
-            Logger.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
-        }
+           LOGGER.log(Level.SEVERE, "Socket could not bind to port: " + SIMULATOR_PORT);
+        } 
     }
 
     /**
@@ -176,6 +182,10 @@ public class ErrorSimulator extends Controller {
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
 		int timeout = Integer.parseInt(arguments.get(2)) * TIMEOUT_MILLISECONDS;
+		if (timeout < 0){
+			this.cli.message("Timeout must be a positive number");
+			return;
+		}
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
 				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DELAY_PACKET, arguments.get(0), packetNum, timeout);
@@ -222,10 +232,10 @@ public class ErrorSimulator extends Controller {
      */
     private void duplicatePacketSimulation(ArrayList<String> arguments) {
 		if (arguments.size() < 2){
-			throw new IllegalArgumentException("Duplicate simulation requires 2 arguments");
+			throw new IllegalArgumentException("Duplicate simulation requires 3 arguments");
 		}
 	    int packetNum = verifyNum(arguments.get(1), 1);
-	    
+
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
 	    	try {
 				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
@@ -251,7 +261,7 @@ public class ErrorSimulator extends Controller {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-    	this.cli.message("Incoming requests are now passing through unaltered");		
+    	this.cli.message("Next request will now pass through unaltered");		
 	}
 
     /**
@@ -267,7 +277,7 @@ public class ErrorSimulator extends Controller {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-    	this.cli.message("Incoming request packets will have their mode changed to " + mode);
+    	this.cli.message("Next request will have its mode changed to " + mode);
     }
     
 	/**
@@ -282,7 +292,7 @@ public class ErrorSimulator extends Controller {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-        this.cli.message("Now running Remove End Byte Simulation on incoming requests");
+        this.cli.message("Next request will have its End of Message 0 byte removed");
     }
 
     /**
@@ -297,7 +307,7 @@ public class ErrorSimulator extends Controller {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-        this.cli.message("Now running Remove Request Seperator Simulation on incoming requests");
+        this.cli.message("Next request will have its 0 byte seperator removed");
     }
 
     /**
@@ -313,7 +323,7 @@ public class ErrorSimulator extends Controller {
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-    		this.cli.message("Now running Change Sender Address on incoming requests");
+    		this.cli.message("Packet " + packetNum + "will now have be sent from the wrong sender");
     	}
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -344,7 +354,7 @@ public class ErrorSimulator extends Controller {
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-	        this.cli.message("Now running Change Length Simulation on incoming requests");
+	        this.cli.message("Packet " + packetNum + "will now have its length changed to " + length);
         }
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -389,7 +399,7 @@ public class ErrorSimulator extends Controller {
 	    		} catch (SocketException e) {
 	    			e.printStackTrace();
 	    		}
-	            this.cli.message("Now running Change Opcode Simulation on incoming requests");
+	            this.cli.message("Packet " + packetNum + "will now have its opcode changed to " + opCodeInt);
 	        }
 	        else {
 	        	this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
@@ -420,4 +430,15 @@ public class ErrorSimulator extends Controller {
 		}
 		return returnNum;
     }
+
+	@Override
+	public synchronized void simulationStarted() {
+		this.simulationsInProgress += 1;
+	}
+    
+	@Override
+	public synchronized void simulationComplete() {
+		this.simulationsInProgress -= 1;
+		
+	}
 }

@@ -2,6 +2,9 @@ package stream;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import core.req.InvalidMessageException;
 
@@ -11,10 +14,11 @@ import core.req.InvalidMessageException;
  */
 public class DelayedPacketStream implements SimulatorStream{
 	
-	PacketStream stream;
-	int delayedPacketNumber;
-	int delayTime;
-	boolean alreadyDelayed = false;
+	private static final Logger LOGGER = Logger.getGlobal();
+	private PacketStream stream;
+	private int delayedPacketNumber;
+	private int delayTime;
+	private boolean alreadyDelayed = false;
 	
 	/**
 	 * 
@@ -32,16 +36,25 @@ public class DelayedPacketStream implements SimulatorStream{
 	}
 
 	@Override
-	public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
+	public boolean send(final DatagramPacket packet) throws IOException, InvalidMessageException {
 		if ((stream.getNumberPacketsOfPackets() == delayedPacketNumber) && !alreadyDelayed){
-			try {
-				Thread.sleep(this.delayTime);
-				alreadyDelayed = true;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Thread t = new Thread(new Runnable(){
+				public void run(){
+					try {
+						LOGGER.log(Level.INFO, "Delaying packet by " + delayTime + "ms : " + Arrays.toString(packet.getData()));
+						Thread.sleep(delayTime);
+						stream.send(packet);
+					} catch (IOException | InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			alreadyDelayed = true;
+			t.start();
+		}else{
+			stream.send(packet);
 		}
-		this.stream.send(packet);
+		return true;
 	}
 
 	@Override

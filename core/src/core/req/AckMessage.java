@@ -74,7 +74,7 @@ public class AckMessage extends Message {
      */
     @Override
     public String toString() {
-        return super.toString()+" block number: "+this.block;
+        return super.toString()+" block number: "+Short.toUnsignedInt(block);
     }
 
     /**

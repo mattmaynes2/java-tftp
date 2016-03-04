@@ -4,12 +4,13 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import core.cli.CLI;
 import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
-import core.log.Logger;
+import core.log.ConsoleLogger;
 
 /**
  * Controller
@@ -53,6 +54,11 @@ public abstract class Controller implements CommandHandler{
      */
     protected Map<String, Boolean> commandLineOptions;
 
+    /**
+     * 
+     */
+    protected static final Logger LOGGER = Logger.getGlobal();
+   
     /**
      * Constructs a new controller with some default CLI commands
      *
@@ -105,9 +111,9 @@ public abstract class Controller implements CommandHandler{
      */
     protected void applyCommandLineOptions(){
         if (this.commandLineOptions.getOrDefault(QUIET_MODE_FLAG, false)){
-            Logger.init(Level.INFO);
+            ConsoleLogger.init(Level.INFO);
         }else{
-            Logger.init(Level.ALL);
+            ConsoleLogger.init(Level.ALL);
         }
     }
 

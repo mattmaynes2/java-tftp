@@ -6,11 +6,11 @@ import core.req.InvalidMessageException;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 
-import core.log.Logger;
+import core.log.ConsoleLogger;
 
 import java.util.Arrays;
 import java.util.logging.Level;
-
+import java.util.logging.Logger;
 import java.io.IOException;
 
 import java.net.SocketAddress;
@@ -30,8 +30,15 @@ import java.net.DatagramPacket;
  * the socket the address will be updated to be the sender's address.
  */
 public class NodeSocket {
+	/**
+	 * Timeout time for the socket in ms
+	 */
+    private static final int TIMEOUT_TIME = 2400;
 
-    private static final int TIMEOUT_TIME = 2400; 
+    /**
+     * Logger used to log information
+     */
+	private static final Logger LOGGER = Logger.getGlobal(); 
 
 	/**
      * Address of the socket that this socket is communicating with.
@@ -175,7 +182,7 @@ public class NodeSocket {
      */
     private boolean validateEndpoint (DatagramPacket packet) throws IOException {
         if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
-            Logger.log(Level.WARNING, "Received message with unknown transfer ID");
+            LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
             this.send(
                 new ErrorMessage(ErrorCode.UNKNOWN_TID, "Unknown transfer ID"),
                 packet.getSocketAddress());
