@@ -68,11 +68,10 @@ public class ReadTransfer extends Transfer {
         // Starting the transfer
         this.notifyStart();
 
-        try {
+        try {           
+            msg = this.getNext();
             // Create a stream to write the file too
             out = new FileOutputStream(this.getFilename());
-            
-            msg = this.getNext();
             // We should continue to read until we get a block
             // that is less than the standard data block size
             while (msg.getData().length == DataMessage.BLOCK_SIZE){
