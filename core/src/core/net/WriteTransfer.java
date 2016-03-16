@@ -55,7 +55,7 @@ public class WriteTransfer extends Transfer {
         WriteRequest request;
 
         try {
-            request = new WriteRequest(this.getFilename());
+            request = new WriteRequest(this.getFilename());            
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
@@ -97,7 +97,6 @@ public class WriteTransfer extends Transfer {
     public void run () {
         FileInputStream in;
         DataMessage msg;
-
         // Starting the transfer
         this.notifyStart();
 

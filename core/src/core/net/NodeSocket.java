@@ -1,23 +1,20 @@
 package core.net;
 
-import core.req.Message;
-import core.req.MessageFactory;
-import core.req.InvalidMessageException;
-import core.req.ErrorCode;
-import core.req.ErrorMessage;
-
-import core.log.ConsoleLogger;
-
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.io.IOException;
-
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import core.req.ErrorCode;
+import core.req.ErrorMessage;
+import core.req.InvalidMessageException;
+import core.req.Message;
+import core.req.MessageFactory;
 
 
 /**

@@ -1,8 +1,10 @@
 package core.ctrl;
 
+import java.io.File;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
+
 import core.net.ReadTransfer;
 import core.net.RequestListener;
 import core.net.RequestReceiver;
@@ -10,8 +12,8 @@ import core.net.Transfer;
 import core.net.TransferListener;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
-import core.req.Request;
 import core.req.ErrorMessage;
+import core.req.Request;
 
 /**
  * Request Controller
@@ -19,7 +21,7 @@ import core.req.ErrorMessage;
  * Responds to transfer requests and performs operations
  */
 public abstract class RequestController extends Controller implements RequestListener, TransferListener  {
-
+	
     /**
      * Handles sockets requests
      */
@@ -47,13 +49,14 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void handleRequest (Request req, SocketAddress address){
     	LOGGER.log(Level.FINE, "Received request from client " + req.toString());
-
+    	String filename = appendPrefix(req.getFilename());
+    	new File(getPrefix()).mkdirs();
         switch(req.getOpCode()){
             case READ:
-                this.read(address, req.getFilename());
+                this.read(address, filename);
                 break;
             case WRITE:
-                this.write(address, req.getFilename());
+                this.write(address, filename);
                 break;
             default:
             	break;
