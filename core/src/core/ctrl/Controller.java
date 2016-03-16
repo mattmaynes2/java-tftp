@@ -17,7 +17,7 @@ import core.log.ConsoleLogger;
  *
  * Handles requests from a command line interface and spawns transfers
  */
-public abstract class Controller implements CommandHandler{
+public abstract class Controller implements CommandHandler {
 
     /**
      * Command line option to turn on quiet mode logging
@@ -55,10 +55,10 @@ public abstract class Controller implements CommandHandler{
     protected Map<String, Boolean> commandLineOptions;
 
     /**
-     * 
+     *
      */
     protected static final Logger LOGGER = Logger.getGlobal();
-   
+
     /**
      * Constructs a new controller with some default CLI commands
      *
@@ -153,17 +153,17 @@ public abstract class Controller implements CommandHandler{
      *
      * @param command - User's CLI command
      */
-        public void handleCommand (Command command){
-            switch (command.getToken()){
-                case SHUTDOWN_COMMAND:
-                    this.stop();
-                    break;
-                case HELP_COMMAND:
-                    this.usage();
-                    break;
-                default:
-                    break;
-            }
+    public void handleCommand (Command command){
+        switch (command.getToken()){
+            case SHUTDOWN_COMMAND:
+                this.stop();
+                break;
+            case HELP_COMMAND:
+                this.usage();
+                break;
+            default:
+                break;
         }
+    }
 
 }

@@ -23,9 +23,7 @@ import core.req.OpCode;
  */
 public abstract class Transfer implements Runnable {
 
-    protected static final int MAX_ATTEMPTS = 5;
-
-	/**
+    /**
      * Listeners to the stages of a transfer
      */
     private ArrayList<TransferListener> listeners;
@@ -103,17 +101,18 @@ public abstract class Transfer implements Runnable {
      * @throws InvalidMessageException - If the acknowledge is larger than expected
      */
     protected void checkOrder (AckMessage ack) throws MessageOrderException, InvalidMessageException {
-       if (Short.toUnsignedInt(ack.getBlock()) < Short.toUnsignedInt(this.getBlockNumber())) {
-    	   throw new MessageOrderException(
-                ack.getOpCode().name() + " Message out of order." +
-                " Expected " + this.getBlockNumber() +
-                " Received " + ack.getBlock());
-        }else if(Short.toUnsignedInt(ack.getBlock()) > Short.toUnsignedInt(this.getBlockNumber())) {
-        	throw new InvalidMessageException(ack.getOpCode().name() + 
-        			" Message has a wrong block code "+
-        			" Expected " + this.getBlockNumber() +
+        if (Short.toUnsignedInt(ack.getBlock()) < Short.toUnsignedInt(this.getBlockNumber())) {
+            throw new MessageOrderException(
+                    ack.getOpCode().name() + " Message out of order." +
+                    " Expected " + this.getBlockNumber() +
                     " Received " + ack.getBlock());
-        	
+        }
+        else if(Short.toUnsignedInt(ack.getBlock()) > Short.toUnsignedInt(this.getBlockNumber())) {
+            throw new InvalidMessageException(ack.getOpCode().name() +
+                    " Message has a wrong block code "+
+                    " Expected " + this.getBlockNumber() +
+                    " Received " + ack.getBlock());
+
         }
     }
 
@@ -176,9 +175,9 @@ public abstract class Transfer implements Runnable {
      *
      * @return Current block number index
      */
-    public short getBlockNumber() {
-        return this.currentBlock;
-    }
+                public short getBlockNumber() {
+                    return this.currentBlock;
+                }
 
     /**
      * Increments the current block number and then returns the new value
@@ -188,7 +187,7 @@ public abstract class Transfer implements Runnable {
     protected short incrementBlockNumber () {
         return this.currentBlock++;
     }
-    
+
     /**
      * Decrements the current block number and then returns the new value
      *
@@ -249,24 +248,29 @@ public abstract class Transfer implements Runnable {
         }
     }
 
-	protected void notifyTimeout(int attempsLeft) {
-		for (TransferListener listener : this.listeners) {
-            listener.handleTimeout(attempsLeft);
-        }
-		
-	}
-
-	protected void notifyException(Exception e) {
-		for (TransferListener listener : this.listeners) {
+    /**
+     * Notifies all listeners that an exception has occurred
+     * and the transfer has been terminated
+     *
+     * @param e - The exception that occurred
+     */
+    protected void notifyException (Exception e) {
+        for (TransferListener listener : this.listeners) {
             listener.handleException(e);
         }
-	}
+    }
 
-	protected void notifyInfo(String info) {
-		for (TransferListener listener : this.listeners) {
+    /**
+     * Notifies all listeners that an information message
+     * has been generated from the transfer
+     *
+     * @param info - Status message of the transfer
+     */
+    protected void notifyInfo (String info) {
+        for (TransferListener listener : this.listeners) {
             listener.handleInfo(info);
         }
-		
-	}
+
+    }
 
 }

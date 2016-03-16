@@ -6,11 +6,9 @@ import core.req.InvalidMessageException;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 
-import core.log.ConsoleLogger;
-
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import java.io.IOException;
 
 import java.net.SocketAddress;
@@ -30,15 +28,16 @@ import java.net.DatagramPacket;
  * the socket the address will be updated to be the sender's address.
  */
 public class NodeSocket {
-	/**
+
+    /**
 	 * Timeout time for the socket in ms
 	 */
     private static final int TIMEOUT_TIME = 2400;
 
     /**
-     * Logger used to log information
+     * Default number of attempts to retry sending and receiving after timeouts
      */
-	private static final Logger LOGGER = Logger.getGlobal(); 
+    private static final int DEFAULT_ATTEMPTS = 5;
 
 	/**
      * Address of the socket that this socket is communicating with.
@@ -46,9 +45,19 @@ public class NodeSocket {
     private SocketAddress address;
 
     /**
+     * Number of retry attempts when a socket times out
+     */
+    private int attempts;
+
+    /**
      * UDP socket that this socket is using for sending and receiving
      */
     private DatagramSocket socket;
+
+    /**
+     * Listeners to events of this socket
+     */
+    private ArrayList<NodeSocketListener> listeners;
 
     /**
      * Constructs a new node socket with a dynamically assigned port
@@ -56,8 +65,10 @@ public class NodeSocket {
      * @throws SocketException - If there are no ports available
      */
     public NodeSocket () throws SocketException {
-        this.socket = new DatagramSocket();
-        // set timeout
+        this.listeners  = new ArrayList<NodeSocketListener>();
+        this.socket     = new DatagramSocket();
+        this.attempts   = DEFAULT_ATTEMPTS;
+        // Set the socket timeout
         socket.setSoTimeout(TIMEOUT_TIME);
     }
 
@@ -70,9 +81,12 @@ public class NodeSocket {
      * @throws SocketException - If there are no ports available
      */
     public NodeSocket (SocketAddress address) throws SocketException {
-        this.address = address;
-        this.socket = new DatagramSocket();
-     // set timeout
+        this.socket     = new DatagramSocket();
+        this.listeners  = new ArrayList<NodeSocketListener>();
+        this.address    = address;
+        this.attempts   = DEFAULT_ATTEMPTS;
+
+        // Set timeout
         socket.setSoTimeout(TIMEOUT_TIME);
     }
 
@@ -85,6 +99,7 @@ public class NodeSocket {
      */
     public NodeSocket (int port) throws SocketException {
         this.socket = new DatagramSocket(port);
+        this.attempts = DEFAULT_ATTEMPTS;
     }
 
     /**
@@ -102,8 +117,27 @@ public class NodeSocket {
      *
      * @param address - New socket endpoint address to communicate with
      */
-    public void setAddress(SocketAddress address){
+    public void setAddress (SocketAddress address){
         this.address = address;
+    }
+
+    /**
+     * Adds a listener for the transfer events
+     *
+     * @param listener - The listener to add
+     */
+    public void addNodeSocketListener (NodeSocketListener listener) {
+        this.listeners.add(listener);
+    }
+
+    /**
+     * Sets the number of attempts that a socket should try to send or
+     * receive on a socket after timeouts
+     *
+     * @param attempts - Number of retry attempts
+     */
+    public void setAttempts (int attempts) {
+        this.attempts = attempts;
     }
 
     /**
@@ -146,16 +180,33 @@ public class NodeSocket {
      *
      * @throws IOException - If the transmission fails
      * @throws InvalidMessageException - If the message received is not valid
-     * @throws SocketTimeoutException -If a packet isn't received within TIMEOUT_TIME
+     * @throws UnreachableHostException - If the host is no longer listening
      */
-    public Message receive() throws IOException, InvalidMessageException,SocketTimeoutException {
+    public Message receive() throws
+        IOException, InvalidMessageException, UnreachableHostException {
+
         // Create a packet to buffer the data received
         DatagramPacket packet;
+        boolean received = false;
+        int attempt = 0;
 
         do {
             // Receive the packets from the socket
             packet = new DatagramPacket(new byte[1024], 1024);
-            this.socket.receive(packet);
+            while (!received) {
+                try {
+                    this.socket.receive(packet);
+                    received = true;
+                } catch (SocketTimeoutException e) {
+                    // Increment the attempt count and heck if the maximum number
+                    // of timeouts have been reached.
+                    if (++attempt == this.attempts) {
+                        throw new UnreachableHostException("No response from host after "
+                            + this.attempts + " attempts");
+                    }
+                    this.notifyTimeout(this.attempts - attempt);
+                }
+            }
         }
         // If the sender is invalid then receive another packet
         while(!this.validateEndpoint(packet));
@@ -182,12 +233,31 @@ public class NodeSocket {
      */
     private boolean validateEndpoint (DatagramPacket packet) throws IOException {
         if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
-            LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
+            this.notifyUnknownTID();
             this.send(
                 new ErrorMessage(ErrorCode.UNKNOWN_TID, "Unknown transfer ID"),
                 packet.getSocketAddress());
             return false;
         }
         return true;
+    }
+
+    /**
+     * Notifies that a timeout occurred and how many timeouts are remaining
+     */
+    private void notifyTimeout (int remaining) {
+        for (NodeSocketListener l : this.listeners) {
+            l.handleTimeout(remaining);
+        }
+    }
+
+    /**
+     * Notifies all listeners that a message has been received
+     * from an unknown TID
+     */
+    private void notifyUnknownTID () {
+        for (NodeSocketListener l : this.listeners) {
+            l.handleUnknownTID();
+        }
     }
 }
