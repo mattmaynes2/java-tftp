@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import core.log.ConsoleLogger;
 import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;

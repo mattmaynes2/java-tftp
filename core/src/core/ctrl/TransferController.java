@@ -1,5 +1,6 @@
 package core.ctrl;
 
+import java.io.File;
 import java.net.SocketAddress;
 
 import core.cli.Command;
@@ -84,9 +85,13 @@ public abstract class TransferController extends Controller implements TransferL
      *
      * @param filename - Name of file to transfer
      */
-    public void write (String filename){
+    public void write (String filename) {
         Transfer runner;
-
+        File file = new File(filename);
+        if(!file.isFile()) {
+        	System.out.println("File not found: " + filename);
+        	return;
+        }
         try {
             runner = new WriteTransfer(this.getAddress(), filename);
             runner.addTransferListener(this);
