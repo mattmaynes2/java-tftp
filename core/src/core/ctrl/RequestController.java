@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
 
+import core.net.ErrorResponder;
 import core.net.ReadTransfer;
 import core.net.RequestListener;
 import core.net.RequestReceiver;
@@ -12,6 +13,7 @@ import core.net.Transfer;
 import core.net.TransferListener;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
+import core.req.ErrorCode;
 import core.req.ErrorMessage;
 import core.req.Request;
 
@@ -100,14 +102,26 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void read (SocketAddress address, String filename){
         Transfer runner;
-
-        try {
-            runner = new WriteTransfer(address, filename);
-            runner.addTransferListener(this);
-            (new Thread(runner)).start();
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        ErrorResponder responder;
+        // Start an error thread that will send an error code 1 message to the client
+        if(!(new File(filename).isFile())) {
+        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
+			try {
+				responder = new ErrorResponder(msg, address);
+				responder.addListener(this);
+				(new Thread(responder)).start(); 	
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+        } else { // Otherwise start the transfer
+	        try {
+	            runner = new WriteTransfer(address, filename);
+	            runner.addTransferListener(this);
+	            (new Thread(runner)).start();
+	        } catch (Exception e){
+	            e.printStackTrace();
+	            System.exit(1);
+	        }
         }
     }
 
