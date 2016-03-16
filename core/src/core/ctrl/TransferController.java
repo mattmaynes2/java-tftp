@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import core.cli.Command;
 import core.net.ReadTransfer;
 import core.net.Transfer;
+import core.net.TransferListener;
 import core.net.WriteTransfer;
 
 /**
@@ -12,7 +13,7 @@ import core.net.WriteTransfer;
  *
  * Spawns transfers when user enters CLI commands
  */
-public abstract class TransferController extends Controller {
+public abstract class TransferController extends Controller implements TransferListener  {
 
     /**
      * Command to initialize a read command
@@ -28,6 +29,7 @@ public abstract class TransferController extends Controller {
      * Constructs a transfer controller with a read and write command
      *
      * @param address - Address of endpoint to communicate with
+     * @param commandLineArgs - Arguments entered by the user at startup
      */
     public TransferController (SocketAddress address, String[] commandLineArgs) {
         super(address, commandLineArgs);
@@ -83,7 +85,7 @@ public abstract class TransferController extends Controller {
      * @param filename - Name of file to transfer
      */
     public void write (String filename){
-        WriteTransfer runner;
+        Transfer runner;
 
         try {
             runner = new WriteTransfer(this.getAddress(), filename);
@@ -102,8 +104,10 @@ public abstract class TransferController extends Controller {
      * Runs a transfer in a background thread
      *
      * @param transfer - Transfer to run in background thread
+     *
+     * @throws InterruptedException - If the transfer gets killed externally
      */
-    public void performTransfer (Transfer transfer) throws InterruptedException{
+    public void performTransfer (Transfer transfer) throws InterruptedException {
         Thread transferThread = new Thread(transfer);
         transferThread.start();
         transferThread.join();

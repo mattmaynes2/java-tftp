@@ -3,16 +3,17 @@ package stream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.logging.Level;
-
-import core.log.Logger;
+import java.util.logging.Logger;
 import core.req.InvalidMessageException;
 import sim.PacketModifier;
 
 public class InjectPacketStream implements SimulatorStream {
-
+	
+	private static final Logger LOGGER = Logger.getGlobal();
     private PacketStream stream;
     private PacketModifier modifier;
     private int injectAt;
+    private boolean hasInjected;
 
 /**
  * 
@@ -24,6 +25,7 @@ public class InjectPacketStream implements SimulatorStream {
         this.stream=stream;
         this.modifier=modifier;
         this.injectAt=injectAt;
+        this.hasInjected = false;
     }
 
 
@@ -36,19 +38,26 @@ public class InjectPacketStream implements SimulatorStream {
      * Replaces the packet at the specified point in the sequence with the modified packet
      */
     @Override
-    public void send(DatagramPacket packet) throws IOException, InvalidMessageException {
-        if(getNumberPacketsOfPackets()==injectAt) {
-            Logger.log(Level.INFO, "About to Send Modifyied Packet");
+    public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
+        if(!hasInjected && getNumberPacketsOfPackets()==injectAt) {
+        	hasInjected = true;
+        	LOGGER.log(Level.INFO, "About to Send Modifyied Packet");
         	stream.send(modifier.modifyPacket(packet));
         }else {
             stream.send(packet);
         }
-
+        return true;
     }
 
     @Override
     public int getNumberPacketsOfPackets() {
         return stream.getNumberPacketsOfPackets();
     }
+
+
+	@Override
+	public void close() {
+		stream.close();
+	}
 
 }

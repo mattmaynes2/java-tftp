@@ -4,23 +4,21 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import sim.SimulationTypes;
 import core.util.Worker;
+import stream.PacketStream;
+import stream.SimulatorStream;
+import threads.SimulationEventListener;
 import threads.SimulatorThread;
 
-
-public class ReceiveWorker extends Worker {
+public class ReceiveWorker extends Worker{
 
 	private DatagramSocket requestSocket;
-	private SimulationTypes type;
-	private int packetNumber;
-	private PacketModifier modifier;
+	private SimulatorStream stream;
+	private SimulationEventListener simulationListener;
 	
 	public ReceiveWorker(int port) throws SocketException {
 		requestSocket = new DatagramSocket(port);
-		type = SimulationTypes.PASS_THROUGH;
-		packetNumber = 0;
-		modifier = null;
+		stream = null;
 	}
 	
 	@Override
@@ -28,7 +26,12 @@ public class ReceiveWorker extends Worker {
          DatagramPacket receivePacket = new DatagramPacket(new byte[1024], 1024);
          try {
 			requestSocket.receive(receivePacket);
-			(new SimulatorThread(receivePacket, type, packetNumber, this.modifier)).start();
+			SimulatorThread newThread = new SimulatorThread(receivePacket, stream);
+			if (simulationListener != null){
+				newThread.subscribeSimulationEvents(simulationListener);
+			}
+			newThread.start();
+			stream = new PacketStream();
 		} catch (SocketException e) {
 			// Ignore socket exception if not currently running
 			if(this.isRunning()) {
@@ -46,14 +49,14 @@ public class ReceiveWorker extends Worker {
 	@Override
 	public void teardown() {
 		requestSocket.close();
+		stream.close();
 	}
 	
-	public void setConfiguration(SimulationTypes type, int packetNumber, PacketModifier modifier) {
-		
-		this.type = type;
-		this.packetNumber = packetNumber;
-		this.modifier = modifier;
-		
+	public void setConfiguration(SimulatorStream stream) {
+		this.stream = stream;
 	}
-
+	
+	public void subscribeSimulationEvents(SimulationEventListener listener){
+		this.simulationListener = listener;
+	}
 }

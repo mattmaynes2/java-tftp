@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * This defines the functionality for a generic command line interface to be used by the client, errorSimulator, 
+ * This defines the functionality for a generic command line interface to be used by the client, errorSimulator,
  * and Server
  *
  */
@@ -23,8 +23,8 @@ public class CLI extends Worker {
     private Scanner scanner;
 
     /**
-     * 
-     * @param interpreter  the interpreter for the commands 
+     *
+     * @param interpreter  the interpreter for the commands
      * @param in  the input stream to read from
      * @param out  the output stream to write to
      */
@@ -75,7 +75,7 @@ public class CLI extends Worker {
 
     /**
      * Notifies all current handlers that a command has been received
-     * @param command
+     * @param command Command to send to handlers
      */
     public void notifyHandlers(Command command){
         for (CommandHandler handler : handlers){
@@ -96,11 +96,11 @@ public class CLI extends Worker {
             e.printStackTrace();
         }
     }
-    
+
     public void message(String message){
     	write(message + "\n");
     }
-    
+
     public void prompt(){
     	write(PROMPT);
     }

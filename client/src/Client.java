@@ -1,10 +1,7 @@
 import core.req.Message;
 import core.req.ErrorMessage;
-
-import core.log.Logger;
+import core.ctrl.Controller;
 import core.ctrl.TransferController;
-
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -13,7 +10,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 
 public class Client extends TransferController {
-
+	
     private static final int SERVER_PORT = 69;
     private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
@@ -46,16 +43,16 @@ public class Client extends TransferController {
 
     @Override
     public void handleMessage(Message msg) {
-        Logger.log(Level.FINE, "Received transfer message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Received transfer message: " + msg.toString());
     }
 
     @Override
     public void handleSendMessage(Message msg) {
-        Logger.log(Level.FINE, "Sending message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Sending message: " + msg.toString());
     }
 
     public void handleErrorMessage (ErrorMessage err) {
-        Logger.log(Level.SEVERE, "Error message: " + err.toString());
+        LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("Finished transfer with errors");
     }
 
@@ -65,7 +62,7 @@ public class Client extends TransferController {
     }
 
     public static void main(String[] args){
-        Client client;
+        Controller client;
 
         try {
             InetSocketAddress address =
@@ -77,4 +74,21 @@ public class Client extends TransferController {
             e.printStackTrace();
         }
     }
+
+	@Override
+	public void handleException(Exception e) {
+		LOGGER.log(Level.SEVERE,e.getMessage());
+		this.cli.message("Finished transfer with errors");
+	}
+	
+	@Override
+	public void handleTimeout(int attemptsLeft) {
+		LOGGER.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
+	}
+
+	@Override
+	public void handleInfo(String info) {
+		LOGGER.log(Level.INFO,info);
+		
+	}
 }

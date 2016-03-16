@@ -1,9 +1,7 @@
 
 import java.net.SocketException;
 import java.util.logging.Level;
-
 import core.ctrl.RequestController;
-import core.log.Logger;
 import core.req.ErrorMessage;
 import core.req.Message;
 
@@ -32,12 +30,12 @@ public class Server extends RequestController {
 
     @Override
     public void handleMessage(Message msg){
-        Logger.log(Level.FINE, "Received message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Received message: " + msg.toString());
     }
 
     @Override
     public void handleSendMessage(Message msg) {
-        Logger.log(Level.FINE, "Sending message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Sending message: " + msg.toString());
     }
 
     @Override
@@ -48,7 +46,7 @@ public class Server extends RequestController {
     }
 
     public synchronized void handleErrorMessage (ErrorMessage err){
-        Logger.log(Level.SEVERE, "Error message: " + err.toString());
+        LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("\nFinished transfer with errors");
         this.activeTransferCount--;
     }
@@ -80,4 +78,22 @@ public class Server extends RequestController {
             System.out.println("Ensure that you have sufficient privileges to bind to this port");
         }
     }
+
+	@Override
+	public void handleException(Exception e) {
+		LOGGER.log(Level.SEVERE,e.getMessage());
+		this.cli.message("Finished transfer with errors");
+		this.activeTransferCount--;
+	}
+
+	@Override
+	public void handleTimeout(int attemptsLeft) {
+		LOGGER.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
+	}
+
+	@Override
+	public void handleInfo(String info) {
+		LOGGER.log(Level.INFO,info);
+		
+	}
 }

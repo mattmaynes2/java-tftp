@@ -6,15 +6,16 @@ import core.req.InvalidMessageException;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 
-import core.log.Logger;
+import core.log.ConsoleLogger;
 
 import java.util.Arrays;
 import java.util.logging.Level;
-
+import java.util.logging.Logger;
 import java.io.IOException;
 
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 
@@ -29,8 +30,17 @@ import java.net.DatagramPacket;
  * the socket the address will be updated to be the sender's address.
  */
 public class NodeSocket {
+	/**
+	 * Timeout time for the socket in ms
+	 */
+    private static final int TIMEOUT_TIME = 2400;
 
     /**
+     * Logger used to log information
+     */
+	private static final Logger LOGGER = Logger.getGlobal(); 
+
+	/**
      * Address of the socket that this socket is communicating with.
      */
     private SocketAddress address;
@@ -47,6 +57,8 @@ public class NodeSocket {
      */
     public NodeSocket () throws SocketException {
         this.socket = new DatagramSocket();
+        // set timeout
+        socket.setSoTimeout(TIMEOUT_TIME);
     }
 
     /**
@@ -54,11 +66,14 @@ public class NodeSocket {
      * that will communicate to the desired address
      *
      * @param address - Address to send messages to
+     *
+     * @throws SocketException - If there are no ports available
      */
     public NodeSocket (SocketAddress address) throws SocketException {
         this.address = address;
         this.socket = new DatagramSocket();
-
+     // set timeout
+        socket.setSoTimeout(TIMEOUT_TIME);
     }
 
     /**
@@ -131,8 +146,9 @@ public class NodeSocket {
      *
      * @throws IOException - If the transmission fails
      * @throws InvalidMessageException - If the message received is not valid
+     * @throws SocketTimeoutException -If a packet isn't received within TIMEOUT_TIME
      */
-    public Message receive() throws IOException, InvalidMessageException {
+    public Message receive() throws IOException, InvalidMessageException,SocketTimeoutException {
         // Create a packet to buffer the data received
         DatagramPacket packet;
 
@@ -166,7 +182,7 @@ public class NodeSocket {
      */
     private boolean validateEndpoint (DatagramPacket packet) throws IOException {
         if (this.address != null && !this.address.equals(packet.getSocketAddress())) {
-            Logger.log(Level.WARNING, "Received message with unknown transfer ID");
+            LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
             this.send(
                 new ErrorMessage(ErrorCode.UNKNOWN_TID, "Unknown transfer ID"),
                 packet.getSocketAddress());

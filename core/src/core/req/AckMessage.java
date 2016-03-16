@@ -9,14 +9,33 @@ import java.nio.ByteBuffer;
  */
 public class AckMessage extends Message {
 
+    /**
+     * Number of bytes in an acknowledge message
+     */
     protected static final int ACK_SIZE = 4;
-	private short block;
 
+    /**
+     * Block number being acknowledged
+     */
+    private short block;
+
+    /**
+     * Constructs an acknowledge message byte decoding the given byte data
+     *
+     * @param bytes - Encoded message to decode
+     *
+     * @throws InvalidMessageException - Thrown if the byte data does not represent a valid message
+     */
     public AckMessage(byte[] bytes) throws InvalidMessageException {
         super(bytes);
         this.decode(bytes);
     }
 
+    /**
+     * Constructs an acknowledge message for the given block
+     *
+     * @param block - Index of block being acknowledged
+     */
     public AckMessage(short block){
         super(OpCode.ACK);
         this.block=block;
@@ -24,15 +43,19 @@ public class AckMessage extends Message {
 
     /**
      * Constructor used by classes that extend AckMessage
+     *
+     * @param opcode - Code for acknowledge message
+     * @param block - Block number being acknowledged
      */
-    protected AckMessage(OpCode opcode,short block) {
+    protected AckMessage(OpCode opcode, short block) {
         super(opcode);
         this.block=block;
     }
 
     /**
-     * 
-     * @return the block number 
+     * Returns the block number of the acknowledge
+     *
+     * @return the block number
      */
     public short getBlock() {
         return this.block;
@@ -40,7 +63,7 @@ public class AckMessage extends Message {
 
     /**
      * set the block number
-     * @param block
+     * @param block - Block number for this packet
      */
     public void setBlock(short block) {
         this.block = block;
@@ -51,13 +74,14 @@ public class AckMessage extends Message {
      */
     @Override
     public String toString() {
-        return super.toString()+" block number: "+this.block;
+        return super.toString()+" block number: "+Short.toUnsignedInt(block);
     }
 
-    /** 
-     * Param bytes  a byte list to decode
+    /**
      * The method verifies the byte list is in a valid form for an acknowledgement packet
-     * If verified, it sets the block number to the appropriate value  
+     * If verified, it sets the block number to the appropriate value
+     *
+     * @param bytes - List of bytes to decode
      */
     @Override
     protected void decode(byte[] bytes) throws InvalidMessageException {
@@ -65,10 +89,10 @@ public class AckMessage extends Message {
             throw new InvalidMessageException("Ack Message must be 4 bytes");
         }
         super.decode(bytes);
-        
+
         //stores the block number in a byte buffer to be converted into a short
         ByteBuffer wrapper = ByteBuffer.wrap(bytes, 2, 2);
-        
+
         this.block= wrapper.getShort();
     }
 
@@ -79,10 +103,10 @@ public class AckMessage extends Message {
     public byte[] toBytes() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteBuffer b = ByteBuffer.allocate(2);
-	    b.putShort(this.block);
-	
-	    byte[] result = b.array();
-	    
+        b.putShort(this.block);
+
+        byte[] result = b.array();
+
         try {
             out.write(super.toBytes());
             out.write(result);

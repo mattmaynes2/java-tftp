@@ -1,33 +1,29 @@
 package core.ctrl;
 
-import core.req.Message;
-import core.req.ErrorMessage;
-
-import core.net.TransferListener;
+import java.net.SocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import core.cli.CLI;
 import core.cli.Command;
 import core.cli.CommandHandler;
 import core.cli.CommandInterpreter;
-import core.log.Logger;
+import core.log.ConsoleLogger;
 
-import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.logging.Level;
 /**
  * Controller
  *
  * Handles requests from a command line interface and spawns transfers
  */
-public abstract class Controller implements CommandHandler, TransferListener {
-	
-	/**
-	 * Command line option to turn on quiet mode logging
-	 */
+public abstract class Controller implements CommandHandler{
+
+    /**
+     * Command line option to turn on quiet mode logging
+     */
     private final static String QUIET_MODE_FLAG = "q";
-	
+
     /**
      * Command to shutdown this controller
      */
@@ -52,14 +48,21 @@ public abstract class Controller implements CommandHandler, TransferListener {
      * Command line interface to communicate with user
      */
     protected CLI cli;
-    
+
     /**
      * Map of command line options specified by the user
      */
     protected Map<String, Boolean> commandLineOptions;
 
     /**
+     * 
+     */
+    protected static final Logger LOGGER = Logger.getGlobal();
+   
+    /**
      * Constructs a new controller with some default CLI commands
+     *
+     * @param commandLineArgs - Arguments from the command line
      */
     protected Controller (String[] commandLineArgs) {
         this.interpreter = new CommandInterpreter();
@@ -74,12 +77,18 @@ public abstract class Controller implements CommandHandler, TransferListener {
      * Constructs a new controller to communicate to the given address
      *
      * @param address - Address of endpoint to communicate with
+     * @param commandLineArgs - Arguments from the command line
      */
     public Controller (SocketAddress address, String[] commandLineArgs){
         this(commandLineArgs);
         this.address = address;
     }
-    
+
+    /**
+     * Sets the allowed command line options
+     *
+     * @param args - Set of options available
+     */
     private void setCommandLineOptions(String[] args){
         for (int i=0; i < args.length; i++){
             if (args[i].startsWith("-") && args[i].length() > 1){
@@ -88,17 +97,24 @@ public abstract class Controller implements CommandHandler, TransferListener {
         }
     }
 
+    /**
+     * Adds an option to the available command line options
+     *
+     * @param option - The valid option that is to be added to the command set
+     */
     private void setOption(String option){
-    	this.commandLineOptions.put(option, true);
+        this.commandLineOptions.put(option, true);
     }
-    
 
+    /**
+     * Applies the command line options to the given options
+     */
     protected void applyCommandLineOptions(){
-    	if (this.commandLineOptions.getOrDefault(QUIET_MODE_FLAG, false)){
-    		Logger.init(Level.INFO);
-    	}else{
-    		Logger.init(Level.ALL);
-    	}
+        if (this.commandLineOptions.getOrDefault(QUIET_MODE_FLAG, false)){
+            ConsoleLogger.init(Level.INFO);
+        }else{
+            ConsoleLogger.init(Level.ALL);
+        }
     }
 
     /**
@@ -137,42 +153,17 @@ public abstract class Controller implements CommandHandler, TransferListener {
      *
      * @param command - User's CLI command
      */
-    public void handleCommand (Command command){
-        switch (command.getToken()){
-            case SHUTDOWN_COMMAND:
-                this.stop();
-                break;
-            case HELP_COMMAND:
-                this.usage();
-                break;
-            default:
-                break;
+        public void handleCommand (Command command){
+            switch (command.getToken()){
+                case SHUTDOWN_COMMAND:
+                    this.stop();
+                    break;
+                case HELP_COMMAND:
+                    this.usage();
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-
-    /**
-     * Invoked when a transfer is started
-     */
-    public abstract void handleStart ();
-
-    /**
-     * Invoked when a transfer receives a message from the endpoint
-     *
-     * @param msg - The message received
-     */
-    public abstract void handleMessage (Message msg);
-
-    /**
-     * Invoked when an error is received during a transfer
-     *
-     * @param err - The error received
-     */
-    public abstract void handleErrorMessage (ErrorMessage err);
-
-    /**
-     * Invoked when the transfer is complete
-     */
-    public abstract void handleComplete ();
-
 
 }
