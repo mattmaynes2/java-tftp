@@ -8,10 +8,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import core.log.ConsoleLogger;
 
 import core.req.AckMessage;
 import core.req.DataMessage;
@@ -35,11 +31,6 @@ import core.req.WriteRequest;
  * )).start()
  */
 public class WriteTransfer extends Transfer {
-
-    /**
-     * Logger used to log information
-     */
-    private static final Logger LOGGER = Logger.getGlobal();
 
     /**
      * Stores the current message being transferred
@@ -176,18 +167,13 @@ public class WriteTransfer extends Transfer {
      * @param remaining - Number of retry attempts remaining
      */
     public void handleTimeout (int remaining) {
+        super.handleTimeout(remaining);
         try {
             this.sendDataMessage(this.currentMessage);
-            LOGGER.log(Level.WARNING, "Socket timed out while waiting for message. "
-                    + "Will attempt " + remaining + " more time(s)");
         } catch (IOException e){
             e.printStackTrace();
             System.exit(0);
         }
-    }
-
-    public void handleUnknownTID () {
-        LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
     }
 
     /**

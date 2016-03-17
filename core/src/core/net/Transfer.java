@@ -1,9 +1,15 @@
 package core.net;
 
 import java.io.IOException;
+
 import java.net.SocketAddress;
 import java.net.SocketException;
+
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import core.log.ConsoleLogger;
 
 import core.req.AckMessage;
 import core.req.ErrorCode;
@@ -21,7 +27,12 @@ import core.req.OpCode;
  * It is left to the subclass to use the appropriate notification function to
  * signal transfer listeners of the different stages of the transfer.
  */
-public abstract class Transfer implements Runnable {
+public abstract class Transfer implements Runnable, NodeSocketListener {
+
+    /**
+     * Logger used to log information
+     */
+    private static final Logger LOGGER = Logger.getGlobal();
 
     /**
      * Listeners to the stages of a transfer
@@ -57,6 +68,8 @@ public abstract class Transfer implements Runnable {
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
         this.currentBlock = 0;
+
+        this.socket.addNodeSocketListener(this);
     }
 
     /**
@@ -76,6 +89,24 @@ public abstract class Transfer implements Runnable {
             System.exit(1);
         }
     }
+
+    /**
+     * Handles the timeout of a node socket
+     *
+     * @param remaining - Number of retry attempts remaining
+     */
+    public void handleTimeout (int remaining) {
+        LOGGER.log(Level.WARNING, "Socket timed out while waiting for message. "
+                + "Will attempt " + remaining + " more time(s)");
+    }
+
+    /**
+     * Logs that an invalid TID was received
+     */
+    public void handleUnknownTID () {
+        LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
+    }
+
 
     /**
      * Checks if the given message is an error message and throws an exception
