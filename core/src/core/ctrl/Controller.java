@@ -173,19 +173,10 @@ public abstract class Controller implements CommandHandler {
     }
 
     public String appendPrefix(String filepath) {
-    	String path = filepath;
-    	if (null != filepath && filepath.length() > 0 )
-    	{
-    	    int endIndex = filepath.lastIndexOf("/");
-    	    if (endIndex != -1)
-    	    {
-    	        path = directoryPrefix.concat(filepath.substring(endIndex+1));  
-    	    }
-    	    else {
-    	    	path = directoryPrefix.concat(filepath);
-    	    }
+    	if(filepath.startsWith("/")|| filepath.startsWith(":/", 1) ||filepath.startsWith(":\\",1)) {
+    		return filepath;
     	}
-    	return path;
+    	return directoryPrefix.concat(filepath);
     }
 
     /**
