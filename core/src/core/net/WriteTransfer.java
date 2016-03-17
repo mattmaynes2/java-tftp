@@ -100,10 +100,19 @@ public class WriteTransfer extends Transfer {
         // Starting the transfer
         this.notifyStart();
 
+        String file = this.getFilename();
+        int endIndex;
+       
+        endIndex = this.getFilename().lastIndexOf("/");
+	    if (endIndex != -1)  
+	    {
+	        file = file.substring(endIndex+1);
+	    }
+	    
         try {
 
             // Create a new stream to read the file
-            in = new FileInputStream(this.getFilename());
+            in = new FileInputStream(file);
 
             // Continue to send data until all of the data has been sent
             do {

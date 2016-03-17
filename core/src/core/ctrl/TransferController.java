@@ -65,7 +65,8 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void read (String filename){
         ReadTransfer runner;
-
+        File file = new File(getPrefix());
+        file.mkdirs();
         try {
             runner = new ReadTransfer(this.getAddress(), appendPrefix(filename));
             runner.addTransferListener(this);
@@ -88,13 +89,13 @@ public abstract class TransferController extends Controller implements TransferL
     public void write (String filename) {
         Transfer runner;
         File file = new File(appendPrefix(filename));
-        System.out.println("Filename is: " + filename);
         if(!file.isFile()) {
-        	System.out.println("File not found: " + filename);
+        	System.out.println("File not found: " + file);
         	return;
         }
         try {
-            runner = new WriteTransfer(this.getAddress(), filename);
+            runner = new WriteTransfer(this.getAddress(), appendPrefix(filename));
+            System.out.println("Client Filename: " + appendPrefix(filename));
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){

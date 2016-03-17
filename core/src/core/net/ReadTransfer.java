@@ -67,7 +67,6 @@ public class ReadTransfer extends Transfer {
 
         // Starting the transfer
         this.notifyStart();
-
         try {           
             msg = this.getNext();
             // Create a stream to write the file too

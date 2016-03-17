@@ -179,12 +179,12 @@ public abstract class Controller implements CommandHandler{
     	    int endIndex = filepath.lastIndexOf("/");
     	    if (endIndex != -1)  
     	    {
-    	        path = directoryPrefix.concat(filepath.substring(0, endIndex));
+    	        path = directoryPrefix.concat(filepath.substring(endIndex+1));  
     	    }
     	    else {
     	    	path = directoryPrefix.concat(filepath);
     	    }
-    	} 
+    	}
     	return path;
     }
     
