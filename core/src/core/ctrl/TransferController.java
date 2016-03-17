@@ -65,10 +65,32 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void read (String filename){
         ReadTransfer runner;
-        File file = new File(getPrefix());
-        file.mkdirs();
+        File file;
+        String path;
+
+
+        path = this.appendPrefix(filename);
+        file = new File(path);
+
+        // Before starting the transfer, ensure that the file exists
+        // and that there are sufficient permissions to read from it
+        if (file.exists()) {
+        	System.out.println("File already exists: " + filename +
+                "\nEither remove the file from the working directory, "
+                + "or change the working directory.");
+        	return;
+        }
+        /*else if (!(new File(this.getPrefix()).canWrite())) {
+            System.out.println("Insufficient permissions to write file: "
+                + filename + "\nPermission denied");
+            return;
+        }*/
+
+        // At this point the transfer is read to begin. The
+        // requested file does not already exist and there are
+        // sufficient privileges to write
         try {
-            runner = new ReadTransfer(this.getAddress(), appendPrefix(filename));
+            runner = new ReadTransfer(this.getAddress(), path);
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){
@@ -88,11 +110,25 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void write (String filename) {
         Transfer runner;
-        File file = new File(appendPrefix(filename));
-        if(!file.isFile()) {
-        	System.out.println("File not found: " + file);
+        File file;
+        String path;
+
+        path = this.appendPrefix(filename);
+        file = new File(path);
+
+        if (!file.exists()) {
+        	System.out.println("File not found: " + filename);
         	return;
         }
+        else if (!file.canRead()) {
+            System.out.println("Insufficient permissions to read file: "
+                + filename + "\nPermission denied");
+            return;
+        }
+
+        // At this point the transfer is read to being.
+        // There are no issues with permissions on this end of
+        // the transfer
         try {
             runner = new WriteTransfer(this.getAddress(), appendPrefix(filename));
             System.out.println("Client Filename: " + appendPrefix(filename));
@@ -119,4 +155,5 @@ public abstract class TransferController extends Controller implements TransferL
         transferThread.start();
         transferThread.join();
     }
+
 }

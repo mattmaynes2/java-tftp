@@ -17,7 +17,7 @@ import core.log.ConsoleLogger;
  *
  * Handles requests from a command line interface and spawns transfers
  */
-public abstract class Controller implements CommandHandler{
+public abstract class Controller implements CommandHandler {
 
     /**
      * Command line option to turn on quiet mode logging
@@ -33,7 +33,7 @@ public abstract class Controller implements CommandHandler{
      * Command to request usage information for this process
      */
     public static final String HELP_COMMAND = "help";
-    
+
 	/**
 	 * Command to set the file write destination
 	 */
@@ -60,15 +60,15 @@ public abstract class Controller implements CommandHandler{
     protected Map<String, Boolean> commandLineOptions;
 
     /**
-     * 
+     *
      */
     protected static final Logger LOGGER = Logger.getGlobal();
-    
+
     /**
-     * 
+     *
      */
     private String directoryPrefix = "";
-   
+
     /**
      * Constructs a new controller with some default CLI commands
      *
@@ -136,7 +136,7 @@ public abstract class Controller implements CommandHandler{
     public SocketAddress getAddress (){
         return this.address;
     }
-    
+
     public String getPrefix() {
     	return this.directoryPrefix;
     }
@@ -165,19 +165,19 @@ public abstract class Controller implements CommandHandler{
 
     /**
      * Changes the current working directory
-     * 
+     *
      * @param dir - the new working directory
      */
     public void changeWorkingDirectory(String dir) {
-    	this.directoryPrefix = dir;    	
+    	this.directoryPrefix = dir;
     }
-    
+
     public String appendPrefix(String filepath) {
     	String path = filepath;
     	if (null != filepath && filepath.length() > 0 )
     	{
     	    int endIndex = filepath.lastIndexOf("/");
-    	    if (endIndex != -1)  
+    	    if (endIndex != -1)
     	    {
     	        path = directoryPrefix.concat(filepath.substring(endIndex+1));  
     	    }
@@ -187,7 +187,7 @@ public abstract class Controller implements CommandHandler{
     	}
     	return path;
     }
-    
+
     /**
      * Invoked when a user types a command on the interface
      *
@@ -207,7 +207,5 @@ public abstract class Controller implements CommandHandler{
                 break;
         }
     }
-    
-    
 
 }
