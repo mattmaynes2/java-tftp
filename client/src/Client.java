@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 
 public class Client extends TransferController {
-	
+
     private static final int SERVER_PORT = 69;
     private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
@@ -75,20 +75,15 @@ public class Client extends TransferController {
         }
     }
 
-	@Override
-	public void handleException(Exception e) {
-		LOGGER.log(Level.SEVERE,e.getMessage());
-		this.cli.message("Finished transfer with errors");
-	}
-	
-	@Override
-	public void handleTimeout(int attemptsLeft) {
-		LOGGER.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
-	}
+    @Override
+    public void handleException(Exception e) {
+        LOGGER.log(Level.SEVERE,e.getMessage());
+        this.cli.message("Finished transfer with errors");
+    }
 
-	@Override
-	public void handleInfo(String info) {
-		LOGGER.log(Level.INFO,info);
-		
-	}
+    @Override
+    public void handleInfo(String info) {
+        LOGGER.log(Level.INFO,info);
+
+    }
 }

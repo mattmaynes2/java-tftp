@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import core.req.AckMessage;
 import core.req.ErrorCode;
@@ -21,11 +23,14 @@ import core.req.OpCode;
  * It is left to the subclass to use the appropriate notification function to
  * signal transfer listeners of the different stages of the transfer.
  */
-public abstract class Transfer implements Runnable {
+public abstract class Transfer implements Runnable, NodeSocketListener {
 
-    protected static final int MAX_ATTEMPTS = 5;
+    /**
+     * Logger used to log information
+     */
+    private static final Logger LOGGER = Logger.getGlobal();
 
-	/**
+    /**
      * Listeners to the stages of a transfer
      */
     private ArrayList<TransferListener> listeners;
@@ -39,8 +44,10 @@ public abstract class Transfer implements Runnable {
     /**
      * Name of the file to transfer
      */
-    private String filename;
+    protected String sourceName;
 
+    protected String destinationName;
+    
     /**
      * Current data block being transferred
      */
@@ -50,15 +57,20 @@ public abstract class Transfer implements Runnable {
      * Constructs a transfer with a socket which will move the specified file
      *
      * @param address - Address to use as the endpoint
-     * @param filename - Path of file to transfer
+     * @param sourceName - Source path of file to transfer
+     * @param destination - Destination path of the file to transfer
      *
      * @throws SocketException - If the socket cannot be created
      */
-    public Transfer (SocketAddress address, String filename) throws SocketException {
-        this.filename = filename;
+    public Transfer (SocketAddress address, String sourceName, String destinationName) throws SocketException {
+        this.sourceName = sourceName;
+        this.destinationName = destinationName;
+        
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
         this.currentBlock = 0;
+
+        this.socket.addNodeSocketListener(this);
     }
 
     /**
@@ -78,6 +90,24 @@ public abstract class Transfer implements Runnable {
             System.exit(1);
         }
     }
+
+    /**
+     * Handles the timeout of a node socket
+     *
+     * @param remaining - Number of retry attempts remaining
+     */
+    public void handleTimeout (int remaining) {
+        LOGGER.log(Level.WARNING, "Socket timed out while waiting for message. "
+                + "Will attempt " + remaining + " more time(s)");
+    }
+
+    /**
+     * Logs that an invalid TID was received
+     */
+    public void handleUnknownTID () {
+        LOGGER.log(Level.WARNING, "Received message with unknown transfer ID");
+    }
+
 
     /**
      * Checks if the given message is an error message and throws an exception
@@ -103,17 +133,18 @@ public abstract class Transfer implements Runnable {
      * @throws InvalidMessageException - If the acknowledge is larger than expected
      */
     protected void checkOrder (AckMessage ack) throws MessageOrderException, InvalidMessageException {
-       if (Short.toUnsignedInt(ack.getBlock()) < Short.toUnsignedInt(this.getBlockNumber())) {
-    	   throw new MessageOrderException(
-                ack.getOpCode().name() + " Message out of order." +
-                " Expected " + this.getBlockNumber() +
-                " Received " + ack.getBlock());
-        }else if(Short.toUnsignedInt(ack.getBlock()) > Short.toUnsignedInt(this.getBlockNumber())) {
-        	throw new InvalidMessageException(ack.getOpCode().name() + 
-        			" Message has a wrong block code "+
-        			" Expected " + this.getBlockNumber() +
+        if (Short.toUnsignedInt(ack.getBlock()) < Short.toUnsignedInt(this.getBlockNumber())) {
+            throw new MessageOrderException(
+                    ack.getOpCode().name() + " Message out of order." +
+                    " Expected " + this.getBlockNumber() +
                     " Received " + ack.getBlock());
-        	
+        }
+        else if(Short.toUnsignedInt(ack.getBlock()) > Short.toUnsignedInt(this.getBlockNumber())) {
+            throw new InvalidMessageException(ack.getOpCode().name() +
+                    " Message has a wrong block code "+
+                    " Expected " + this.getBlockNumber() +
+                    " Received " + ack.getBlock());
+
         }
     }
 
@@ -141,7 +172,7 @@ public abstract class Transfer implements Runnable {
      * @return Name of file being transfered
      */
     public String getFilename () {
-        return this.filename;
+        return this.sourceName;
     }
 
     /**
@@ -188,7 +219,7 @@ public abstract class Transfer implements Runnable {
     protected short incrementBlockNumber () {
         return this.currentBlock++;
     }
-    
+
     /**
      * Decrements the current block number and then returns the new value
      *
@@ -249,24 +280,29 @@ public abstract class Transfer implements Runnable {
         }
     }
 
-	protected void notifyTimeout(int attempsLeft) {
-		for (TransferListener listener : this.listeners) {
-            listener.handleTimeout(attempsLeft);
-        }
-		
-	}
-
-	protected void notifyException(Exception e) {
-		for (TransferListener listener : this.listeners) {
+    /**
+     * Notifies all listeners that an exception has occurred
+     * and the transfer has been terminated
+     *
+     * @param e - The exception that occurred
+     */
+    protected void notifyException (Exception e) {
+        for (TransferListener listener : this.listeners) {
             listener.handleException(e);
         }
-	}
+    }
 
-	protected void notifyInfo(String info) {
-		for (TransferListener listener : this.listeners) {
+    /**
+     * Notifies all listeners that an information message
+     * has been generated from the transfer
+     *
+     * @param info - Status message of the transfer
+     */
+    protected void notifyInfo (String info) {
+        for (TransferListener listener : this.listeners) {
             listener.handleInfo(info);
         }
-		
-	}
+
+    }
 
 }

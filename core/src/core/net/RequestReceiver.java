@@ -39,7 +39,7 @@ public class RequestReceiver extends Worker {
      * Logger used to log information
      */
 	private static final Logger LOGGER = Logger.getGlobal();
-	
+
     /**
      * Constructs a new request receiver to listen for requests on
      * the given port
@@ -58,7 +58,7 @@ public class RequestReceiver extends Worker {
         this.listeners.add(handler);
     }
 
-    public void listen () throws IOException, SocketException {
+    public void listen () throws IOException, SocketException, UnreachableHostException {
         Request req;
         NodeSocket errorSocket;
         ErrorMessage err;

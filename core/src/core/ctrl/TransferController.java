@@ -1,5 +1,6 @@
 package core.ctrl;
 
+import java.io.File;
 import java.net.SocketAddress;
 
 import core.cli.Command;
@@ -64,9 +65,35 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void read (String filename){
         ReadTransfer runner;
+        File file, dir;
+        String path;
 
+
+        path = this.appendPrefix(filename);
+        dir  = new File(this.getPrefix());
+        file = new File(path);
+
+        System.out.println("Requesting to read: " + filename);
+
+        // Before starting the transfer, ensure that the file exists
+        // and that there are sufficient permissions to read from it
+        if (file.exists() && file.isFile()) {
+        	System.out.println("File already exists: " + filename +
+                "\nEither remove the file from the working directory, "
+                + "or change the working directory.");
+        	return;
+        }
+        else if (dir.exists() && !dir.canWrite()) {
+            System.out.println("Insufficient permissions to write file: "
+                + filename + "\nPermission denied");
+            return;
+        }
+
+        // At this point the transfer is read to begin. The
+        // requested file does not already exist and there are
+        // sufficient privileges to write
         try {
-            runner = new ReadTransfer(this.getAddress(), filename);
+            runner = new ReadTransfer(this.getAddress(), filename, path);
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){
@@ -84,11 +111,31 @@ public abstract class TransferController extends Controller implements TransferL
      *
      * @param filename - Name of file to transfer
      */
-    public void write (String filename){
+    public void write (String filename) {
         Transfer runner;
+        File file;
+        String path;
 
+        path = this.appendPrefix(filename);
+        file = new File(path);
+
+        System.out.println("Requesting to write: " + filename);
+        if (!file.exists()) {
+        	System.out.println("File not found: " + filename);
+        	return;
+        }
+        else if (!file.canRead()) {
+            System.out.println("Insufficient permissions to read file: "
+                + filename + "\nPermission denied");
+            return;
+        }
+
+        // At this point the transfer is read to being.
+        // There are no issues with permissions on this end of
+        // the transfer
         try {
-            runner = new WriteTransfer(this.getAddress(), filename);
+            runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
+            System.out.println("Client Filename: " + appendPrefix(filename));
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){
@@ -112,4 +159,5 @@ public abstract class TransferController extends Controller implements TransferL
         transferThread.start();
         transferThread.join();
     }
+
 }

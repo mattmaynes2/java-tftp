@@ -24,9 +24,9 @@ public class Server extends RequestController {
         System.out.println("TFTP Server");
         System.out.println("  Commands:");
         System.out.println("    help           Prints this message");
-        System.out.println("    shutdown       Exits the server");
+        System.out.println("    chgdir         Change the working directory");
+        System.out.println("    shutdown       Exits the server");      
     }
-
 
     @Override
     public void handleMessage(Message msg){
@@ -59,11 +59,11 @@ public class Server extends RequestController {
 
     @Override
     public synchronized void stop(){
-    	if (this.activeTransferCount != 0){
-    		this.cli.message("There are currently " + this.activeTransferCount +
+        if (this.activeTransferCount != 0){
+            this.cli.message("There are currently " + this.activeTransferCount +
                     " transfers still running. The server will shut down after all transfers have completed.");
-    	}
-    	super.stop();
+        }
+        super.stop();
     }
 
     public static void main (String[] args) {
@@ -79,21 +79,16 @@ public class Server extends RequestController {
         }
     }
 
-	@Override
-	public void handleException(Exception e) {
-		LOGGER.log(Level.SEVERE,e.getMessage());
-		this.cli.message("Finished transfer with errors");
-		this.activeTransferCount--;
-	}
+    @Override
+    public void handleException(Exception e) {
+        LOGGER.log(Level.SEVERE,e.getMessage());
+        this.cli.message("Finished transfer with errors");
+        this.activeTransferCount--;
+    }
 
-	@Override
-	public void handleTimeout(int attemptsLeft) {
-		LOGGER.log(Level.WARNING,"Socket timed out while waiting for message. Will attempt "+attemptsLeft+" more times");
-	}
+    @Override
+    public void handleInfo(String info) {
+        LOGGER.log(Level.INFO,info);
 
-	@Override
-	public void handleInfo(String info) {
-		LOGGER.log(Level.INFO,info);
-		
-	}
+    }
 }

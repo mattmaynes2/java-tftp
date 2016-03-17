@@ -17,7 +17,7 @@ import core.log.ConsoleLogger;
  *
  * Handles requests from a command line interface and spawns transfers
  */
-public abstract class Controller implements CommandHandler{
+public abstract class Controller implements CommandHandler {
 
     /**
      * Command line option to turn on quiet mode logging
@@ -33,6 +33,11 @@ public abstract class Controller implements CommandHandler{
      * Command to request usage information for this process
      */
     public static final String HELP_COMMAND = "help";
+
+	/**
+	 * Command to set the file write destination
+	 */
+	public static final String CHANGE_DIRECTORY_COMMAND = "chgdir";
 
     /**
      * Address of endpoint to communicate with during transfer
@@ -55,10 +60,15 @@ public abstract class Controller implements CommandHandler{
     protected Map<String, Boolean> commandLineOptions;
 
     /**
-     * 
+     *
      */
     protected static final Logger LOGGER = Logger.getGlobal();
-   
+
+    /**
+     *
+     */
+    private String directoryPrefix = "";
+
     /**
      * Constructs a new controller with some default CLI commands
      *
@@ -68,9 +78,10 @@ public abstract class Controller implements CommandHandler{
         this.interpreter = new CommandInterpreter();
         this.interpreter.addCommand(SHUTDOWN_COMMAND);
         this.interpreter.addCommand(HELP_COMMAND);
+        this.interpreter.addCommand(CHANGE_DIRECTORY_COMMAND);
         this.commandLineOptions = new HashMap<String, Boolean>();
-        setCommandLineOptions(commandLineArgs);
-        applyCommandLineOptions();
+        this.setCommandLineOptions(commandLineArgs);
+        this.applyCommandLineOptions();
     }
 
     /**
@@ -127,6 +138,16 @@ public abstract class Controller implements CommandHandler{
     }
 
     /**
+     * Returns the directory prefix that this controller is
+     * reading and writing from
+     *
+     * @return Prefix of directory
+     */
+    public String getPrefix() {
+    	return this.directoryPrefix;
+    }
+
+    /**
      * Starts the controller and command line interface
      */
     public void start () {
@@ -149,21 +170,48 @@ public abstract class Controller implements CommandHandler{
     public abstract void usage();
 
     /**
+     * Changes the current working directory
+     *
+     * @param dir - the new working directory
+     */
+    public void changeWorkingDirectory(String dir) {
+    	this.directoryPrefix = dir + "/";
+    }
+
+
+/**
+ * Appends the current directory prefix to the given path
+ *
+ * @param filepath - Path to prepend prefix to
+ *
+ * @return Complete path
+ */
+    public String appendPrefix(String filepath) {
+    	if(filepath.startsWith("/")|| filepath.startsWith(":/", 1) ||filepath.startsWith(":\\",1)) {
+    		return filepath;
+    	}
+    	return directoryPrefix.concat(filepath);
+    }
+
+    /**
      * Invoked when a user types a command on the interface
      *
      * @param command - User's CLI command
      */
-        public void handleCommand (Command command){
-            switch (command.getToken()){
-                case SHUTDOWN_COMMAND:
-                    this.stop();
-                    break;
-                case HELP_COMMAND:
-                    this.usage();
-                    break;
-                default:
-                    break;
-            }
+    public void handleCommand (Command command){
+        switch (command.getToken()){
+            case SHUTDOWN_COMMAND:
+                this.stop();
+                break;
+            case HELP_COMMAND:
+                this.usage();
+                break;
+            case CHANGE_DIRECTORY_COMMAND:
+            	this.changeWorkingDirectory(command.getFirstArgument());
+                break;
+            default:
+                break;
         }
+    }
 
 }

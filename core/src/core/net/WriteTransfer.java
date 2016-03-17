@@ -4,9 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.Arrays;
-
 
 import core.req.AckMessage;
 import core.req.DataMessage;
@@ -32,16 +30,22 @@ import core.req.WriteRequest;
 public class WriteTransfer extends Transfer {
 
     /**
+     * Stores the current message being transferred
+     */
+    private DataMessage currentMessage;
+
+    /**
      * Constructs a new transfer will write data to a socket from
      * the file with the given name
      *
      * @param address - Address of endpoint to send data
-     * @param filename - Name of file to send to server
+     * @param filename - Source name of the file to send to server
+     * @param destinationName - Destination name of the file on the server
      *
      * @throws SocketException - If the socket cannot be created
      */
-    public WriteTransfer (SocketAddress address, String filename) throws SocketException {
-        super(address, filename);
+    public WriteTransfer (SocketAddress address, String sourceName, String destinationName) throws SocketException {
+        super(address, sourceName, destinationName);
     }
 
     /**
@@ -55,23 +59,12 @@ public class WriteTransfer extends Transfer {
         WriteRequest request;
 
         try {
-            request = new WriteRequest(this.getFilename());
+            request = new WriteRequest(this.destinationName);
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
-            AckMessage ack =null;
-            int sendAttemps=0;
-            while(ack == null) {
-            	try {
-            		ack=this.getAcknowledge();
-            	}catch(SocketTimeoutException e) {
-            		sendAttemps++;
-            		if(sendAttemps == MAX_ATTEMPTS) {
-            			throw new UnreachableHostException("No response from host tried 5 times");
-            		}
-            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
-            	}
-            }
+
+            AckMessage ack = this.getAcknowledge();
 
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
@@ -83,8 +76,8 @@ public class WriteTransfer extends Transfer {
             // This should never happen since it was just a request
             this.notifyException(e);
             return false;
-        }catch(UnreachableHostException e) {
-        	this.notifyException(e);
+        } catch (UnreachableHostException e) {
+            this.notifyException(e);
             return false;
         }
         return true;
@@ -96,39 +89,26 @@ public class WriteTransfer extends Transfer {
      */
     public void run () {
         FileInputStream in;
-        DataMessage msg;
+        AckMessage ack;
 
         // Starting the transfer
         this.notifyStart();
 
         try {
-
             // Create a new stream to read the file
-            in = new FileInputStream(this.getFilename());
+            in = new FileInputStream(this.sourceName);
 
             // Continue to send data until all of the data has been sent
             do {
-            	msg = createMessage(in);
-            	int sendAttemps=0;
-            	AckMessage ack=null;
-            	this.sendDataMessage(msg);
-            	while(ack == null ) {
-	            	try {
-	                	ack=this.getAcknowledge();
-	            	}catch(SocketTimeoutException e){
-	            		sendAttemps++;
-	            		if(sendAttemps == MAX_ATTEMPTS) {
-	            			throw new UnreachableHostException("No response from host tried 5 times");
-	            		}
-	            		this.notifyTimeout(MAX_ATTEMPTS-sendAttemps);
-	            		//resend message
-	            		this.sendDataMessage(msg);
-	            	}catch(MessageOrderException e) {
-	            		this.notifyInfo(e.getMessage()+"\nIgnoring Messge");
-	            	}
-            	}
-                this.notifyMessage(ack);
-            } while(msg.getData().length == DataMessage.BLOCK_SIZE);
+                this.currentMessage = createMessage(in);
+                this.sendDataMessage(this.currentMessage);
+                try {
+                    ack = this.getAcknowledge();
+                    this.notifyMessage(ack);
+                } catch (MessageOrderException e) {
+                    this.notifyInfo(e.getMessage() + "\nIgnoring Message");
+                }
+            } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
 
             // Close the input stream and socket
             in.close();
@@ -140,8 +120,8 @@ public class WriteTransfer extends Transfer {
             this.notifyError(e.getErrorMessage());
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
-        } catch(UnreachableHostException e) {
-        	this.notifyException(e);
+        } catch (UnreachableHostException e) {
+            this.notifyException(e);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -157,13 +137,14 @@ public class WriteTransfer extends Transfer {
      * @throws InvalidMessageException - If the received message has an invalid encoding
      * @throws ErrorMessageException - If an error message is received
      * @throws MessageOrderException - If an acknowledge is received out of order
-     * @throws SocketTimeoutException - If an acknowledge packet isn't received within TIMEOUT_TIME
+     * @throws UnreachableHostException - If an acknowledge packet isn't received within TIMEOUT_TIME
      */
     public AckMessage getAcknowledge () throws
-            IOException,
-            InvalidMessageException,
-            ErrorMessageException,
-            MessageOrderException, SocketTimeoutException{
+        IOException,
+        InvalidMessageException,
+        ErrorMessageException,
+        MessageOrderException,
+        UnreachableHostException {
 
         Message msg;
         AckMessage ack;
@@ -175,6 +156,21 @@ public class WriteTransfer extends Transfer {
         this.checkOrder(ack);
 
         return ack;
+    }
+
+    /**
+     * Handles the timeout of a node socket
+     *
+     * @param remaining - Number of retry attempts remaining
+     */
+    public void handleTimeout (int remaining) {
+        super.handleTimeout(remaining);
+        try {
+            this.sendDataMessage(this.currentMessage);
+        } catch (IOException e){
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     /**
