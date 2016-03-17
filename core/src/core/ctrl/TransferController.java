@@ -77,7 +77,7 @@ public abstract class TransferController extends Controller implements TransferL
 
         // Before starting the transfer, ensure that the file exists
         // and that there are sufficient permissions to read from it
-        if (dir.exists() && file.isFile()) {
+        if (file.exists() && file.isFile()) {
         	System.out.println("File already exists: " + filename +
                 "\nEither remove the file from the working directory, "
                 + "or change the working directory.");

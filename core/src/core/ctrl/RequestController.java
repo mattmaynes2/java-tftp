@@ -107,15 +107,13 @@ public abstract class RequestController extends Controller implements RequestLis
     public void read (SocketAddress address, String filename){
         Transfer runner;
         ErrorMessage err;
-        File file, dir;
+        File file;
         String path;
 
         path = this.appendPrefix(filename);
-        dir  = new File(this.getPrefix());
         file = new File(path);
 
-        /*
-        if (!dir.exists() || !file.isFile()) {
+        if (!file.exists() || !file.isFile()) {
             err = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
             this.respondError(err, address);
             return;
@@ -126,7 +124,6 @@ public abstract class RequestController extends Controller implements RequestLis
             this.respondError(err, address);
             return;
         }
-        */
 
         try {
             runner = new WriteTransfer(address, filename);
@@ -156,7 +153,7 @@ public abstract class RequestController extends Controller implements RequestLis
         file = new File(path);
 
         // Start an error thread that will send an error code 6 message to the client if the file already exists
-        /*if (dir.exists() && file.isFile()) {
+        if (file.exists() && file.isFile()) {
             err = new ErrorMessage(ErrorCode.FILE_ALREADY_EXISTS, "\"" + filename + "\" already exists.");
             this.respondError(err, address);
             return;
@@ -167,7 +164,7 @@ public abstract class RequestController extends Controller implements RequestLis
             this.respondError(err, address);
             return;
         }
-        */
+
 
         try {
             runner = new ReadTransfer(address, filename);
