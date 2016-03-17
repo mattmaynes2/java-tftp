@@ -2,6 +2,8 @@ package core.net;
 
 import core.req.AckMessage;
 import core.req.DataMessage;
+import core.req.ErrorCode;
+import core.req.ErrorMessage;
 import core.req.Message;
 import core.req.ReadRequest;
 import core.req.OpCode;
@@ -106,6 +108,9 @@ public class ReadTransfer extends Transfer {
         } catch (UnreachableHostException e) {
             this.notifyException(e);
             removeFile(out);
+        } catch (IOException e) {
+        	this.handleDiskFull();
+        	removeFile(out);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -234,5 +239,22 @@ public class ReadTransfer extends Transfer {
             this.getSocket().send(ack);
         }
 
+    }
+
+    /**
+     * Handles an I/O exception where the disk is full or the disk allocation
+     * has exceeded by sending an error message on the socket and notifies
+     * listeners of the error
+     */
+    private void handleDiskFull() {
+    	ErrorMessage msg;
+        try {
+            msg = new ErrorMessage(ErrorCode.DISK_FULL, "Disk is full.");
+            this.getSocket().send(msg);
+            this.notifyError(msg);
+        } catch (IOException e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

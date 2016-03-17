@@ -24,9 +24,9 @@ public class Server extends RequestController {
         System.out.println("TFTP Server");
         System.out.println("  Commands:");
         System.out.println("    help           Prints this message");
-        System.out.println("    shutdown       Exits the server");
+        System.out.println("    chgdir         Change the working directory");
+        System.out.println("    shutdown       Exits the server");      
     }
-
 
     @Override
     public void handleMessage(Message msg){

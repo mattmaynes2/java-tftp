@@ -1,8 +1,11 @@
 package core.ctrl;
 
+import java.io.File;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
+
+import core.net.ErrorResponder;
 import core.net.ReadTransfer;
 import core.net.RequestListener;
 import core.net.RequestReceiver;
@@ -10,8 +13,9 @@ import core.net.Transfer;
 import core.net.TransferListener;
 import core.net.WriteTransfer;
 import core.req.AckMessage;
-import core.req.Request;
+import core.req.ErrorCode;
 import core.req.ErrorMessage;
+import core.req.Request;
 
 /**
  * Request Controller
@@ -19,7 +23,7 @@ import core.req.ErrorMessage;
  * Responds to transfer requests and performs operations
  */
 public abstract class RequestController extends Controller implements RequestListener, TransferListener  {
-
+	
     /**
      * Handles sockets requests
      */
@@ -47,13 +51,14 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void handleRequest (Request req, SocketAddress address){
     	LOGGER.log(Level.FINE, "Received request from client " + req.toString());
-
+    	String filename = appendPrefix(req.getFilename());
+    	new File(getPrefix()).mkdirs();
         switch(req.getOpCode()){
             case READ:
-                this.read(address, req.getFilename());
+                this.read(address, filename);
                 break;
             case WRITE:
-                this.write(address, req.getFilename());
+                this.write(address, filename);
                 break;
             default:
             	break;
@@ -97,14 +102,20 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void read (SocketAddress address, String filename){
         Transfer runner;
-
-        try {
-            runner = new WriteTransfer(address, filename);
-            runner.addTransferListener(this);
-            (new Thread(runner)).start();
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        
+        // Start an error thread that will send an error code 1 message to the client
+        if(!(new File(filename).isFile())) {
+        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
+        	sendErrorResponse(msg, address);
+        } else { // Otherwise start the transfer
+	        try {
+	            runner = new WriteTransfer(address, filename);
+	            runner.addTransferListener(this);
+	            (new Thread(runner)).start();
+	        } catch (Exception e){
+	            e.printStackTrace();
+	            System.exit(1);
+	        }
         }
     }
 
@@ -117,20 +128,44 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void write (SocketAddress address, String filename){
         ReadTransfer runner;
-
-        try {
-            runner = new ReadTransfer(address, filename);
-
-            runner.addTransferListener(this);
-            AckMessage ack = new AckMessage((short)0);
-            this.handleSendMessage(ack);
-            // Send the initial Ack
-            runner.getSocket().send(ack);
-            (new Thread(runner)).start();
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        
+        // Start an error thread that will send an error code 6 message to the client if the file already exists
+        if(new File(filename).isFile()) {
+        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_ALREADY_EXISTS, "\"" + filename + "\" already exists.");
+        	sendErrorResponse(msg, address);
+        } else { // Otherwise start the transfer
+	        try {
+	            runner = new ReadTransfer(address, filename);
+	
+	            runner.addTransferListener(this);
+	            AckMessage ack = new AckMessage((short)0);
+	            this.handleSendMessage(ack);
+	            // Send the initial Ack
+	            runner.getSocket().send(ack);
+	            (new Thread(runner)).start();
+	        } catch (Exception e){
+	            e.printStackTrace();
+	            System.exit(1);
+	        }
         }
 
+    }
+    
+    /**
+     * Creates an ErrorResponder thread which sends an error message to the specified address
+     * 
+     * @param msg - An ErrorMessage that contains the information relevant to the type of error encountered
+     * @param address - The socket address that the error message should be sent to
+     */
+    public void sendErrorResponse(ErrorMessage msg, SocketAddress address) {
+    	ErrorResponder responder;
+    	try {
+			responder = new ErrorResponder(msg, address);
+			responder.addListener(this);
+			(new Thread(responder)).start(); 	
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
     }
 }

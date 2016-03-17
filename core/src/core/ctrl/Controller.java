@@ -34,6 +34,11 @@ public abstract class Controller implements CommandHandler {
      */
     public static final String HELP_COMMAND = "help";
 
+	/**
+	 * Command to set the file write destination
+	 */
+	public static final String CHANGE_DIRECTORY_COMMAND = "chgdir";
+
     /**
      * Address of endpoint to communicate with during transfer
      */
@@ -60,6 +65,11 @@ public abstract class Controller implements CommandHandler {
     protected static final Logger LOGGER = Logger.getGlobal();
 
     /**
+     *
+     */
+    private String directoryPrefix = "";
+
+    /**
      * Constructs a new controller with some default CLI commands
      *
      * @param commandLineArgs - Arguments from the command line
@@ -68,6 +78,7 @@ public abstract class Controller implements CommandHandler {
         this.interpreter = new CommandInterpreter();
         this.interpreter.addCommand(SHUTDOWN_COMMAND);
         this.interpreter.addCommand(HELP_COMMAND);
+        this.interpreter.addCommand(CHANGE_DIRECTORY_COMMAND);
         this.commandLineOptions = new HashMap<String, Boolean>();
         setCommandLineOptions(commandLineArgs);
         applyCommandLineOptions();
@@ -126,6 +137,10 @@ public abstract class Controller implements CommandHandler {
         return this.address;
     }
 
+    public String getPrefix() {
+    	return this.directoryPrefix;
+    }
+
     /**
      * Starts the controller and command line interface
      */
@@ -149,6 +164,31 @@ public abstract class Controller implements CommandHandler {
     public abstract void usage();
 
     /**
+     * Changes the current working directory
+     *
+     * @param dir - the new working directory
+     */
+    public void changeWorkingDirectory(String dir) {
+    	this.directoryPrefix = dir;
+    }
+
+    public String appendPrefix(String filepath) {
+    	String path = filepath;
+    	if (null != filepath && filepath.length() > 0 )
+    	{
+    	    int endIndex = filepath.lastIndexOf("/");
+    	    if (endIndex != -1)
+    	    {
+    	        path = directoryPrefix.concat(filepath.substring(0, endIndex));
+    	    }
+    	    else {
+    	    	path = directoryPrefix.concat(filepath);
+    	    }
+    	}
+    	return path;
+    }
+
+    /**
      * Invoked when a user types a command on the interface
      *
      * @param command - User's CLI command
@@ -161,6 +201,8 @@ public abstract class Controller implements CommandHandler {
             case HELP_COMMAND:
                 this.usage();
                 break;
+            case CHANGE_DIRECTORY_COMMAND:
+            	this.changeWorkingDirectory(command.getFirstArgument());
             default:
                 break;
         }
