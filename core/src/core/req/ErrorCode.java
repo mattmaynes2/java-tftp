@@ -2,10 +2,11 @@ package core.req;
 
 public enum ErrorCode {
 	FILE_NOT_FOUND			((byte) 0x01),
+    ACCESS_VIOLATION        ((byte) 0x02),
 	DISK_FULL				((byte) 0x03),
 	ILLEGAL_OP				((byte) 0x04),
-	UNKNOWN_TID			((byte) 0x05),
-	FILE_ALREADY_EXISTS	((byte) 0x06);
+	UNKNOWN_TID			    ((byte) 0x05),
+	FILE_ALREADY_EXISTS	    ((byte) 0x06);
 
     private byte code;
 
@@ -21,6 +22,8 @@ public enum ErrorCode {
         switch(code){
         	case 0x01:
         		return FILE_NOT_FOUND;
+            case 0x02:
+                return ACCESS_VIOLATION;
         	case 0x03:
         		return DISK_FULL;
         	case 0x04:

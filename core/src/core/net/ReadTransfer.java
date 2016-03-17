@@ -121,16 +121,15 @@ public class ReadTransfer extends Transfer {
      *
      * @param out - the outputstream for the file that needs to be deleted
      */
-    private void removeFile(FileOutputStream out) {
-        if(out!=null) {
+    private void removeFile (FileOutputStream out) {
+        if (out != null) {
             try {
-
                 out.close();
                 File f = new File(this.getFilename());
-                if(f.delete()) {
-                    this.notifyInfo("Deleted "+getFilename());
-                }else {
-                    this.notifyInfo("Unable to deleted "+getFilename());
+                if (f.delete()) {
+                    this.notifyInfo("Deleted " + getFilename());
+                } else {
+                    this.notifyInfo("Unable to deleted " + getFilename());
                 }
             } catch (IOException e1) {
                 this.notifyInfo("Error closing output stream");

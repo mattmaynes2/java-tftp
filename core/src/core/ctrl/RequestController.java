@@ -23,7 +23,7 @@ import core.req.Request;
  * Responds to transfer requests and performs operations
  */
 public abstract class RequestController extends Controller implements RequestListener, TransferListener  {
-	
+
     /**
      * Handles sockets requests
      */
@@ -50,18 +50,22 @@ public abstract class RequestController extends Controller implements RequestLis
      * @param address - Sender's address
      */
     public void handleRequest (Request req, SocketAddress address){
-    	LOGGER.log(Level.FINE, "Received request from client " + req.toString());
-    	String filename = appendPrefix(req.getFilename());
-    	new File(getPrefix()).mkdirs();
+        LOGGER.log(Level.FINE, "Received request from client " + req.toString());
+
+        // Ensure that the destination directory exists for each request.
+        // If for some reason the destination is deleted between requests
+        // then it needs to be reconstructed.
+        new File(getPrefix()).mkdirs();
+
         switch(req.getOpCode()){
             case READ:
-                this.read(address, filename);
+                this.read(address, req.getFilename());
                 break;
             case WRITE:
-                this.write(address, filename);
+                this.write(address, req.getFilename());
                 break;
             default:
-            	break;
+                break;
         }
     }
 
@@ -102,20 +106,31 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void read (SocketAddress address, String filename){
         Transfer runner;
-        
-        // Start an error thread that will send an error code 1 message to the client
-        if(!(new File(filename).isFile())) {
-        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
-        	sendErrorResponse(msg, address);
-        } else { // Otherwise start the transfer
-	        try {
-	            runner = new WriteTransfer(address, filename);
-	            runner.addTransferListener(this);
-	            (new Thread(runner)).start();
-	        } catch (Exception e){
-	            e.printStackTrace();
-	            System.exit(1);
-	        }
+        ErrorMessage err;
+        File file;
+        String path;
+
+        path = this.appendPrefix(filename);
+        file = new File(path);
+        if (!file.exists()) {
+            err = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
+            this.respondError(err, address);
+            return;
+        }
+        else if (!file.canRead()) {
+            err = new ErrorMessage(ErrorCode.ACCESS_VIOLATION,
+                    "Insufficient privileges to read file \"" + filename + "\"");
+            this.respondError(err, address);
+            return;
+        }
+
+        try {
+            runner = new WriteTransfer(address, filename);
+            runner.addTransferListener(this);
+            (new Thread(runner)).start();
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -128,44 +143,58 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void write (SocketAddress address, String filename){
         ReadTransfer runner;
-        
+        ErrorMessage err;
+        File file;
+        String path;
+
+        path = this.appendPrefix(filename);
+        file = new File(path);
+
         // Start an error thread that will send an error code 6 message to the client if the file already exists
-        if(new File(filename).isFile()) {
-        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_ALREADY_EXISTS, "\"" + filename + "\" already exists.");
-        	sendErrorResponse(msg, address);
-        } else { // Otherwise start the transfer
-	        try {
-	            runner = new ReadTransfer(address, filename);
-	
-	            runner.addTransferListener(this);
-	            AckMessage ack = new AckMessage((short)0);
-	            this.handleSendMessage(ack);
-	            // Send the initial Ack
-	            runner.getSocket().send(ack);
-	            (new Thread(runner)).start();
-	        } catch (Exception e){
-	            e.printStackTrace();
-	            System.exit(1);
-	        }
+        if (file.exists()) {
+            err = new ErrorMessage(ErrorCode.FILE_ALREADY_EXISTS, "\"" + filename + "\" already exists.");
+            this.respondError(err, address);
+            return;
+        }
+        else if (!file.canWrite()){
+            err = new ErrorMessage(ErrorCode.ACCESS_VIOLATION,
+                    "Insufficient privileges to write file \"" + filename + "\"");
+            this.respondError(err, address);
+            return;
         }
 
+
+        try {
+            runner = new ReadTransfer(address, filename);
+
+            runner.addTransferListener(this);
+            AckMessage ack = new AckMessage((short)0);
+            this.handleSendMessage(ack);
+            // Send the initial Ack
+            runner.getSocket().send(ack);
+            (new Thread(runner)).start();
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
-    
+
     /**
      * Creates an ErrorResponder thread which sends an error message to the specified address
-     * 
+     *
      * @param msg - An ErrorMessage that contains the information relevant to the type of error encountered
      * @param address - The socket address that the error message should be sent to
      */
-    public void sendErrorResponse(ErrorMessage msg, SocketAddress address) {
-    	ErrorResponder responder;
-    	try {
-			responder = new ErrorResponder(msg, address);
-			responder.addListener(this);
-			(new Thread(responder)).start(); 	
-		} catch (SocketException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+    public void respondError (ErrorMessage msg, SocketAddress address) {
+        ErrorResponder responder;
+
+        try {
+            responder = new ErrorResponder(msg, address);
+            responder.addListener(this);
+            (new Thread(responder)).start();
+        } catch (SocketException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }
