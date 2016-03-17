@@ -93,7 +93,7 @@ public abstract class TransferController extends Controller implements TransferL
         // requested file does not already exist and there are
         // sufficient privileges to write
         try {
-            runner = new ReadTransfer(this.getAddress(), path);
+            runner = new ReadTransfer(this.getAddress(), filename, path);
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){
@@ -134,7 +134,7 @@ public abstract class TransferController extends Controller implements TransferL
         // There are no issues with permissions on this end of
         // the transfer
         try {
-            runner = new WriteTransfer(this.getAddress(), appendPrefix(filename));
+            runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
             System.out.println("Client Filename: " + appendPrefix(filename));
             runner.addTransferListener(this);
 

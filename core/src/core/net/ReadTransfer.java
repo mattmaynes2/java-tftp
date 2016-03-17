@@ -40,8 +40,8 @@ public class ReadTransfer extends Transfer {
      *
      * @throws SocketException - If the socket cannot be created
      */
-    public ReadTransfer (SocketAddress address, String filename) throws SocketException {
-        super(address, filename);
+    public ReadTransfer (SocketAddress address, String filename, String destinationName) throws SocketException {
+        super(address, filename, destinationName);
     }
 
     /**
@@ -73,7 +73,7 @@ public class ReadTransfer extends Transfer {
         try {
             msg = this.getNext();
             // Create a stream to write the file too
-            out = new FileOutputStream(this.getFilename());
+            out = new FileOutputStream(this.destinationName);
             // We should continue to read until we get a block
             // that is less than the standard data block size
             while (msg.getData().length == DataMessage.BLOCK_SIZE){

@@ -44,8 +44,10 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
     /**
      * Name of the file to transfer
      */
-    private String filename;
+    protected String sourceName;
 
+    protected String destinationName;
+    
     /**
      * Current data block being transferred
      */
@@ -55,12 +57,15 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
      * Constructs a transfer with a socket which will move the specified file
      *
      * @param address - Address to use as the endpoint
-     * @param filename - Path of file to transfer
+     * @param sourceName - Source path of file to transfer
+     * @param destination - Destination path of the file to transfer
      *
      * @throws SocketException - If the socket cannot be created
      */
-    public Transfer (SocketAddress address, String filename) throws SocketException {
-        this.filename = filename;
+    public Transfer (SocketAddress address, String sourceName, String destinationName) throws SocketException {
+        this.sourceName = sourceName;
+        this.destinationName = destinationName;
+        
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
         this.currentBlock = 0;
@@ -167,7 +172,7 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
      * @return Name of file being transfered
      */
     public String getFilename () {
-        return this.filename;
+        return this.sourceName;
     }
 
     /**

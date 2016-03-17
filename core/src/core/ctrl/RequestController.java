@@ -126,7 +126,7 @@ public abstract class RequestController extends Controller implements RequestLis
         }
 
         try {
-            runner = new WriteTransfer(address, filename);
+            runner = new WriteTransfer(address, path, filename);
             runner.addTransferListener(this);
             (new Thread(runner)).start();
         } catch (Exception e){
@@ -167,7 +167,7 @@ public abstract class RequestController extends Controller implements RequestLis
 
 
         try {
-            runner = new ReadTransfer(address, filename);
+            runner = new ReadTransfer(address, path, path);
 
             runner.addTransferListener(this);
             AckMessage ack = new AckMessage((short)0);

@@ -39,12 +39,13 @@ public class WriteTransfer extends Transfer {
      * the file with the given name
      *
      * @param address - Address of endpoint to send data
-     * @param filename - Name of file to send to server
+     * @param filename - Source name of the file to send to server
+     * @param destinationName - Destination name of the file on the server
      *
      * @throws SocketException - If the socket cannot be created
      */
-    public WriteTransfer (SocketAddress address, String filename) throws SocketException {
-        super(address, filename);
+    public WriteTransfer (SocketAddress address, String sourceName, String destinationName) throws SocketException {
+        super(address, sourceName, destinationName);
     }
 
     /**
@@ -58,7 +59,7 @@ public class WriteTransfer extends Transfer {
         WriteRequest request;
 
         try {
-            request = new WriteRequest(this.getFilename());
+            request = new WriteRequest(this.destinationName);
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
@@ -95,7 +96,7 @@ public class WriteTransfer extends Transfer {
 
         try {
             // Create a new stream to read the file
-            in = new FileInputStream(this.getFilename());
+            in = new FileInputStream(this.sourceName);
 
             // Continue to send data until all of the data has been sent
             do {
