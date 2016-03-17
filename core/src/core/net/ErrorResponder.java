@@ -6,7 +6,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 import core.req.ErrorMessage;
-import core.req.Message;
 
 public class ErrorResponder implements Runnable {
 
@@ -23,18 +22,28 @@ public class ErrorResponder implements Runnable {
 	@Override
 	public void run() {
 		try {
-			notifySendMessage(errorMsg);
+			notifySendErrorMessage(errorMsg);
 			this.socket.send(this.errorMsg);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Adds a listener to the message being sent
+	 * 
+	 * @param listener - The listener to add to the message that will be sent
+	 */
 	public void addListener(TransferListener listener) {
 		this.listeners.add(listener);
 	}
 	
-	public void notifySendMessage(Message msg) {
+	/**
+	 * Notify the listeners that the error message has been sent
+	 * 
+	 * @param msg - The error message that is being sent
+	 */
+	public void notifySendErrorMessage(ErrorMessage msg) {
 		for (TransferListener listener : this.listeners) {
             listener.handleSendMessage(msg);
         }

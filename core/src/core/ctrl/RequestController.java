@@ -102,17 +102,11 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void read (SocketAddress address, String filename){
         Transfer runner;
-        ErrorResponder responder;
+        
         // Start an error thread that will send an error code 1 message to the client
         if(!(new File(filename).isFile())) {
         	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_NOT_FOUND, "\"" + filename + "\" not found.");
-			try {
-				responder = new ErrorResponder(msg, address);
-				responder.addListener(this);
-				(new Thread(responder)).start(); 	
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
+        	sendErrorResponse(msg, address);
         } else { // Otherwise start the transfer
 	        try {
 	            runner = new WriteTransfer(address, filename);
@@ -134,20 +128,44 @@ public abstract class RequestController extends Controller implements RequestLis
      */
     public void write (SocketAddress address, String filename){
         ReadTransfer runner;
-
-        try {
-            runner = new ReadTransfer(address, filename);
-
-            runner.addTransferListener(this);
-            AckMessage ack = new AckMessage((short)0);
-            this.handleSendMessage(ack);
-            // Send the initial Ack
-            runner.getSocket().send(ack);
-            (new Thread(runner)).start();
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        
+        // Start an error thread that will send an error code 6 message to the client if the file already exists
+        if(new File(filename).isFile()) {
+        	ErrorMessage msg = new ErrorMessage(ErrorCode.FILE_ALREADY_EXISTS, "\"" + filename + "\" already exists.");
+        	sendErrorResponse(msg, address);
+        } else { // Otherwise start the transfer
+	        try {
+	            runner = new ReadTransfer(address, filename);
+	
+	            runner.addTransferListener(this);
+	            AckMessage ack = new AckMessage((short)0);
+	            this.handleSendMessage(ack);
+	            // Send the initial Ack
+	            runner.getSocket().send(ack);
+	            (new Thread(runner)).start();
+	        } catch (Exception e){
+	            e.printStackTrace();
+	            System.exit(1);
+	        }
         }
 
+    }
+    
+    /**
+     * Creates an ErrorResponder thread which sends an error message to the specified address
+     * 
+     * @param msg - An ErrorMessage that contains the information relevant to the type of error encountered
+     * @param address - The socket address that the error message should be sent to
+     */
+    public void sendErrorResponse(ErrorMessage msg, SocketAddress address) {
+    	ErrorResponder responder;
+    	try {
+			responder = new ErrorResponder(msg, address);
+			responder.addListener(this);
+			(new Thread(responder)).start(); 	
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
     }
 }

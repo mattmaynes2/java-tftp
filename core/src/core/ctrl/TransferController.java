@@ -65,7 +65,11 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void read (String filename){
         ReadTransfer runner;
-
+        File file = new File(appendPrefix(filename));
+        if(file.isFile()) {
+        	System.out.println("File already exists: " + filename + "\nEither remove the file from the working directory, or change the working directory.");
+        	return;
+        }
         try {
             runner = new ReadTransfer(this.getAddress(), appendPrefix(filename));
             runner.addTransferListener(this);
