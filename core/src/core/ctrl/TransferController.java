@@ -120,7 +120,7 @@ public abstract class TransferController extends Controller implements TransferL
         file = new File(path);
 
         System.out.println("Requesting to write: " + filename);
-        if (!file.isFile()) {
+        if (!file.exists()) {
         	System.out.println("File not found: " + filename);
         	return;
         }
@@ -134,7 +134,8 @@ public abstract class TransferController extends Controller implements TransferL
         // There are no issues with permissions on this end of
         // the transfer
         try {
-            runner = new WriteTransfer(this.getAddress(), filename);
+            runner = new WriteTransfer(this.getAddress(), appendPrefix(filename));
+            System.out.println("Client Filename: " + appendPrefix(filename));
             runner.addTransferListener(this);
 
             if (runner.sendRequest()){

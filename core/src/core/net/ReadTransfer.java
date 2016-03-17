@@ -1,23 +1,21 @@
 package core.net;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.SocketAddress;
+import java.net.SocketException;
+
 import core.req.AckMessage;
 import core.req.DataMessage;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
-import core.req.Message;
-import core.req.ReadRequest;
-import core.req.OpCode;
 import core.req.ErrorMessageException;
 import core.req.InvalidMessageException;
+import core.req.Message;
 import core.req.MessageOrderException;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import core.req.OpCode;
+import core.req.ReadRequest;
 
 /**
  * Read Transfer

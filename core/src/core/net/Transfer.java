@@ -1,15 +1,11 @@
 package core.net;
 
 import java.io.IOException;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
-
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import core.log.ConsoleLogger;
 
 import core.req.AckMessage;
 import core.req.ErrorCode;
