@@ -22,7 +22,7 @@ public class ErrorResponder implements Runnable {
 	@Override
 	public void run() {
 		try {
-			notifySendErrorMessage(errorMsg);
+			notifyError(errorMsg);
 			this.socket.send(this.errorMsg);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,9 +43,9 @@ public class ErrorResponder implements Runnable {
 	 * 
 	 * @param msg - The error message that is being sent
 	 */
-	public void notifySendErrorMessage(ErrorMessage msg) {
+	public void notifyError(ErrorMessage msg) {
 		for (TransferListener listener : this.listeners) {
-            listener.handleSendMessage(msg);
+            listener.handleErrorMessage(msg);
         }
 	}
 
