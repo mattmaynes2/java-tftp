@@ -80,8 +80,8 @@ public abstract class Controller implements CommandHandler {
         this.interpreter.addCommand(HELP_COMMAND);
         this.interpreter.addCommand(CHANGE_DIRECTORY_COMMAND);
         this.commandLineOptions = new HashMap<String, Boolean>();
-        setCommandLineOptions(commandLineArgs);
-        applyCommandLineOptions();
+        this.setCommandLineOptions(commandLineArgs);
+        this.applyCommandLineOptions();
     }
 
     /**
@@ -137,6 +137,12 @@ public abstract class Controller implements CommandHandler {
         return this.address;
     }
 
+    /**
+     * Returns the directory prefix that this controller is
+     * reading and writing from
+     *
+     * @return Prefix of directory
+     */
     public String getPrefix() {
     	return this.directoryPrefix;
     }
@@ -169,23 +175,18 @@ public abstract class Controller implements CommandHandler {
      * @param dir - the new working directory
      */
     public void changeWorkingDirectory(String dir) {
-    	this.directoryPrefix = dir;
+    	this.directoryPrefix = dir + "/";
     }
 
-    public String appendPrefix(String filepath) {
-    	String path = filepath;
-    	if (null != filepath && filepath.length() > 0 )
-    	{
-    	    int endIndex = filepath.lastIndexOf("/");
-    	    if (endIndex != -1)
-    	    {
-    	        path = directoryPrefix.concat(filepath.substring(0, endIndex));
-    	    }
-    	    else {
-    	    	path = directoryPrefix.concat(filepath);
-    	    }
-    	}
-    	return path;
+    /**
+     * Appends the current directory prefix to the given path
+     *
+     * @param filepath - Path to prepend prefix to
+     *
+     * @return Complete path
+     */
+    public String appendPrefix(String path) {
+        return this.directoryPrefix.concat(path);
     }
 
     /**
@@ -203,6 +204,7 @@ public abstract class Controller implements CommandHandler {
                 break;
             case CHANGE_DIRECTORY_COMMAND:
             	this.changeWorkingDirectory(command.getFirstArgument());
+                break;
             default:
                 break;
         }

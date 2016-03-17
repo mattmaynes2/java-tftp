@@ -37,7 +37,7 @@ public class CommandInterpreter {
      * @throws CommandInputException If the command is invalid
      */
     public Command parseCommand (String input) throws CommandInputException {
-        StringTokenizer tokenizer = new StringTokenizer(input);
+        StringTokenizer tokenizer = new StringTokenizer(input, " ");
         String token;
 
         try {

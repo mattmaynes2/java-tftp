@@ -55,7 +55,7 @@ public class ReadTransfer extends Transfer {
      */
     public boolean sendRequest () throws IOException {
         ReadRequest request = new ReadRequest(this.getFilename());
-        notifySendMessage(request);
+        this.notifySendMessage(request);
         this.getSocket().send(request);
         this.getSocket().reset();
         return true;
@@ -101,16 +101,16 @@ public class ReadTransfer extends Transfer {
             this.notifyComplete();
         } catch (ErrorMessageException e){
             this.notifyError(e.getErrorMessage());
-            removeFile(out);
+            this.removeFile(out);
         } catch (InvalidMessageException e){
             this.handleInvalidMessage(e);
-            removeFile(out);
+            this.removeFile(out);
         } catch (UnreachableHostException e) {
             this.notifyException(e);
-            removeFile(out);
+            this.removeFile(out);
         } catch (IOException e) {
         	this.handleDiskFull();
-        	removeFile(out);
+        	this.removeFile(out);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -175,7 +175,7 @@ public class ReadTransfer extends Transfer {
             this.checkOrder(data);
         } catch (MessageOrderException e) {
 
-            this.notifyInfo(e.getMessage()+"\n resending ack");
+            this.notifyInfo(e.getMessage() + "\n resending ack");
 
             // Reset block number to before message was received
             this.decrementBlockNumber();
@@ -215,13 +215,14 @@ public class ReadTransfer extends Transfer {
         InvalidMessageException,
         ErrorMessageException {
         Message msg = null;
+        AckMessage ack;
 
         try {
             this.getSocket().setAttempts(1);
             msg = this.getSocket().receive();
             this.notifyMessage(msg);
         } catch (UnreachableHostException e) {
-             // Squash IT!!!
+            // Squash IT!!!
         }
 
         if (msg != null) {
@@ -233,7 +234,7 @@ public class ReadTransfer extends Transfer {
             this.notifyInfo("Received data packet again, resending ack");
 
             // Re-send ack message
-            AckMessage ack = new AckMessage(this.getBlockNumber());
+            ack = new AckMessage(this.getBlockNumber());
             this.notifySendMessage(ack);
             this.getSocket().send(ack);
         }

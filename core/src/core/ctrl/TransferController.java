@@ -65,26 +65,29 @@ public abstract class TransferController extends Controller implements TransferL
      */
     public void read (String filename){
         ReadTransfer runner;
-        File file;
+        File file, dir;
         String path;
 
 
         path = this.appendPrefix(filename);
+        dir  = new File(this.getPrefix());
         file = new File(path);
+
+        System.out.println("Requesting to read: " + filename);
 
         // Before starting the transfer, ensure that the file exists
         // and that there are sufficient permissions to read from it
-        if (file.exists()) {
+        if (dir.exists() && file.isFile()) {
         	System.out.println("File already exists: " + filename +
                 "\nEither remove the file from the working directory, "
                 + "or change the working directory.");
         	return;
         }
-        /*else if (!(new File(this.getPrefix()).canWrite())) {
+        else if (dir.exists() && !dir.canWrite()) {
             System.out.println("Insufficient permissions to write file: "
                 + filename + "\nPermission denied");
             return;
-        }*/
+        }
 
         // At this point the transfer is read to begin. The
         // requested file does not already exist and there are
@@ -116,8 +119,8 @@ public abstract class TransferController extends Controller implements TransferL
         path = this.appendPrefix(filename);
         file = new File(path);
 
-        System.out.println("Filename is: " + path);
-        if (!file.exists()) {
+        System.out.println("Requesting to write: " + filename);
+        if (!file.isFile()) {
         	System.out.println("File not found: " + filename);
         	return;
         }
