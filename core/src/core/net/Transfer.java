@@ -202,9 +202,9 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
      *
      * @return Current block number index
      */
-                public short getBlockNumber() {
-                    return this.currentBlock;
-                }
+    public short getBlockNumber() {
+        return this.currentBlock;
+    }
 
     /**
      * Increments the current block number and then returns the new value
