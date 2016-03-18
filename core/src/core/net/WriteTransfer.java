@@ -39,7 +39,7 @@ public class WriteTransfer extends Transfer {
      * the file with the given name
      *
      * @param address - Address of endpoint to send data
-     * @param filename - Source name of the file to send to server
+     * @param sourceName - Source name of the file to send to server
      * @param destinationName - Destination name of the file on the server
      *
      * @throws SocketException - If the socket cannot be created

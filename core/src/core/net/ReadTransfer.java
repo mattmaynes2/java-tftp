@@ -37,6 +37,7 @@ public class ReadTransfer extends Transfer {
      *
      * @param address - Address of endpoint to read from
      * @param filename - Name of file to store incoming data
+     * @param destinationName - Destination path of the file to transfer
      *
      * @throws SocketException - If the socket cannot be created
      */

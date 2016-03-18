@@ -58,7 +58,7 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
      *
      * @param address - Address to use as the endpoint
      * @param sourceName - Source path of file to transfer
-     * @param destination - Destination path of the file to transfer
+     * @param destinationName - Destination path of the file to transfer
      *
      * @throws SocketException - If the socket cannot be created
      */
