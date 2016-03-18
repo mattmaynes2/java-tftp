@@ -61,21 +61,21 @@ Each simulation runs for a single transfer. The mode reset to norm after each tr
 The server and client timeout is 2400ms
 
     Commands:
-    help                                       Prints this message
-    shutdown                                   Exits the simulator
-    norm                                       Forward packets through without alteration
-    rend                                       Removes the end byte of the next request packet.
-    			     						      ie Removes the 0 Byte after Mode
-    rrs                                        Removes the Request Seperator of the next request
-    										      packet. ie Removes 0 Byte after Filename
-    mode      <mode>                           Changes the mode of the next request packet
-    csa       <type> <packetNum>               Changes the sender TID of a specified packet
-    op        <type> <packetNum> <opCode>      Changes the opcode of a specified packet
-    cl        <type> <packetNum> <packetLen>   Changes the length of a specified packet
-    delay     <type> <packetNum> <numTimeouts> Delays the specified packet by a number of
-    											  timeouts
-    duplicate <type> <packetNum>               Sends a duplicate of the specified packet
-    drop      <type> <packetNum>               Drops the specified packet
+    help            Prints this message
+    shutdown        Exits the simulator
+    norm            Forward packets through without alteration
+    rend            Removes the end byte of the next request packet.
+    			      ie Removes the 0 Byte after Mode
+    rrs             Removes the Request Seperator of the next request
+    				  packet. ie Removes 0 Byte after Filename
+    mode      <m>           Changes the mode of the next request packet
+    csa       <t> <n>       Changes the sender TID of a specified packet
+    op        <t> <n> <o>   Changes the opcode of a specified packet
+    cl        <t> <n> <o>   Changes the length of a specified packet
+    delay     <t> <n> <o>   Delays the specified packet by a number of
+    						  timeouts
+    duplicate <t> <n>       Sends a duplicate of the specified packet
+    drop      <t> <n>       Drops the specified packet
 ```
 
 ##### Notes
@@ -279,7 +279,7 @@ simulator and client communicate on a single port and therefore it never has
 a mismatched transfer id. Instead the second response is just ignored by the
 client.
 
-**Note** this was an issue discovered in the laster iteration but due to the 
+**Note** this was an issue discovered in the last iteration but due to the 
 lack of time caused by the late feedback it was not fixed for this iteration.
 
 
