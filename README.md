@@ -31,12 +31,17 @@ Repeat this process for the `server` project and the `errorSimulator` project.
 
 Eclipse should now be configured properly.
 
-
 ## Running Instructions
 
 **Note** All transfers take place from the present working directory
 of the respective project. For example a write operation from the client
 will write from `project-root/client/`  
+
+There is a change directory command `cd` which allows you to move the
+present working directory to a different folder. For example
+`cd ../` will change the directory to the directory above the current
+project. All directory changes are relative to the original project
+directory. To return to the project directory, simply type `cd .`
 
 ### Server
 - To run the server, run the server project from eclipse.
@@ -268,7 +273,13 @@ For further details on any specific class from a core package, refer to the
 provided javadoc.  
 
 ## Known Issues
-- Due to the error simulator only running one thread per request, a duplicate request is not throwing an error 5. This is due to the fact that the error simualtor and client communicate on a single port and therefore it never has a mismatched transfer id. Instead the second response is just ignored by the client.
+Due to the error simulator only running one thread per request, a duplicate
+request is not throwing an error 5. This is due to the fact that the error
+simulator and client communicate on a single port and therefore it never has
+a mismatched transfer id. Instead the second response is just ignored by the
+client.
 
+**Note** this was an issue discovered in the laster iteration but due to the 
+lack of time caused by the late feedback it was not fixed for this iteration.
 
 
