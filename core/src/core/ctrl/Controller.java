@@ -1,6 +1,7 @@
 package core.ctrl;
 
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -211,11 +212,31 @@ public abstract class Controller implements CommandHandler {
                 this.usage();
                 break;
             case CHANGE_DIRECTORY_COMMAND:
-            	this.changeWorkingDirectory(command.getFirstArgument());
+                try{
+                	changeWorkingDirectory(concatPath(command.getArguments()));
+                	this.cli.message("Relative directory is now: " + this.getPrefix());
+                }catch (IndexOutOfBoundsException e) {
+                    this.cli.message("Incorrect number of parameters for cd.  Format is cd filepath");
+                }           	
                 break;
             default:
                 break;
         }
     }
+
+    /**
+     * Takes all the input parameters and makes them one file path
+     * @param arguments - the arguments to concatenate
+     * @return the file path
+     */
+	private String concatPath(ArrayList<String> arguments) {
+		StringBuffer buf= new StringBuffer();
+		for(String s:arguments){
+			buf.append(s+" ");
+		}
+		buf.deleteCharAt(buf.length()-1);
+		return buf.toString();
+		
+	}
 
 }
