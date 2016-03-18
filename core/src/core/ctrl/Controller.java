@@ -175,7 +175,11 @@ public abstract class Controller implements CommandHandler {
      * @param dir - the new working directory
      */
     public void changeWorkingDirectory(String dir) {
-    	this.directoryPrefix = dir + "/";
+    	if (dir.endsWith("/")){
+    		this.directoryPrefix = dir;
+    	}else{
+    		this.directoryPrefix = dir + "/";
+    	}
     }
 
 
