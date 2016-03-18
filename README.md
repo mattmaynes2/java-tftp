@@ -1,4 +1,4 @@
-# TFTP Iteration Three
+# TFTP Iteration Four
 
 ## Setup Instructions
 Set your eclipse workspace to the top level, which is the project 
@@ -93,6 +93,63 @@ To enter a command line argument in eclipse:
 - Select the `Arguments` tab on the right hand side
 - In the `Program Arguments` text box, add `-t`
 
+
+## Error Codes
+
+### #1 File Not Found
+#### Read Request
+During a read request, the client will send a request to read a file. If the 
+file does not exist then the server will spawn a special `Error Responder` 
+thread which will respond with an error code 1. This indicates to the client
+that the file does not exist to on the server.
+
+#### Write Request
+Before sending a request to write a file to the server, the client performs
+a check to find the desired file. If the file cannot be found then the client
+immediately notifies the user and never sends a request.
+
+### #2 Access Violation
+#### Read Request
+When a file request is made to the server for a file that cannot be read then
+an `Error Responder` will immediately respond with an error code 2. Alternatively,
+if the client does not have permission to write to its destination folder then
+the read request will never be sent.
+
+#### Write Request
+If a client does not have permission to access a local file then a request will
+never be sent and the user will be notified immediately. If the client sends
+a write request and the server cannot write to its destination folder then 
+it will respond with an error code 2.
+
+### #3 Disk Full or Allocation Exceeded
+#### Read Request
+If a client runs out of disk space during a transfer then it will terminate
+the transfer and send an error code 3 to the server.
+
+#### Write Request
+If a server runs out of disk space during a transfer then it will terminate
+the transfer and send an error code 3 to its clients
+
+### #4 Illegal TFTP Operation
+If an endpoint receives a TFTP message that contains an invalid opcode then
+it will respond with an error code 4 packet.
+
+### #5 Unknown Transfer ID
+If an endpoint receives a packet from a sender that differs from the one that 
+is currently performing transfer then it will respond with an error code 5
+to the unknown sender and continue the transfer.
+
+### #6 File Already Exists
+#### Read Request
+If a request is made to read a file from a server that already exists on
+a client then the client will immediately notify the user and terminate 
+without sending a request.
+
+#### Write Request
+If a server receives a request to write a file that already exists, it will
+respond with an error code 6 and never start the transfer.
+
+
 ## Project Structure
 The file TeamResponsibilities.txt describes the responsibilities of each team 
 member for this iteration. The document is split into a different section for 
@@ -123,7 +180,6 @@ application.
 #### Server
 The server project contains the code specific to the server application.
 
-
 ## UCM Diagrams
 
 ### Request
@@ -138,7 +194,6 @@ to the client.
 ### Write Transfer
 This shows the steady state transfer when writing to a file on the server
 from the client.
-
 
 ## Source Code Structure
 
@@ -194,7 +249,7 @@ This includes actions such as writing to sockets, reading from sockets, etc.
 
 #### core.req
 This package contains the logic for encoding and decoding TFTP protocol
-messages.  
+messages. 
 
 #### core.util
 This package contains two utility classes: ByteUtils.java and Worker.java
@@ -208,7 +263,6 @@ This is an abstract base class for long running asynchronous jobs.
 
 For further details on any specific class from a core package, refer to the
 provided javadoc.  
-
 
 ## Known Issues
 - Due to the error simulator only running one thread per request, a duplicate request is not throwing an error 5. This is due to the fact that the error simualtor and client communicate on a single port and therefore it never has a mismatched transfer id. Instead the second response is just ignored by the client.
