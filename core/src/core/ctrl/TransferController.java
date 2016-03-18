@@ -72,6 +72,7 @@ public abstract class TransferController extends Controller implements TransferL
         path = this.appendPrefix(filename);
         dir  = new File(this.getPrefix());
         file = new File(path);
+        new File(getPrefix()).mkdirs();
 
         System.out.println("Requesting to read: " + filename);
 
