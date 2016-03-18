@@ -41,6 +41,7 @@ will write from `project-root/client/`
 ### Server
 - To run the server, run the server project from eclipse.
 - To shutdown the server, type `shutdown` in the servers command line interface.
+- The working directory of the server can be changed with `cd`. All read and writes will be relative to the new folder
 
 ### Error Simulator
 - To run the Error Simulator, run the error simulator from eclipse.
@@ -84,6 +85,8 @@ command line argument.
 - To see the usage information, type `help` in the cli.  
 - To perform a read operation from the server to the client, type `read` followed by a space and the filename.
 - To perform a write operation from the client to the server, type `write` followed by a space and the filename.
+- The working directory of the client can be changed with `cd`. All read and writes will be relative to the new folder
+
 
 #### Command Line Arguments
 To enter a command line argument in eclipse:
