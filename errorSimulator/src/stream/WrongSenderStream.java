@@ -11,20 +11,20 @@ import core.util.ByteUtils;
 
 /**
  * Sends a packet on a different socket than the receiver is expecting
- * used to cause error code 5s 
+ * used to cause error code 5s
  * @author Jeremy
  *
  */
-public class WrongSenderStream implements SimulatorStream {
+public class WrongSenderStream extends SimulatorStream {
 
 	private static final Logger LOGGER = Logger.getGlobal();
     private SimulatorStream mainStream;
     private PacketStream wrongStream;
     private int sendAt;
     private boolean hasSentFromWrongStream;
-    
+
     /**
-     * 
+     *
      * @param stream the stream that will be used for main communication
      * @param sendAt packet number in sequence that will trigger a packet to be sent from the wrong stream
      * @throws SocketException thrown if there are no available ports
@@ -44,7 +44,7 @@ public class WrongSenderStream implements SimulatorStream {
    /**
     * If the number of packets received is equal to the packet in the sequence to modify
     *  Send a packet out from a stream using a different address than the one that had been used
-    *  for previous communication. 
+    *  for previous communication.
     *  otherwise send packet from the main stream used for communication
     */
     @Override
