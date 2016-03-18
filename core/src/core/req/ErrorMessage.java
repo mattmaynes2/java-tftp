@@ -34,7 +34,7 @@ public class ErrorMessage extends Message {
     }
 
     public String toString () {
-        return this.errorCode + " message: " + this.message;
+        return "Opcode: " + this.errorCode.getCode() + " " + this.errorCode + " message: " + this.message;
     }
 
     public void decode (byte[] data) throws InvalidMessageException {
