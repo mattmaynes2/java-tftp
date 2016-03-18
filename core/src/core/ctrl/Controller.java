@@ -37,7 +37,7 @@ public abstract class Controller implements CommandHandler {
 	/**
 	 * Command to set the file write destination
 	 */
-	public static final String CHANGE_DIRECTORY_COMMAND = "chgdir";
+	public static final String CHANGE_DIRECTORY_COMMAND = "cd";
 
     /**
      * Address of endpoint to communicate with during transfer

@@ -24,7 +24,7 @@ public class Server extends RequestController {
         System.out.println("TFTP Server");
         System.out.println("  Commands:");
         System.out.println("    help           Prints this message");
-        System.out.println("    chgdir         Change the working directory (source and destination directory of files)");
+        System.out.println("    cd         Change the working directory (source and destination directory of files)");
         System.out.println("    shutdown       Exits the server");      
     }
 
