@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import core.req.InvalidMessageException;
 import sim.PacketModifier;
 
-public class InjectPacketStream implements SimulatorStream {
-	
+public class InjectPacketStream extends SimulatorStream {
+
 	private static final Logger LOGGER = Logger.getGlobal();
     private PacketStream stream;
     private PacketModifier modifier;
@@ -16,7 +16,7 @@ public class InjectPacketStream implements SimulatorStream {
     private boolean hasInjected;
 
 /**
- * 
+ *
  * @param stream a Packet stream that sends and receives packets
  * @param modifier modifier object used to modify the packet before sending out
  * @param injectAt the packet number in the sequence to replace with the modified packet
