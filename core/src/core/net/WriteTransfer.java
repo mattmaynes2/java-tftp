@@ -106,7 +106,6 @@ public class WriteTransfer extends Transfer {
                     ack = this.getAcknowledge();
                     this.notifyMessage(ack);
                 } catch (MessageOrderException e) {
-                    this.decrementBlockNumber();
                     this.notifyInfo(e.getMessage() + "\nIgnoring Message");
                 }
             } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
