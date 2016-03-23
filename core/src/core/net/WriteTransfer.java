@@ -106,6 +106,7 @@ public class WriteTransfer extends Transfer {
                     ack = this.getAcknowledge();
                     this.notifyMessage(ack);
                 } catch (MessageOrderException e) {
+                    this.decrementBlockNumber();
                     this.notifyInfo(e.getMessage() + "\nIgnoring Message");
                 }
             } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
@@ -197,7 +198,7 @@ public class WriteTransfer extends Transfer {
     private void closeFile (FileInputStream in) {
         try {
             if (in != null) {
-                 in.close();
+                in.close();
             }
         } catch (IOException e) {
             // squash it
