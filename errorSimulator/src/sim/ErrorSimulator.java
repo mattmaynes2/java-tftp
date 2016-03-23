@@ -13,7 +13,7 @@ import threads.SimulationEventListener;
 
 public class ErrorSimulator extends Controller implements SimulationEventListener{
 
-    public static final int SIMULATOR_PORT = 68;
+    public static final int SIMULATOR_PORT = 8080;
     public static final int REQUEST_PACKET = 1;
     public static final int HIGHEST_PACKET = Short.MAX_VALUE*2 + 1;
     public static final int TIMEOUT_MILLISECONDS = 2400;
@@ -323,7 +323,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-    		this.cli.message("Packet " + packetNum + "will now have be sent from the wrong sender");
+    		this.cli.message("Packet " + packetNum + " will now be sent from the wrong sender");
     	}
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -354,7 +354,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     		} catch (SocketException e) {
     			e.printStackTrace();
     		}
-	        this.cli.message("Packet " + packetNum + "will now have its length changed to " + length);
+	        this.cli.message("Packet " + packetNum + " will now have its length changed to " + length);
         }
         else {
         	this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
@@ -399,7 +399,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
 	    		} catch (SocketException e) {
 	    			e.printStackTrace();
 	    		}
-	            this.cli.message("Packet " + packetNum + "will now have its opcode changed to " + opCodeInt);
+	            this.cli.message("Packet " + packetNum + " will now have its opcode changed to " + opCodeInt);
 	        }
 	        else {
 	        	this.cli.message("OpCode out of bounds.  -32727 < opcode < 32728");
