@@ -72,10 +72,6 @@ public class WriteTransfer extends Transfer {
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
             return false;
-        } catch (MessageOrderException e){
-            // This should never happen since it was just a request
-            this.notifyException(e);
-            return false;
         } catch (UnreachableHostException e) {
             this.notifyException(e);
             return false;
@@ -88,7 +84,7 @@ public class WriteTransfer extends Transfer {
      * and writing them to the socket
      */
     public void run () {
-        FileInputStream in;
+        FileInputStream in = null;
         AckMessage ack;
 
         // Starting the transfer
@@ -102,27 +98,27 @@ public class WriteTransfer extends Transfer {
             do {
                 this.currentMessage = createMessage(in);
                 this.sendDataMessage(this.currentMessage);
-                try {
-                    ack = this.getAcknowledge();
-                    this.notifyMessage(ack);
-                } catch (MessageOrderException e) {
-                    this.notifyInfo(e.getMessage() + "\nIgnoring Message");
-                }
+                ack = this.getAcknowledge();
+                this.notifyMessage(ack);
             } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
 
             // Close the input stream and socket
-            in.close();
+            this.closeFile(in);
             this.getSocket().close();
 
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
+            this.closeFile(in);
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
+            this.closeFile(in);
         } catch (UnreachableHostException e) {
             this.notifyException(e);
-        } catch (Exception e){
+            this.closeFile(in);
+        } catch (Exception e) {
+            this.closeFile(in);
             e.printStackTrace();
         }
     }
@@ -136,14 +132,12 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the socket is closed
      * @throws InvalidMessageException - If the received message has an invalid encoding
      * @throws ErrorMessageException - If an error message is received
-     * @throws MessageOrderException - If an acknowledge is received out of order
      * @throws UnreachableHostException - If an acknowledge packet isn't received within TIMEOUT_TIME
      */
     public AckMessage getAcknowledge () throws
         IOException,
         InvalidMessageException,
         ErrorMessageException,
-        MessageOrderException,
         UnreachableHostException {
 
         Message msg;
@@ -153,7 +147,13 @@ public class WriteTransfer extends Transfer {
         this.checkErrorMessage(msg);
         this.checkCast(msg, OpCode.ACK);
         ack = (AckMessage) msg;
-        this.checkOrder(ack);
+
+        try {
+           this.checkOrder(ack);
+        } catch (MessageOrderException e) {
+            this.notifyInfo(e.getMessage() + "\nIgnoring Message");
+            return this.getAcknowledge();
+        }
 
         return ack;
     }
@@ -183,6 +183,21 @@ public class WriteTransfer extends Transfer {
     private void sendDataMessage(DataMessage msg) throws IOException {
         this.notifySendMessage(msg);
         this.getSocket().send(msg);
+    }
+
+    /**
+     * Closes the given file stream
+     *
+     * @param in - Input stream to close
+     */
+    private void closeFile (FileInputStream in) {
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            // squash it
+        }
     }
 
     /**

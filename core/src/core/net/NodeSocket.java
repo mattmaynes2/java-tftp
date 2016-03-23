@@ -129,6 +129,15 @@ public class NodeSocket {
     }
 
     /**
+     * Removes a listener from transfer events
+     *
+     * @param listener - The listener to remove
+     */
+    public void removeNodeSocketListener (NodeSocketListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    /**
      * Sets the number of attempts that a socket should try to send or
      * receive on a socket after timeouts
      *
