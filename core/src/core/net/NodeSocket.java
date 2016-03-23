@@ -185,12 +185,13 @@ public class NodeSocket {
 
         // Create a packet to buffer the data received
         DatagramPacket packet;
-        boolean received = false;
+        boolean received;
         int attempt = 0;
 
         do {
             // Receive the packets from the socket
             packet = new DatagramPacket(new byte[1024], 1024);
+            received=false;
             while (!received) {
                 try {
                     this.socket.receive(packet);

@@ -19,18 +19,18 @@ public abstract class SimulatorStream {
     private SocketAddress clientAddress;
 
     /**
-     * Sets the client's socket address for this straem
+     * Sets the client's socket address for this stream
      *
      * @param address - Socket address of client
      */
-    public void setSocketAddress (SocketAddress address) {
+    public void setClientAddress (SocketAddress address) {
         this.clientAddress = address;
     }
 
     /**
      * Returns the client's socket address for this stream
      */
-    public SocketAddress getSocketAddress () {
+    public SocketAddress getClientAddress () {
         return this.clientAddress;
     }
 

@@ -8,6 +8,9 @@ import java.net.DatagramPacket;
 
 import threads.SimulatorThread;
 import core.req.InvalidMessageException;
+import core.req.Message;
+import core.req.MessageFactory;
+import core.req.OpCode;
 
 public class DuplicatePacketStream extends SimulatorStream {
 
@@ -32,13 +35,14 @@ public class DuplicatePacketStream extends SimulatorStream {
         this.stream.send(packet);
         if (!hasDuplicated && (this.stream.getNumberPacketsOfPackets() == this.duplicatedPacketNumber)){
             LOGGER.log(Level.INFO, "Duplicating packet: " + Arrays.toString(packet.getData()));
-            // TODO confirm that this value is 1
-            if (this.duplicatedPacketNumber > 1) {
-                this.stream.send(packet);
-            }
-            else {
-                // Spawn new thread for duplicate request
+           
+            Message msg=MessageFactory.createMessage(packet.getData());
+            if (OpCode.READ.equals(msg.getOpCode())||OpCode.WRITE.equals(msg.getOpCode())) {
+            	packet.setSocketAddress(getClientAddress()); 
+            	// Spawn new thread for duplicate request
                 (new Thread (new SimulatorThread(packet, new PacketStream()))).start();
+            }else {
+            	this.stream.send(packet);              
             }
             hasDuplicated = true;
         }
