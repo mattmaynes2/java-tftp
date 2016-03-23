@@ -88,7 +88,7 @@ public class WriteTransfer extends Transfer {
      * and writing them to the socket
      */
     public void run () {
-        FileInputStream in;
+        FileInputStream in = null;
         AckMessage ack;
 
         // Starting the transfer
@@ -111,18 +111,22 @@ public class WriteTransfer extends Transfer {
             } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
 
             // Close the input stream and socket
-            in.close();
+            this.closeFile(in);
             this.getSocket().close();
 
             // Notify that the transfer is complete
             this.notifyComplete();
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
+            this.closeFile(in);
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
+            this.closeFile(in);
         } catch (UnreachableHostException e) {
             this.notifyException(e);
-        } catch (Exception e){
+            this.closeFile(in);
+        } catch (Exception e) {
+            this.closeFile(in);
             e.printStackTrace();
         }
     }
@@ -183,6 +187,19 @@ public class WriteTransfer extends Transfer {
     private void sendDataMessage(DataMessage msg) throws IOException {
         this.notifySendMessage(msg);
         this.getSocket().send(msg);
+    }
+
+    /**
+     * Closes the given file stream
+     *
+     * @param in - Input stream to close
+     */
+    private void closeFile (FileInputStream in) {
+        try {
+            in.close();
+        } catch (IOException e) {
+            // squash it
+        }
     }
 
     /**
