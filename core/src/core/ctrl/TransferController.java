@@ -1,7 +1,10 @@
 package core.ctrl;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 import core.cli.Command;
 import core.net.ReadTransfer;
@@ -15,6 +18,11 @@ import core.net.WriteTransfer;
  * Spawns transfers when user enters CLI commands
  */
 public abstract class TransferController extends Controller implements TransferListener  {
+
+    /**
+     * Command to change the server to connect to
+     */
+    public static final String SERVER_COMMAND = "server";
 
     /**
      * Command to initialize a read command
@@ -32,10 +40,11 @@ public abstract class TransferController extends Controller implements TransferL
      * @param address - Address of endpoint to communicate with
      * @param commandLineArgs - Arguments entered by the user at startup
      */
-    public TransferController (SocketAddress address, String[] commandLineArgs) {
+    public TransferController (InetSocketAddress address, String[] commandLineArgs) {
         super(address, commandLineArgs);
         this.interpreter.addCommand(READ_COMMAND);
         this.interpreter.addCommand(WRITE_COMMAND);
+        this.interpreter.addCommand(SERVER_COMMAND);
     }
 
     /**
@@ -54,6 +63,23 @@ public abstract class TransferController extends Controller implements TransferL
             case WRITE_COMMAND:
                 this.write(command.getFirstArgument());
                 break;
+            case SERVER_COMMAND:
+                this.changeServer(command.getFirstArgument());
+                break;
+        }
+    }
+
+    /**
+     * Changes the server that the client will connect to
+     * @param firstArgument The hostname of the server to connect to, or a numeric IP address
+     */
+    private void changeServer(String firstArgument) {
+        try {
+            InetAddress addr = InetAddress.getByName(firstArgument);
+            int port = this.getAddress().getPort();
+            setAddress(new InetSocketAddress(addr, port));
+        } catch (UnknownHostException e) {
+            cli.message("Unknown host. Please specify a valid hostname or numeric IP address");
         }
     }
 
@@ -79,14 +105,14 @@ public abstract class TransferController extends Controller implements TransferL
         // Before starting the transfer, ensure that the file exists
         // and that there are sufficient permissions to read from it
         if (file.exists() && file.isFile()) {
-        	System.out.println("File already exists: " + filename +
-                "\nEither remove the file from the working directory, "
-                + "or change the working directory.");
-        	return;
+            System.out.println("File already exists: " + filename +
+                    "\nEither remove the file from the working directory, "
+                    + "or change the working directory.");
+            return;
         }
         else if (dir.exists() && !dir.canWrite()) {
             System.out.println("Insufficient permissions to write file: "
-                + filename + "\nPermission denied");
+                    + filename + "\nPermission denied");
             return;
         }
 
@@ -122,12 +148,12 @@ public abstract class TransferController extends Controller implements TransferL
 
         System.out.println("Requesting to write: " + filename);
         if (!file.exists()) {
-        	System.out.println("File not found: " + filename);
-        	return;
+            System.out.println("File not found: " + filename);
+            return;
         }
         else if (!file.canRead()) {
             System.out.println("Insufficient permissions to read file: "
-                + filename + "\nPermission denied");
+                    + filename + "\nPermission denied");
             return;
         }
 
@@ -136,8 +162,8 @@ public abstract class TransferController extends Controller implements TransferL
         // the transfer
         try {
             runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
-            System.out.println("Client Filename: " + appendPrefix(filename));
             runner.addTransferListener(this);
+            System.out.println("Client Filename: " + appendPrefix(filename));
 
             if (runner.sendRequest()){
                 performTransfer(runner);

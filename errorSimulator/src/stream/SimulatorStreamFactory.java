@@ -13,7 +13,7 @@ public class SimulatorStreamFactory {
 	private final static String DATA_STREAM_OPTION = "data";
 	private final static String ACK_STREAM_OPTION = "ack";
 	private final static String REQ_STREAM_OPTION = "req";
-	
+
 	/**
 	 * Static method that creates a decorated SimulatorStream based on the input parameters
 	 * @param type type of SimulatorStream to create
@@ -37,9 +37,9 @@ public class SimulatorStreamFactory {
                 return  new PacketStream();
         }
     }
-    
+
     /**
-     * 
+     *
      * @param dataOrAck Either "data" or "ack", specifies the stream type to create
      * @throws IllegalArgumentException if dataOrAck is not "data" or "ack"
      * @return The stream that is appropriate based on dataOrAck
