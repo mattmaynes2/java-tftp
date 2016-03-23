@@ -164,12 +164,14 @@ public class WriteTransfer extends Transfer {
      * @param remaining - Number of retry attempts remaining
      */
     public void handleTimeout (int remaining) {
-        super.handleTimeout(remaining);
-        try {
-            this.sendDataMessage(this.currentMessage);
-        } catch (IOException e){
-            e.printStackTrace();
-            System.exit(0);
+        if(this.currentMessage != null) {
+            super.handleTimeout(remaining);
+            try {
+                this.sendDataMessage(this.currentMessage);
+            } catch (IOException e){
+                e.printStackTrace();
+                System.exit(0);
+            }
         }
     }
 
