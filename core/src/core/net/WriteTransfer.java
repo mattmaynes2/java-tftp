@@ -196,7 +196,9 @@ public class WriteTransfer extends Transfer {
      */
     private void closeFile (FileInputStream in) {
         try {
-            in.close();
+            if (in != null) {
+                 in.close();
+            }
         } catch (IOException e) {
             // squash it
         }
