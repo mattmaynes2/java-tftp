@@ -1,5 +1,6 @@
 package core.ctrl;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public abstract class Controller implements CommandHandler {
     /**
      * Address of endpoint to communicate with during transfer
      */
-    protected SocketAddress address;
+    protected InetSocketAddress address;
 
     /**
      * Command line interpreter for receiving user commands to control system
@@ -91,11 +92,23 @@ public abstract class Controller implements CommandHandler {
      * @param address - Address of endpoint to communicate with
      * @param commandLineArgs - Arguments from the command line
      */
-    public Controller (SocketAddress address, String[] commandLineArgs){
+    public Controller (InetSocketAddress address, String[] commandLineArgs){
         this(commandLineArgs);
         this.address = address;
     }
 
+    /**
+     * Sets the address this endpoint is communicating with
+     * @param address The address to communicate with
+     */
+    public void setAddress(InetSocketAddress address){
+    	if (address == null)
+    	{
+    		throw new IllegalArgumentException("Address cannot be null");
+    	}
+    	this.address = address;
+    }
+    
     /**
      * Sets the allowed command line options
      *
@@ -134,7 +147,7 @@ public abstract class Controller implements CommandHandler {
      *
      * @return Address of endpoint
      */
-    public SocketAddress getAddress (){
+    public InetSocketAddress getAddress (){
         return this.address;
     }
 

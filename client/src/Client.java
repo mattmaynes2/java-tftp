@@ -15,7 +15,7 @@ public class Client extends TransferController {
     private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
 
-    public Client (SocketAddress address, String[] commandLineArgs){
+    public Client(InetSocketAddress address, String[] commandLineArgs){
         super(address, commandLineArgs);
         if (this.commandLineOptions.getOrDefault(TEST_MODE_FLAG, false)){
             try {
@@ -30,11 +30,12 @@ public class Client extends TransferController {
     public void usage() {
         System.out.println("TFTP Client");
         System.out.println("  Commands:");
-        System.out.println("    help           Prints this message");
-        System.out.println("    cd             Change the working directory (source and destination directory of files)");
-        System.out.println("    read  <file>   Reads a file from a tftp server to the current working directory");
-        System.out.println("    write <file>   Writes a file from the current working directory to a tftp server");
-        System.out.println("    shutdown       Exits the client");
+        System.out.println("    help              Prints this message");
+        System.out.println("    cd                Change the working directory (source and destination directory of files)");
+        System.out.println("    read   <file>     Reads a file from a tftp server to the current working directory");
+        System.out.println("    write  <file>     Writes a file from the current working directory to a tftp server");
+        System.out.println("    server <address>  Sets the hostname or IP address of the server to transfer with");
+        System.out.println("    shutdown          Exits the client");
     }
 
     @Override
