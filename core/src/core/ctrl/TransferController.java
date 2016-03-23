@@ -95,9 +95,9 @@ public abstract class TransferController extends Controller implements TransferL
         // sufficient privileges to write
         try {
             runner = new ReadTransfer(this.getAddress(), filename, path);
-            runner.addTransferListener(this);
 
             if (runner.sendRequest()){
+                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){
@@ -137,9 +137,9 @@ public abstract class TransferController extends Controller implements TransferL
         try {
             runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
             System.out.println("Client Filename: " + appendPrefix(filename));
-            runner.addTransferListener(this);
 
             if (runner.sendRequest()){
+                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){
