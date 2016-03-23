@@ -15,26 +15,26 @@ import core.req.OpCode;
  */
 public class CountAcksStream extends PacketStream {
 
-	public CountAcksStream() throws SocketException {
-		super();
-	}
+    public CountAcksStream() throws SocketException {
+        super();
+    }
 
-	/**
-	 * increments the number of packets received only if the packet is an ack
-	 */
-	@Override
-	protected void incNumRecieved(DatagramPacket packet) {
-		byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
-		Message msg;
-		try {
-			msg = MessageFactory.createMessage(bytes);
-			if(OpCode.ACK.equals(msg.getOpCode())) {
-				super.incNumRecieved(packet);
-			}
-		} catch (InvalidMessageException e) {
-			// don't increment count
-		}
-		
-	}
+    /**
+     * increments the number of packets received only if the packet is an ack
+     */
+    @Override
+    protected void incNumRecieved(DatagramPacket packet) {
+        byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
+        Message msg;
+        try {
+            msg = MessageFactory.createMessage(bytes);
+            if(OpCode.ACK.equals(msg.getOpCode())) {
+                super.incNumRecieved(packet);
+            }
+        } catch (InvalidMessageException e) {
+            // don't increment count
+        }
+
+    }
 
 }

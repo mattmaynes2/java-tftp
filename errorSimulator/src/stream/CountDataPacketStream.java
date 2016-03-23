@@ -16,25 +16,25 @@ import core.req.OpCode;
  */
 public class CountDataPacketStream extends PacketStream {
 
-	public CountDataPacketStream() throws SocketException {
-		super();
-	}
+    public CountDataPacketStream() throws SocketException {
+        super();
+    }
 
-	/**
-	 * increment the number of packets received only if the packet is a data packet
-	 */
-	@Override
-	protected void incNumRecieved(DatagramPacket packet) {
-		byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
-		Message msg;
-		try {
-			msg = MessageFactory.createMessage(bytes);
-			if(OpCode.DATA.equals(msg.getOpCode())) {
-				super.incNumRecieved(packet);
-			}
-		} catch (InvalidMessageException e) {
-			// don't increment count
-		}
-		
-	}
+    /**
+     * increment the number of packets received only if the packet is a data packet
+     */
+    @Override
+    protected void incNumRecieved(DatagramPacket packet) {
+        byte[] bytes = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
+        Message msg;
+        try {
+            msg = MessageFactory.createMessage(bytes);
+            if(OpCode.DATA.equals(msg.getOpCode())) {
+                super.incNumRecieved(packet);
+            }
+        } catch (InvalidMessageException e) {
+            // don't increment count
+        }
+
+    }
 }
