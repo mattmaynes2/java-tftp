@@ -217,7 +217,7 @@ public class ReadTransfer extends Transfer {
         AckMessage ack;
 
         try {
-            this.getSocket().setAttempts(1);
+            this.getSocket().setAttempts(2);
             msg = this.getSocket().receive();
             this.notifyMessage(msg);
         } catch (UnreachableHostException e) {
