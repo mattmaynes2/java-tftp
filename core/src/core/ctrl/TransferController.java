@@ -19,11 +19,11 @@ import core.net.WriteTransfer;
  */
 public abstract class TransferController extends Controller implements TransferListener  {
 
-	/**
-	 * Command to change the server to connect to
-	 */
-	public static final String SERVER_COMMAND = "server";
-	
+    /**
+     * Command to change the server to connect to
+     */
+    public static final String SERVER_COMMAND = "server";
+
     /**
      * Command to initialize a read command
      */
@@ -64,8 +64,8 @@ public abstract class TransferController extends Controller implements TransferL
                 this.write(command.getFirstArgument());
                 break;
             case SERVER_COMMAND:
-            	this.changeServer(command.getFirstArgument());
-            	break;
+                this.changeServer(command.getFirstArgument());
+                break;
         }
     }
 
@@ -74,16 +74,16 @@ public abstract class TransferController extends Controller implements TransferL
      * @param firstArgument The hostname of the server to connect to, or a numeric IP address
      */
     private void changeServer(String firstArgument) {
-		try {
-			InetAddress addr = InetAddress.getByName(firstArgument);
-			int port = this.getAddress().getPort();
-			setAddress(new InetSocketAddress(addr, port));
-		} catch (UnknownHostException e) {
-			cli.message("Unknown host. Please specify a valid hostname or numeric IP address");
-		}
-	}
+        try {
+            InetAddress addr = InetAddress.getByName(firstArgument);
+            int port = this.getAddress().getPort();
+            setAddress(new InetSocketAddress(addr, port));
+        } catch (UnknownHostException e) {
+            cli.message("Unknown host. Please specify a valid hostname or numeric IP address");
+        }
+    }
 
-	/**
+    /**
      * Performs a read transfer of the given filename from an endpoint
      * to this controller
      *
@@ -105,14 +105,14 @@ public abstract class TransferController extends Controller implements TransferL
         // Before starting the transfer, ensure that the file exists
         // and that there are sufficient permissions to read from it
         if (file.exists() && file.isFile()) {
-        	System.out.println("File already exists: " + filename +
-                "\nEither remove the file from the working directory, "
-                + "or change the working directory.");
-        	return;
+            System.out.println("File already exists: " + filename +
+                    "\nEither remove the file from the working directory, "
+                    + "or change the working directory.");
+            return;
         }
         else if (dir.exists() && !dir.canWrite()) {
             System.out.println("Insufficient permissions to write file: "
-                + filename + "\nPermission denied");
+                    + filename + "\nPermission denied");
             return;
         }
 
@@ -121,9 +121,9 @@ public abstract class TransferController extends Controller implements TransferL
         // sufficient privileges to write
         try {
             runner = new ReadTransfer(this.getAddress(), filename, path);
+            runner.addTransferListener(this);
 
             if (runner.sendRequest()){
-                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){
@@ -148,12 +148,12 @@ public abstract class TransferController extends Controller implements TransferL
 
         System.out.println("Requesting to write: " + filename);
         if (!file.exists()) {
-        	System.out.println("File not found: " + filename);
-        	return;
+            System.out.println("File not found: " + filename);
+            return;
         }
         else if (!file.canRead()) {
             System.out.println("Insufficient permissions to read file: "
-                + filename + "\nPermission denied");
+                    + filename + "\nPermission denied");
             return;
         }
 
@@ -162,10 +162,10 @@ public abstract class TransferController extends Controller implements TransferL
         // the transfer
         try {
             runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
+            runner.addTransferListener(this);
             System.out.println("Client Filename: " + appendPrefix(filename));
 
             if (runner.sendRequest()){
-                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){

@@ -12,7 +12,7 @@ import java.util.logging.Level;
 public class Client extends TransferController {
 
     private static final int SERVER_PORT = 69;
-    private static final int ERROR_SIMULATOR_PORT = 68;
+    private static final int ERROR_SIMULATOR_PORT = 8080;
     private final static String TEST_MODE_FLAG = "t";
 
     public Client(InetSocketAddress address, String[] commandLineArgs){
