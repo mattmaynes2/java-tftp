@@ -218,6 +218,7 @@ public class ReadTransfer extends Transfer {
 
         try {
             this.getSocket().setAttempts(2);
+            this.getSocket().removeNodeSocketListener(this);
             msg = this.getSocket().receive();
             this.notifyMessage(msg);
         } catch (UnreachableHostException e) {
