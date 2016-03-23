@@ -30,7 +30,7 @@ public class NodeSocket {
     /**
 	 * Timeout time for the socket in ms
 	 */
-    private static final int TIMEOUT_TIME = 2400;
+    private static final int TIMEOUT_TIME = 5000;
 
     /**
      * Default number of attempts to retry sending and receiving after timeouts
