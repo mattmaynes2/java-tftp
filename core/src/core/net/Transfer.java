@@ -47,7 +47,7 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
     protected String sourceName;
 
     protected String destinationName;
-    
+
     /**
      * Current data block being transferred
      */
@@ -65,7 +65,7 @@ public abstract class Transfer implements Runnable, NodeSocketListener {
     public Transfer (SocketAddress address, String sourceName, String destinationName) throws SocketException {
         this.sourceName = sourceName;
         this.destinationName = destinationName;
-        
+
         this.socket = new NodeSocket(address);
         this.listeners = new ArrayList<TransferListener>();
         this.currentBlock = 0;

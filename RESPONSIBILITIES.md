@@ -102,8 +102,37 @@ Jeremy Dunsmore
 - Timing diagrams
 - UML
 
+Peter Mark
+
+- Directory changing
+- Bug fixing
+
 Cameron Blanchard
 
 - Test plan
 - Testing
 - Bug fixing 
+
+## Iteration 5
+
+Matthew Maynes
+
+- Bug fixing
+
+Connor Matthews
+
+- Fixing timing diagrams
+
+Jeremy Dunsmore
+
+- Bug fixing
+
+Peter Mark
+
+- Testing plan
+- Testing
+
+Cameron Blanchard
+
+- Bug fixing
+- Testing

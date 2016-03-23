@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import core.util.ByteUtils;
 
 
-public class PacketStream implements SimulatorStream{
+public class PacketStream extends SimulatorStream {
 
 	private static final Logger LOGGER = Logger.getGlobal();
     private DatagramSocket socket;

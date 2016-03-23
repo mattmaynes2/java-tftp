@@ -129,6 +129,15 @@ public class NodeSocket {
     }
 
     /**
+     * Removes a listener from transfer events
+     *
+     * @param listener - The listener to remove
+     */
+    public void removeNodeSocketListener (NodeSocketListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    /**
      * Sets the number of attempts that a socket should try to send or
      * receive on a socket after timeouts
      *
@@ -185,12 +194,13 @@ public class NodeSocket {
 
         // Create a packet to buffer the data received
         DatagramPacket packet;
-        boolean received = false;
+        boolean received;
         int attempt = 0;
 
         do {
             // Receive the packets from the socket
             packet = new DatagramPacket(new byte[1024], 1024);
+            received=false;
             while (!received) {
                 try {
                     this.socket.receive(packet);

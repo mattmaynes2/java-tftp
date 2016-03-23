@@ -42,7 +42,9 @@ public  class SimulatorThread extends Thread {
         this.sendAddress= new InetSocketAddress(InetAddress.getLocalHost(),69);
         this.stream = stream;
         this.clientAddress = packet.getSocketAddress(); //save address of client from initial request
+        this.stream.setClientAddress(clientAddress); // save the client address in the stream
     }
+    
 
     /**
      * Allows the thread to run.  Completes an entire transaction
