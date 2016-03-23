@@ -72,10 +72,6 @@ public class WriteTransfer extends Transfer {
         } catch (ErrorMessageException e) {
             this.notifyError(e.getErrorMessage());
             return false;
-        } catch (MessageOrderException e){
-            // This should never happen since it was just a request
-            this.notifyException(e);
-            return false;
         } catch (UnreachableHostException e) {
             this.notifyException(e);
             return false;
@@ -102,12 +98,8 @@ public class WriteTransfer extends Transfer {
             do {
                 this.currentMessage = createMessage(in);
                 this.sendDataMessage(this.currentMessage);
-                try {
-                    ack = this.getAcknowledge();
-                    this.notifyMessage(ack);
-                } catch (MessageOrderException e) {
-                    this.notifyInfo(e.getMessage() + "\nIgnoring Message");
-                }
+                ack = this.getAcknowledge();
+                this.notifyMessage(ack);
             } while (this.currentMessage.getData().length == DataMessage.BLOCK_SIZE);
 
             // Close the input stream and socket
@@ -140,14 +132,12 @@ public class WriteTransfer extends Transfer {
      * @throws IOException - If the socket is closed
      * @throws InvalidMessageException - If the received message has an invalid encoding
      * @throws ErrorMessageException - If an error message is received
-     * @throws MessageOrderException - If an acknowledge is received out of order
      * @throws UnreachableHostException - If an acknowledge packet isn't received within TIMEOUT_TIME
      */
     public AckMessage getAcknowledge () throws
         IOException,
         InvalidMessageException,
         ErrorMessageException,
-        MessageOrderException,
         UnreachableHostException {
 
         Message msg;
@@ -157,7 +147,13 @@ public class WriteTransfer extends Transfer {
         this.checkErrorMessage(msg);
         this.checkCast(msg, OpCode.ACK);
         ack = (AckMessage) msg;
-        this.checkOrder(ack);
+
+        try {
+           this.checkOrder(ack);
+        } catch (MessageOrderException e) {
+            this.notifyInfo(e.getMessage() + "\nIgnoring Message");
+            return this.getAcknowledge();
+        }
 
         return ack;
     }
