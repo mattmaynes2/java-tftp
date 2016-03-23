@@ -1,7 +1,10 @@
 package core.ctrl;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 import core.cli.Command;
 import core.net.ReadTransfer;
@@ -16,6 +19,11 @@ import core.net.WriteTransfer;
  */
 public abstract class TransferController extends Controller implements TransferListener  {
 
+	/**
+	 * Command to change the server to connect to
+	 */
+	public static final String SERVER_COMMAND = "server";
+	
     /**
      * Command to initialize a read command
      */
@@ -32,10 +40,11 @@ public abstract class TransferController extends Controller implements TransferL
      * @param address - Address of endpoint to communicate with
      * @param commandLineArgs - Arguments entered by the user at startup
      */
-    public TransferController (SocketAddress address, String[] commandLineArgs) {
+    public TransferController (InetSocketAddress address, String[] commandLineArgs) {
         super(address, commandLineArgs);
         this.interpreter.addCommand(READ_COMMAND);
         this.interpreter.addCommand(WRITE_COMMAND);
+        this.interpreter.addCommand(SERVER_COMMAND);
     }
 
     /**
@@ -54,10 +63,27 @@ public abstract class TransferController extends Controller implements TransferL
             case WRITE_COMMAND:
                 this.write(command.getFirstArgument());
                 break;
+            case SERVER_COMMAND:
+            	this.changeServer(command.getFirstArgument());
+            	break;
         }
     }
 
     /**
+     * Changes the server that the client will connect to
+     * @param firstArgument The hostname of the server to connect to, or a numeric IP address
+     */
+    private void changeServer(String firstArgument) {
+		try {
+			InetAddress addr = InetAddress.getByName(firstArgument);
+			int port = this.getAddress().getPort();
+			setAddress(new InetSocketAddress(addr, port));
+		} catch (UnknownHostException e) {
+			cli.message("Unknown host. Please specify a valid hostname or numeric IP address");
+		}
+	}
+
+	/**
      * Performs a read transfer of the given filename from an endpoint
      * to this controller
      *
@@ -95,9 +121,9 @@ public abstract class TransferController extends Controller implements TransferL
         // sufficient privileges to write
         try {
             runner = new ReadTransfer(this.getAddress(), filename, path);
-            runner.addTransferListener(this);
 
             if (runner.sendRequest()){
+                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){
@@ -137,9 +163,9 @@ public abstract class TransferController extends Controller implements TransferL
         try {
             runner = new WriteTransfer(this.getAddress(), appendPrefix(filename), filename);
             System.out.println("Client Filename: " + appendPrefix(filename));
-            runner.addTransferListener(this);
 
             if (runner.sendRequest()){
+                runner.addTransferListener(this);
                 performTransfer(runner);
             }
         } catch (Exception e){
