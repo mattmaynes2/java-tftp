@@ -1,7 +1,11 @@
 import core.req.Message;
 import core.req.ErrorMessage;
+
 import core.ctrl.Controller;
 import core.ctrl.TransferController;
+
+import core.util.ByteUtils;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -45,15 +49,18 @@ public class Client extends TransferController {
 
     @Override
     public void handleMessage(Message msg) {
-        LOGGER.log(Level.FINE, "Received transfer message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
+        LOGGER.log(Level.FINE, "Received message: " + msg.toString());
     }
 
     @Override
     public void handleSendMessage(Message msg) {
+        LOGGER.log(Level.FINE, "Sending bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
         LOGGER.log(Level.FINE, "Sending message: " + msg.toString());
     }
 
     public void handleErrorMessage (ErrorMessage err) {
+        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
         LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("Finished transfer with errors");
     }
