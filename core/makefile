@@ -98,6 +98,7 @@ jar:
 # Cleans the project
 #
 clean:
+	mkdir -p $(BIN)
 	cd $(BIN) && rm -f $(foreach package, $(PACKAGES), $(package)/*.class)
 	find . -name *~ -exec rm -rf {} \;
 
