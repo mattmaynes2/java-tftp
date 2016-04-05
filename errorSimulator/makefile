@@ -73,6 +73,7 @@ sh:
 # Copy the dependencies for the project
 #
 dep: 
+	rm -f $(LIB)/*
 	if [ "$(DEPS)" ]; then cp $(DEPS) $(LIB); fi
 
 #
