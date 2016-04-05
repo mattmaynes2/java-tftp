@@ -151,6 +151,10 @@ public abstract class TransferController extends Controller implements TransferL
             System.out.println("File not found: " + filename);
             return;
         }
+        else if (file.isDirectory()) {
+            System.out.println("Cannot transfer directory " + filename);
+            return;
+        }
         else if (!file.canRead()) {
             System.out.println("Insufficient permissions to read file: "
                     + filename + "\nPermission denied");
