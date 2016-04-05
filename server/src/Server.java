@@ -47,12 +47,11 @@ public class Server extends RequestController {
     @Override
     public synchronized void handleComplete () {
         this.cli.message("\nCompleted a transfer");
-        this.cli.prompt();
         this.activeTransferCount--;
     }
 
     public synchronized void handleErrorMessage (ErrorMessage err){
-        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
+        LOGGER.log(Level.FINE, "Error bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
         LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("\nFinished transfer with errors");
         this.activeTransferCount--;
@@ -60,7 +59,6 @@ public class Server extends RequestController {
 
     public synchronized void handleStart (){
         this.cli.message("\nStarting transfer");
-        this.cli.prompt();
         this.activeTransferCount++;
     }
 

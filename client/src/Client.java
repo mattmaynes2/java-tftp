@@ -60,7 +60,7 @@ public class Client extends TransferController {
     }
 
     public void handleErrorMessage (ErrorMessage err) {
-        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
+        LOGGER.log(Level.FINE, "Error bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
         LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("Finished transfer with errors");
     }
