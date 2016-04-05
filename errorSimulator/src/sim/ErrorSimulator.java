@@ -103,7 +103,7 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
         System.out.println("    bnum          <type> <packetNum> <opCode>		Changes the block number of a specified packet");
         System.out.println("    cl            <type> <packetNum> <packetLen>	Changes the length of a specified packet");
         System.out.println("    delay         <type> <packetNum> <numTimeouts>	Delays the specified packet by a number of timeouts");
-        System.out.println("    duplicate     <type> <packetNum>			Sends a duplicate of the specified packet");
+        System.out.println("    duplicate     <type> <packetNum> <numTimeouts>	Sends a duplicate of the specified packet after a number of timeouts");
         System.out.println("    drop          <type> <packetNum>			Drops the specified packet");
     }
 
@@ -236,21 +236,22 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
      * @param arguments
      */
     private void duplicatePacketSimulation(ArrayList<String> arguments) {
-        if (arguments.size() < 2){
-            throw new IllegalArgumentException("Duplicate simulation requires 3 arguments");
-        }
-        int packetNum = verifyNum(arguments.get(1), 1);
+		if (arguments.size() < 3){
+			throw new IllegalArgumentException("Duplicate simulation requires 3 arguments");
+		}
+	    int packetNum = verifyNum(arguments.get(1), 1);
+	    int delay = verifyNum(arguments.get(2), 0) * TIMEOUT_MILLISECONDS;
 
         if(packetNum > 0 && packetNum < HIGHEST_PACKET) {
-            try {
-                SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum);
-                recieveListener.setConfiguration(stream);
-                this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated");
-            } catch (SocketException e) {
-                e.printStackTrace();
-            } catch(IllegalArgumentException e){
-                this.cli.message(e.getMessage());
-            }
+	    	try {
+				SimulatorStream stream = SimulatorStreamFactory.createSimulationStream(SimulationTypes.DUPLICATE_PACKET, arguments.get(0), packetNum, delay);
+		    	recieveListener.setConfiguration(stream);
+		    	this.cli.message(arguments.get(0) + " packet " + packetNum + " will now be duplicated after " + delay + "ms");
+			} catch (SocketException e) {
+				e.printStackTrace();
+			} catch(IllegalArgumentException e){
+				this.cli.message(e.getMessage());
+			}
         } else {
             this.cli.message("Packet Number out of bounds:   1 < packetNumber < 65535");
         }
