@@ -92,7 +92,7 @@ tests: sh
 #
 jar:
 	cd $(BIN) && $(JAR) cvf ../$(OUT)/$(NAME)-$(VERSION).jar $(foreach package, $(PACKAGES), $(package)/*.class)
-
+	ln -s ../$(OUT)/$(NAME)-$(VERSION).jar ../$(OUT)/$(NAME).jar
 
 #
 # Cleans the project

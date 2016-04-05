@@ -21,6 +21,11 @@ VERSION = $(shell if [ -e VERSION ]; then cat VERSION; else echo "0.0.0"; fi)
 PACKAGES = $(shell if [ -e PACKAGES ]; then cat PACKAGES; else echo "."; fi)
 
 #
+# Java Dependencies
+#
+DEPS = $(shell if [ -e DEPS ]; then cat DEPS; else echo ""; fi)
+
+#
 # Executable Scripts
 #
 SCRIPTS = $(shell if [ -e SCRIPTS ]; then cat SCRIPTS; else echo ""; fi)
@@ -63,11 +68,19 @@ release: clean classes javadoc jar
 #
 sh:
 	if [ "$(SCRIPTS)" ]; then cp $(SCRIPTS) $(BIN); fi 
+
+#
+# Copy the dependencies for the project
+#
+dep: 
+	if [ "$(DEPS)" ]; then cp $(DEPS) $(LIB); fi
+
 #
 # Compiles all of the classes in the project
 #
-classes: sh
+classes: dep
 	$(JC) $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
+
 #
 # Compiles the project verbosely with all of the java compiler messages
 #
