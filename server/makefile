@@ -73,6 +73,7 @@ sh:
 # Copy the dependencies for the project
 #
 dep: 
+	mkdir -p $(LIB)
 	rm -f $(LIB)/*
 	if [ "$(DEPS)" ]; then cp $(DEPS) $(LIB); fi
 
@@ -80,6 +81,7 @@ dep:
 # Compiles all of the classes in the project
 #
 classes: dep
+	mkdir -p $(BIN)
 	$(JC) $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
 #
 # Compiles the project verbosely with all of the java compiler messages

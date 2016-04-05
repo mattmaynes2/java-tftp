@@ -67,6 +67,7 @@ sh:
 # Compiles all of the classes in the project
 #
 classes: sh
+	mkdir -p $(BIN)
 	$(JC) $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
 #
 # Compiles the project verbosely with all of the java compiler messages
