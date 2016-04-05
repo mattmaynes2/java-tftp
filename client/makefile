@@ -108,7 +108,6 @@ tests: sh
 jar:
 	cd $(BIN) && $(JAR) cvf ../$(OUT)/$(NAME)-$(VERSION).jar $(foreach package, $(PACKAGES), $(package)/*.class)
 
-
 #
 # Cleans the project
 #
