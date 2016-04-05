@@ -88,14 +88,6 @@ public class DataMessage extends AckMessage {
     }
 
     /**
-     * Returns a string representation of the data contained in the message
-     */
-    @Override
-    public String toString() {
-        return super.toString() + " data: " + ByteUtils.bytesToHexString(data);
-    }
-
-    /**
      * Returns a byte array of the data contained in the message
      * @return Payload of this message
      */
