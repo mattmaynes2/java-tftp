@@ -1,7 +1,11 @@
 import core.req.Message;
 import core.req.ErrorMessage;
+
 import core.ctrl.Controller;
 import core.ctrl.TransferController;
+
+import core.util.ByteUtils;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -12,7 +16,7 @@ import java.util.logging.Level;
 public class Client extends TransferController {
 
     private static final int SERVER_PORT = 69;
-    private static final int ERROR_SIMULATOR_PORT = 8080;
+    private static final int ERROR_SIMULATOR_PORT = 68;
     private final static String TEST_MODE_FLAG = "t";
 
     public Client(InetSocketAddress address, String[] commandLineArgs){
@@ -45,15 +49,18 @@ public class Client extends TransferController {
 
     @Override
     public void handleMessage(Message msg) {
-        LOGGER.log(Level.FINE, "Received transfer message: " + msg.toString());
+        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
+        LOGGER.log(Level.FINE, "Received message: " + msg.toString());
     }
 
     @Override
     public void handleSendMessage(Message msg) {
+        LOGGER.log(Level.FINE, "Sending bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
         LOGGER.log(Level.FINE, "Sending message: " + msg.toString());
     }
 
     public void handleErrorMessage (ErrorMessage err) {
+        LOGGER.log(Level.FINE, "Error bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
         LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("Finished transfer with errors");
     }

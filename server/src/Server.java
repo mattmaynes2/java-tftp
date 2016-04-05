@@ -1,9 +1,13 @@
+import core.ctrl.RequestController;
+
+import core.req.ErrorMessage;
+import core.req.Message;
+
+import core.util.ByteUtils;
 
 import java.net.SocketException;
 import java.util.logging.Level;
-import core.ctrl.RequestController;
-import core.req.ErrorMessage;
-import core.req.Message;
+
 
 public class Server extends RequestController {
 
@@ -30,22 +34,24 @@ public class Server extends RequestController {
 
     @Override
     public void handleMessage(Message msg){
+        LOGGER.log(Level.FINE, "Received bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
         LOGGER.log(Level.FINE, "Received message: " + msg.toString());
     }
 
     @Override
     public void handleSendMessage(Message msg) {
+        LOGGER.log(Level.FINE, "Sending bytes: " + ByteUtils.bytesToHexString(msg.toBytes()));
         LOGGER.log(Level.FINE, "Sending message: " + msg.toString());
     }
 
     @Override
     public synchronized void handleComplete () {
         this.cli.message("\nCompleted a transfer");
-        this.cli.prompt();
         this.activeTransferCount--;
     }
 
     public synchronized void handleErrorMessage (ErrorMessage err){
+        LOGGER.log(Level.FINE, "Error bytes: " + ByteUtils.bytesToHexString(err.toBytes()));
         LOGGER.log(Level.SEVERE, "Error message: " + err.toString());
         this.cli.message("\nFinished transfer with errors");
         this.activeTransferCount--;
@@ -53,7 +59,6 @@ public class Server extends RequestController {
 
     public synchronized void handleStart (){
         this.cli.message("\nStarting transfer");
-        this.cli.prompt();
         this.activeTransferCount++;
     }
 

@@ -3,6 +3,7 @@ package core.net;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
@@ -55,8 +56,13 @@ public class ReadTransfer extends Transfer {
     public boolean sendRequest () throws IOException {
         ReadRequest request = new ReadRequest(this.getFilename());
         this.notifySendMessage(request);
-        this.getSocket().send(request);
-        this.getSocket().reset();
+        try {
+        	this.getSocket().send(request);
+        	this.getSocket().reset();
+        }catch(BindException e) {
+        	notifyException(e);
+        	return false;
+        }
         return true;
     }
 

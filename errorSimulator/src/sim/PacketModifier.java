@@ -30,7 +30,7 @@ public class PacketModifier {
     private byte[] data;
     private String mode;
     private String filename;
-    private int blockNum;
+    private byte[] blockNum;
     private int length;
     private boolean postFilenameByte;
     private boolean endByte;
@@ -41,7 +41,7 @@ public class PacketModifier {
         data = null;
         mode = null;
         filename = null;
-        blockNum = IGNORE;
+        blockNum = null;
         length = IGNORE;
         postFilenameByte = true;
         endByte = true;
@@ -199,7 +199,7 @@ public class PacketModifier {
      */
     private byte[] handleBlockNum() throws IOException {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        if (this.blockNum != IGNORE) {
+        if (this.blockNum != null) {
             outStream.write(this.blockNum);
         } else {
             outStream.write(Arrays.copyOfRange(inBytes, BLOCK_NUM_INDEX, DATA_INDEX));
@@ -214,7 +214,7 @@ public class PacketModifier {
     public void setOpCode(byte[] opCode) {
         this.opCode = opCode;
     }
-    
+
     /**
      * set what the modifier will change the packet's data to
      * @param data - byte array that the data will be changed to
@@ -222,7 +222,7 @@ public class PacketModifier {
     public void setData(byte[] data) {
         this.data = data;
     }
-    
+
     /**
      * set what the modifier will change the packet's mode to
      * @param mode - String that the mode will be changed to
@@ -230,7 +230,7 @@ public class PacketModifier {
     public void setMode(String mode) {
         this.mode = mode;
     }
-    
+
     /**
      * set what the modifier will change the packet's filename to
      * @param filename - String that the filename will be changed to
@@ -238,15 +238,15 @@ public class PacketModifier {
     public void setFilename(String filename) {
         this.filename = filename;
     }
-    
+
     /**
      * set what the modifier will change the packet's block number to
      * @param blockNum - integer that the blockNum will be changed to
      */
-    public void setBlockNum(int blockNum) {
+    public void setBlockNum(byte[] blockNum) {
         this.blockNum = blockNum;
     }
-    
+
     /**
      * set what the modifier will change the packet's length to
      * @param length - integer that the packet length will be changed to
@@ -254,7 +254,7 @@ public class PacketModifier {
     public void setLength(int length) {
         this.length = length;
     }
-    
+
     /**
      * set whether the modifier will add the 0 byte to the packet after the filename or not
      * @param postFilenameByte - boolean that signifies adding the 0 byte or not
@@ -262,7 +262,7 @@ public class PacketModifier {
     public void setPostFilenameByte(boolean postFilenameByte) {
         this.postFilenameByte = postFilenameByte;
     }
-    
+
     /**
      * set whether the modifier will add the 0 byte to the packet after the data or not
      * @param endByte - boolean that signifies adding the 0 byte or not

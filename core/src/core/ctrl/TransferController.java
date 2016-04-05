@@ -56,16 +56,20 @@ public abstract class TransferController extends Controller implements TransferL
     public void handleCommand (Command command){
         super.handleCommand(command);
 
-        switch (command.getToken()){
-            case READ_COMMAND:
-                this.read(command.getFirstArgument());
-                break;
-            case WRITE_COMMAND:
-                this.write(command.getFirstArgument());
-                break;
-            case SERVER_COMMAND:
-                this.changeServer(command.getFirstArgument());
-                break;
+        try {
+	        switch (command.getToken()){
+	            case READ_COMMAND:
+	                this.read(command.getFirstArgument());
+	                break;
+	            case WRITE_COMMAND:
+	                this.write(command.getFirstArgument());
+	                break;
+	            case SERVER_COMMAND:
+	                this.changeServer(command.getFirstArgument());
+	                break;
+	        }
+        }catch(IndexOutOfBoundsException ex){
+        	this.cli.message("Invalid number of arguments to command: " + command.getToken());
         }
     }
 
@@ -149,6 +153,10 @@ public abstract class TransferController extends Controller implements TransferL
         System.out.println("Requesting to write: " + filename);
         if (!file.exists()) {
             System.out.println("File not found: " + filename);
+            return;
+        }
+        else if (file.isDirectory()) {
+            System.out.println("Cannot transfer directory " + filename);
             return;
         }
         else if (!file.canRead()) {
