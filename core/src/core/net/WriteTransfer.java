@@ -49,6 +49,7 @@ public class WriteTransfer extends Transfer {
         super(address, sourceName, destinationName);
     }
 
+
     /**
      * Sends a request to start this transfer
      *
@@ -57,15 +58,31 @@ public class WriteTransfer extends Transfer {
      * @return If the request was accepted
      */
     public boolean sendRequest () throws IOException {
-        WriteRequest request;
+        return this.sendRequest(REQUEST_ATTEMPTS);
+    }
 
+    /**
+     * Sends a request to start this transfer
+     *
+     * @param times - Number of times to attempt sending request
+     *
+     * @throws IOException - If the endpoint is not listening or the write fails
+     *
+     * @return If the request was accepted
+     */
+    public boolean sendRequest (int times) throws IOException {
+        WriteRequest request;
+        AckMessage ack;
+        SocketAddress addr;
+
+        addr = this.getSocket().getAddress();
         try {
             request = new WriteRequest(this.destinationName);
             this.notifySendMessage(request);
             this.getSocket().send(request);
             this.getSocket().reset();
 
-            AckMessage ack = this.getAcknowledge();
+            ack = this.getAcknowledge();
 
         } catch (InvalidMessageException e) {
             this.handleInvalidMessage(e);
@@ -75,8 +92,9 @@ public class WriteTransfer extends Transfer {
             return false;
         } catch (UnreachableHostException e) {
             this.notifyException(e);
-            return false;
-        }catch(BindException e) {
+            this.getSocket().setAddress(addr);
+            return times > 1 ? this.sendRequest(times - 1) : false;
+        } catch (BindException e) {
         	this.notifyException(e);
         	return false;
         }

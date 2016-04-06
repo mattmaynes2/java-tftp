@@ -26,6 +26,11 @@ import core.req.OpCode;
 public abstract class Transfer implements Runnable, NodeSocketListener {
 
     /**
+     * Number of times to try request before failing
+     */
+    public static final int REQUEST_ATTEMPTS = 5;
+
+    /**
      * Logger used to log information
      */
     private static final Logger LOGGER = Logger.getGlobal();
