@@ -130,7 +130,7 @@ public class ReadTransfer extends Transfer {
         if (out != null) {
             try {
                 out.close();
-                File f = new File(this.getFilename());
+                File f = new File(this.destinationName);
                 if (f.delete()) {
                     this.notifyInfo("Deleted " + getFilename());
                 } else {
