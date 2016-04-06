@@ -2,9 +2,9 @@ package core.ctrl;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import core.cli.Command;
 import core.net.ReadTransfer;
@@ -59,10 +59,10 @@ public abstract class TransferController extends Controller implements TransferL
         try {
 	        switch (command.getToken()){
 	            case READ_COMMAND:
-	                this.read(command.getFirstArgument());
+	                this.read(command.getArguments());
 	                break;
 	            case WRITE_COMMAND:
-	                this.write(command.getFirstArgument());
+	                this.write(command.getArguments());
 	                break;
 	            case SERVER_COMMAND:
 	                this.changeServer(command.getFirstArgument());
@@ -93,12 +93,12 @@ public abstract class TransferController extends Controller implements TransferL
      *
      * @param filename - Name of file to transfer
      */
-    public void read (String filename){
+    public void read (ArrayList<String> name){
         ReadTransfer runner;
         File file, dir;
         String path;
 
-
+        String filename = concatPath(name);
         path = this.appendPrefix(filename);
         dir  = new File(this.getPrefix());
         file = new File(path);
@@ -142,11 +142,12 @@ public abstract class TransferController extends Controller implements TransferL
      *
      * @param filename - Name of file to transfer
      */
-    public void write (String filename) {
+    public void write (ArrayList<String> name) {
         Transfer runner;
         File file;
         String path;
 
+        String filename = concatPath(name);
         path = this.appendPrefix(filename);
         file = new File(path);
 
@@ -194,5 +195,4 @@ public abstract class TransferController extends Controller implements TransferL
         transferThread.start();
         transferThread.join();
     }
-
 }

@@ -1,7 +1,6 @@
 package core.ctrl;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -242,7 +241,7 @@ public abstract class Controller implements CommandHandler {
      * @param arguments - the arguments to concatenate
      * @return the file path
      */
-    private String concatPath(ArrayList<String> arguments) {
+    protected String concatPath(ArrayList<String> arguments) {
         StringBuffer buf= new StringBuffer();
         for(String s:arguments){
             buf.append(s+" ");

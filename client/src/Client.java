@@ -1,17 +1,13 @@
-import core.req.Message;
-import core.req.ErrorMessage;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 import core.ctrl.Controller;
 import core.ctrl.TransferController;
-
+import core.req.ErrorMessage;
+import core.req.Message;
 import core.util.ByteUtils;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-
-import java.util.logging.Level;
 
 public class Client extends TransferController {
 
