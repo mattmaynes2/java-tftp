@@ -495,6 +495,6 @@ public class ErrorSimulator extends Controller implements SimulationEventListene
     @Override
     public synchronized void simulationComplete() {
         this.simulationsInProgress -= 1;
-
+        this.cli.prompt();
     }
 }
