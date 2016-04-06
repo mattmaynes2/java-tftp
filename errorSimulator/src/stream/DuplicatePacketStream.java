@@ -13,6 +13,7 @@ import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
+import core.util.ByteUtils;
 
 public class DuplicatePacketStream extends SimulatorStream {
 
@@ -38,7 +39,7 @@ public class DuplicatePacketStream extends SimulatorStream {
     public boolean send(DatagramPacket packet) throws IOException, InvalidMessageException {
         this.stream.send(packet);
         if (!hasDuplicated && (this.stream.getNumberPacketsOfPackets() == this.duplicatedPacketNumber)){
-            LOGGER.log(Level.INFO, "Duplicating packet: " + Arrays.toString(packet.getData()));
+            LOGGER.log(Level.INFO, "Duplicating packet: " + ByteUtils.bytesToHexString(packet.getData()));
            
             Message msg=MessageFactory.createMessage(packet.getData());
             Runnable task;
