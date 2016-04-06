@@ -1,19 +1,18 @@
 package stream;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import threads.SimulatorThread;
 import core.req.InvalidMessageException;
 import core.req.Message;
 import core.req.MessageFactory;
 import core.req.OpCode;
 import core.util.ByteUtils;
+import threads.SimulatorThread;
 
 public class DuplicatePacketStream extends SimulatorStream {
 
