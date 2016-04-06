@@ -81,7 +81,11 @@ public class DuplicatePacketStream extends SimulatorStream {
 					} 
             	};
             }
-            new Thread(task).start();
+            if(delay>0 || OpCode.READ.equals(msg.getOpCode())||OpCode.WRITE.equals(msg.getOpCode()) ) {
+            	new Thread(task).start();
+            }else {
+            	task.run();
+            }
             hasDuplicated = true;
         }
         return true;
