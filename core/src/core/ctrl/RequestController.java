@@ -16,6 +16,7 @@ import core.req.AckMessage;
 import core.req.ErrorCode;
 import core.req.ErrorMessage;
 import core.req.Request;
+import core.util.ByteUtils;
 
 /**
  * Request Controller
@@ -50,8 +51,8 @@ public abstract class RequestController extends Controller implements RequestLis
      * @param address - Sender's address
      */
     public void handleRequest (Request req, SocketAddress address){
-        LOGGER.log(Level.FINE, "Received request from client " + req.toString());
-
+    	LOGGER.log(Level.FINE,"Received bytes from client "+ByteUtils.bytesToHexString(req.toBytes()));
+    	LOGGER.log(Level.FINE, "Received request from client " + req.toString());
         // Ensure that the destination directory exists for each request.
         // If for some reason the destination is deleted between requests
         // then it needs to be reconstructed.

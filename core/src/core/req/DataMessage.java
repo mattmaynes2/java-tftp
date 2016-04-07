@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import core.util.ByteUtils;
-
 /**
  * This class is responsible for data packets that are treated as acknowledgments
  *
@@ -85,14 +83,6 @@ public class DataMessage extends AckMessage {
             e.printStackTrace();
         }
         return out.toByteArray();
-    }
-
-    /**
-     * Returns a string representation of the data contained in the message
-     */
-    @Override
-    public String toString() {
-        return super.toString() + " data: " + ByteUtils.bytesToHexString(data);
     }
 
     /**

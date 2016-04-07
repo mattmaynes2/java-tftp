@@ -1,4 +1,4 @@
-# TFTP Iteration Four
+# TFTP Iteration Five
 
 ## Setup Instructions
 Set your eclipse workspace to the top level, which is the project 
@@ -55,8 +55,8 @@ directory. To return to the project directory, simply type `cd .`
 #### Simulation Commands
 ```
 TFTP Error Simulator
-<type> must be either 'ack','data', or 'req'
-<packetNum> starts counting at 1 (The first data packet is data 1). 
+<t> must be either 'ack','data', or 'req'
+<n> starts counting at 1 (The first data packet is data 1). 
 Each simulation runs for a single transfer. The mode reset to norm after each transfer
 The server and client timeout is 2400ms
 
@@ -71,6 +71,7 @@ The server and client timeout is 2400ms
     mode      <m>           Changes the mode of the next request packet
     csa       <t> <n>       Changes the sender TID of a specified packet
     op        <t> <n> <o>   Changes the opcode of a specified packet
+    bnum      <t> <n> <o>   Changes the block number of a specified packet
     cl        <t> <n> <o>   Changes the length of a specified packet
     delay     <t> <n> <o>   Delays the specified packet by a number of
     						  timeouts
@@ -91,7 +92,8 @@ command line argument.
 - To perform a read operation from the server to the client, type `read` followed by a space and the filename.
 - To perform a write operation from the client to the server, type `write` followed by a space and the filename.
 - The working directory of the client can be changed with `cd`. All read and writes will be relative to the new folder
-
+- The server that the client is connected to can be changed with `server` followed by the server's IP or hostname. The default server address is localhost.
+- The client can be exited with `shutdown`.
 
 #### Command Line Arguments
 To enter a command line argument in eclipse:
@@ -271,15 +273,4 @@ This is an abstract base class for long running asynchronous jobs.
 
 For further details on any specific class from a core package, refer to the
 provided javadoc.  
-
-## Known Issues
-Due to the error simulator only running one thread per request, a duplicate
-request is not throwing an error 5. This is due to the fact that the error
-simulator and client communicate on a single port and therefore it never has
-a mismatched transfer id. Instead the second response is just ignored by the
-client.
-
-**Note** this was an issue discovered in the last iteration but due to the 
-lack of time caused by the late feedback it was not fixed for this iteration.
-
 

@@ -1,7 +1,6 @@
 package core.ctrl;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,10 +35,10 @@ public abstract class Controller implements CommandHandler {
      */
     public static final String HELP_COMMAND = "help";
 
-	/**
-	 * Command to set the file write destination
-	 */
-	public static final String CHANGE_DIRECTORY_COMMAND = "cd";
+    /**
+     * Command to set the file write destination
+     */
+    public static final String CHANGE_DIRECTORY_COMMAND = "cd";
 
     /**
      * Address of endpoint to communicate with during transfer
@@ -102,13 +101,13 @@ public abstract class Controller implements CommandHandler {
      * @param address The address to communicate with
      */
     public void setAddress(InetSocketAddress address){
-    	if (address == null)
-    	{
-    		throw new IllegalArgumentException("Address cannot be null");
-    	}
-    	this.address = address;
+        if (address == null)
+        {
+            throw new IllegalArgumentException("Address cannot be null");
+        }
+        this.address = address;
     }
-    
+
     /**
      * Sets the allowed command line options
      *
@@ -158,7 +157,7 @@ public abstract class Controller implements CommandHandler {
      * @return Prefix of directory
      */
     public String getPrefix() {
-    	return this.directoryPrefix;
+        return this.directoryPrefix;
     }
 
     /**
@@ -189,26 +188,26 @@ public abstract class Controller implements CommandHandler {
      * @param dir - the new working directory
      */
     public void changeWorkingDirectory(String dir) {
-    	if (dir.endsWith("/")){
-    		this.directoryPrefix = dir;
-    	}else{
-    		this.directoryPrefix = dir + "/";
-    	}
+        if (dir.endsWith("/")){
+            this.directoryPrefix = dir;
+        }else{
+            this.directoryPrefix = dir + "/";
+        }
     }
 
 
-/**
- * Appends the current directory prefix to the given path
- *
- * @param filepath - Path to prepend prefix to
- *
- * @return Complete path
- */
+    /**
+     * Appends the current directory prefix to the given path
+     *
+     * @param filepath - Path to prepend prefix to
+     *
+     * @return Complete path
+     */
     public String appendPrefix(String filepath) {
-    	if(filepath.startsWith("/")|| filepath.startsWith(":/", 1) ||filepath.startsWith(":\\",1)) {
-    		return filepath;
-    	}
-    	return directoryPrefix.concat(filepath);
+        if(filepath.startsWith("/")|| filepath.startsWith(":/", 1) ||filepath.startsWith(":\\",1)) {
+            return filepath;
+        }
+        return directoryPrefix.concat(filepath);
     }
 
     /**
@@ -226,11 +225,11 @@ public abstract class Controller implements CommandHandler {
                 break;
             case CHANGE_DIRECTORY_COMMAND:
                 try{
-                	changeWorkingDirectory(concatPath(command.getArguments()));
-                	this.cli.message("Relative directory is now: " + this.getPrefix());
+                    changeWorkingDirectory(concatPath(command.getArguments()));
+                    this.cli.message("Relative directory is now: " + this.getPrefix());
                 }catch (IndexOutOfBoundsException e) {
                     this.cli.message("Incorrect number of parameters for cd.  Format is cd filepath");
-                }           	
+                }
                 break;
             default:
                 break;
@@ -242,14 +241,14 @@ public abstract class Controller implements CommandHandler {
      * @param arguments - the arguments to concatenate
      * @return the file path
      */
-	private String concatPath(ArrayList<String> arguments) {
-		StringBuffer buf= new StringBuffer();
-		for(String s:arguments){
-			buf.append(s+" ");
-		}
-		buf.deleteCharAt(buf.length()-1);
-		return buf.toString();
-		
-	}
+    protected String concatPath(ArrayList<String> arguments) {
+        StringBuffer buf= new StringBuffer();
+        for(String s:arguments){
+            buf.append(s+" ");
+        }
+        buf.deleteCharAt(buf.length()-1);
+        return buf.toString();
+
+    }
 
 }

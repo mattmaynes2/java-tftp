@@ -67,6 +67,7 @@ sh:
 # Compiles all of the classes in the project
 #
 classes: sh
+	mkdir -p $(BIN)
 	$(JC) $(FLAGS) -d $(BIN) $(foreach package, $(PACKAGES), $(SRC)/$(package)/*.java)
 #
 # Compiles the project verbosely with all of the java compiler messages
@@ -91,13 +92,16 @@ tests: sh
 # Jars the project into a convenient jar output
 #
 jar:
+	mkdir -p $(OUT)
 	cd $(BIN) && $(JAR) cvf ../$(OUT)/$(NAME)-$(VERSION).jar $(foreach package, $(PACKAGES), $(package)/*.class)
-
+	if [ -e $(OUT)/$(NAME).jar ]; then rm $(OUT)/$(NAME).jar; fi
+	cd $(OUT) && ln -s $(NAME)-$(VERSION).jar $(NAME).jar
 
 #
 # Cleans the project
 #
 clean:
+	mkdir -p $(BIN)
 	cd $(BIN) && rm -f $(foreach package, $(PACKAGES), $(package)/*.class)
 	find . -name *~ -exec rm -rf {} \;
 
